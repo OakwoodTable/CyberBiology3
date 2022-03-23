@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\CyberBio3\CyberBio3\CyberBio3\glad\include;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI;E:\CyberBio3\CyberBio3\CyberBio3\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\CyberBio3\CyberBio3\CyberBio3\ImGUI\examples\libs\glfw\lib-vc2010-64;E:\CyberBio3\CyberBio3\CyberBio3\SDL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\CyberBio3\CyberBio3\CyberBio3\SDL_ttf\include;E:\CyberBio3\CyberBio3\CyberBio3\glad\include;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI;E:\CyberBio3\CyberBio3\CyberBio3\SDL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\CyberBio3\CyberBio3\CyberBio3\SDL_ttf\lib\x64;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI\examples\libs\glfw\lib-vc2010-64;E:\CyberBio3\CyberBio3\CyberBio3\SDL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\CyberBio3\CyberBio3\CyberBio3\glad\include;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI;E:\CyberBio3\CyberBio3\CyberBio3\SDL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\CyberBio3\CyberBio3\CyberBio3\ImGUI\examples\libs\glfw\lib-vc2010-64;E:\CyberBio3\CyberBio3\CyberBio3\SDL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\CyberBio3\CyberBio3\CyberBio3\SDL_ttf\include;E:\CyberBio3\CyberBio3\CyberBio3\glad\include;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI;E:\CyberBio3\CyberBio3\CyberBio3\SDL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\CyberBio3\CyberBio3\CyberBio3\SDL_ttf\lib\x64;E:\CyberBio3\CyberBio3\CyberBio3\ImGUI\examples\libs\glfw\lib-vc2010-64;E:\CyberBio3\CyberBio3\CyberBio3\SDL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,13 +121,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalDependencies>SDL2d.lib;SDL2maind.lib;SDL2-staticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2d.lib;SDL2maind.lib;SDL2-staticd.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,6 +143,9 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
+      <ShowIncludes>false</ShowIncludes>
+      <UseFullPaths>true</UseFullPaths>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,8 +154,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2-static.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -172,24 +177,32 @@
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</WholeProgramOptimization>
     </ClCompile>
     <ClCompile Include="imgui_sdl.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="source\Bot.cpp" />
+    <ClCompile Include="source\BotNeuralNet.cpp" />
+    <ClCompile Include="source\Field.cpp" />
+    <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\NeuralNetRenderer.cpp" />
+    <ClCompile Include="source\Neuron.cpp" />
+    <ClCompile Include="source\Object.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Field\Field.h" />
-    <ClInclude Include="Field\Object\Bot\Bot.h" />
-    <ClInclude Include="Field\Object\Bot\Neuron.h" />
-    <ClInclude Include="Field\Object\Bot\Neurons.h" />
-    <ClInclude Include="Field\Object\Object.h" />
     <ClInclude Include="ImGUI\imconfig.h" />
     <ClInclude Include="ImGUI\imgui.h" />
     <ClInclude Include="ImGUI\imgui_internal.h" />
     <ClInclude Include="ImGUI\imstb_rectpack.h" />
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
-    <ClInclude Include="Main.h" />
-    <ClInclude Include="MyTypes.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Settings.h" />
+    <ClInclude Include="source\Bot.h" />
+    <ClInclude Include="source\BotNeuralNet.h" />
+    <ClInclude Include="source\Field.h" />
+    <ClInclude Include="source\Main.h" />
+    <ClInclude Include="source\MyTypes.h" />
+    <ClInclude Include="source\NeuralNetRenderer.h" />
+    <ClInclude Include="source\Neuron.h" />
+    <ClInclude Include="source\Object.h" />
+    <ClInclude Include="source\resource.h" />
+    <ClInclude Include="source\Settings.h" />
+    <ClInclude Include="source\Systems.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Todo next.txt" />
