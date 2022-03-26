@@ -9,12 +9,18 @@ void Object::draw()
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-bool Object::tick()
+int Object::tick()
 {
-	++lifetime;
+	if (currentFrame == lastTickFrame)
+		return 2;
 
-	return false;
+	++lifetime;
+	lastTickFrame = currentFrame;
+
+	return 0;
 }
+
+uint Object::currentFrame = 0;
 
 //Returns lifetime
 uint Object::GetLifetime()

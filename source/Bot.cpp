@@ -167,7 +167,7 @@ BrainOutput Bot::think(BrainInput input)
 		brain.allValues[0][3] = (direction * 1.0f) / 7.0f;
 
 		//Height
-		brain.allValues[0][4] = (y * 1.0f) / (FieldCellsHeight * 0.5f);
+		brain.allValues[0][4] = (y * 1.0f) / (FieldCellsHeight * 1.0f);
 	}
 
 	//Compute
@@ -192,14 +192,51 @@ BrainOutput Bot::think(BrainInput input)
 	return toRet;
 }
 
+int Bot::selectionStep = 0;
 
-bool Bot::tick()
+bool Bot::SelectionWatcher()
 {
-	Object::tick();
+	if (y >= FieldCellsHeight - OceanHeight)
+	{
+		if (selection_lastX < x)
+		{
+			++selection_numRightSteps;	
+			
+		}
+
+		selection_lastX = x;
+
+		if (selection_numTicks++ == 2)
+		{
+			if (selection_numRightSteps == 0)
+			{
+				if(RandomPercent(selectionStep))
+					return true;
+			}
+
+			selection_numRightSteps = 0;
+			selection_numTicks = 0;
+		}
+	}
+
+	return false;
+}
+
+
+int Bot::tick()
+{
+	if (Object::tick() == 2)
+		return 2;
 
 	energy -= EveryTickEnergyPenalty;
 
-	return ((energy) <= 0) || (lifetime >= MaxBotLifetime);
+	if (SelectionWatcher())
+		energy = 0;
+
+	if(((energy) <= 0) || (lifetime >= MaxBotLifetime))
+		return 1;
+
+	return 0;
 }
 
 
@@ -430,6 +467,8 @@ Bot::Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate) :Object(X, Y), 
 			}
 		}
 	#endif
+
+	selection_lastX = X;
 }
 
 
@@ -465,6 +504,8 @@ Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 
 	//for (int m = 0; m < NeuronsInLayer*NumNeuronLayers; ++m)
 		//Mutate();
+
+	selection_lastX = X;
 }
 
 

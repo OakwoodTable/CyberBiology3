@@ -87,7 +87,7 @@
 //-----------------------------------------------------------------
 //Drawing
 #define DrawBotOutline
-//#define DrawBotHead
+#define DrawBotHead
 
 #define BotOutlineColor 111,111,111,255
 
@@ -133,7 +133,7 @@
 #define FertilityDelay 0	//Delay before next birth
 
 //#define ForbidMutations
-#define MutationChancePercent 10
+#define MutationChancePercent 20
 //#define UseTotalMutation
 #define TotalMutationChancePercentX10 0
 //#define RandomColorChancePercentX10 4
@@ -142,16 +142,16 @@
 #define PresetRandomColors
 //#define RandomColorEveryNewMarkersSet
 
-#define MutateNeuronsMaximum 4
-#define MutateNeuronsSlightlyMaximum 5
+#define MutateNeuronsMaximum 5
+#define MutateNeuronsSlightlyMaximum 0
 
 //#define ChangeSeasons
 #define ChangeSeasonAfter 4000
 
 #define NumberOfMutationMarkers 3
-//#define OneMarkerDifferenceCantBeTold
+#define OneMarkerDifferenceCantBeTold
 
-#define OceanHeight 10
+#define OceanHeight 120
 //-----------------------------------------------------------------
 
 
@@ -191,4 +191,13 @@
 #define Render_VerticalDistance 60
 
 #define Render_Font "../ImGUI/misc/fonts/ProggyClean.tff"
+//-----------------------------------------------------------------
+
+
+
+
+//-----------------------------------------------------------------
+// Population chart window
+#define ChartNumValues 1000
+#define AddToChartEvery 200
 //-----------------------------------------------------------------

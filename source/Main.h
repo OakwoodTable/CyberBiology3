@@ -37,11 +37,27 @@ uint ticknum = 0;
 
 void Pause();
 
+//Show more windows
 bool showSaveLoad = false;
 bool showDangerous = false;
 bool showSummary = false;
 bool showBrain = false;
+bool showSelectionInterface = false;
+bool showChart = false;
 
+//Population chart
+float populationChartData[ChartNumValues];
+int chart_numValues = 0;
+int chart_shift = 0;
+int chart_currentPosition = 0;
+
+int timeBeforeNextDataToChart = AddToChartEvery;
+
+void ClearChart();
+void AddToChart(float newVal);
+
+
+//Neural net renderer
 NeuralNetRenderer nn_renderer;
 
 

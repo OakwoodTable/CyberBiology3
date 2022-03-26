@@ -7,6 +7,16 @@ float BotNeuralNet::Activation(float value)
 	return (value >= 0.5f) ? 1.0f : 0.0f;
 }
 
+float BotNeuralNet::PlusMinusActivation(float value)
+{
+	if (value >= 0.5f)
+		return 1.0f;
+	else if (value <= -0.5f)
+		return -1.0f;
+	
+	return 0.0f;
+}
+
 float BotNeuralNet::RadialBasisActivation(float value)
 {
 	return ((value >= 0.45f) && (value <= 0.55f)) ? 1.0f : 0.0f;
@@ -50,7 +60,7 @@ void BotNeuralNet::Process()
 	Neuron* n;
 	int t, v;
 
-	for (uint xi = 0; xi < NumNeuronLayers; ++xi)
+	for (uint xi = 0; xi < NumNeuronLayers-1; ++xi)
 	{
 		for (uint yi = 0; yi < NeuronsInLayer; ++yi)
 		{
@@ -58,8 +68,8 @@ void BotNeuralNet::Process()
 			m = &allMemory[xi][yi];
 			n = &allNeurons[xi][yi];
 
-			//Temporary - костыль
-			if ((n->numConnections == 0) && (n->type != output))
+			//Skip calculation if neuron has no further connections
+			if (n->numConnections == 0)
 			{
 				continue;
 			}
@@ -75,10 +85,6 @@ void BotNeuralNet::Process()
 				v = (int)((*value + n->bias) * 1000.0f);
 				*value = (t <= v) ? 1.0f : 0.0f;
 				break;
-
-			case output:
-				*value = Activation(*value + n->bias);
-				continue;
 
 			case input:
 				*value = *value + n->bias;
@@ -112,6 +118,24 @@ void BotNeuralNet::Process()
 				allValues[xi + 1][n->allConnections[i].num] += *value * n->allConnections[i].weight;
 			}
 		}
+	}
+
+
+	//Output layer
+
+	//Rotation
+	value = &allValues[NeuronOutputLayerIndex][0];
+	n = &allNeurons[NeuronOutputLayerIndex][0];
+
+	*value = PlusMinusActivation(*value + n->bias);
+
+	//All the rest
+	for (uint oi = 1; oi < NeuronsInLayer; ++oi)
+	{
+		value = &allValues[NeuronOutputLayerIndex][oi];
+		n = &allNeurons[NeuronOutputLayerIndex][oi];
+
+		*value = Activation(*value + n->bias);
 	}
 }
 

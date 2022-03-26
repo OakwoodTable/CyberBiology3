@@ -122,14 +122,23 @@ void Field::RepaintBot(Bot* b, Uint8 newColor[3], int differs)
 //Returns true if object was destroyed
 void Field::ObjectTick(Object* tmpObj)
 {
-    if (tmpObj->tick())
+    int t = tmpObj->tick();
+
+    if (t == 1)
     {
         //Object destroyed
         RemoveObject(tmpObj->x, tmpObj->y);
         return;
     }
+    else if (t == 2)
+    {
+        //Skip tick
+        return;
+    }
     else if (tmpObj->type == bot)   //Object is a bot
     {
+        int TEMP_x1 = tmpObj->x;
+
         Bot* tmpBot = (Bot*)tmpObj;
         BrainOutput tmpOut;
         Point lookAt = tmpBot->GetDirection();
@@ -140,10 +149,15 @@ void Field::ObjectTick(Object* tmpObj)
         //Desired destination,
         //that is what bot is lookinig at
         int
-            cx = tmpBot->x + lookAt.x,
-            cy = tmpBot->y + lookAt.y;
+        cx = tmpBot->x + lookAt.x,
+        cy = tmpBot->y + lookAt.y;
 
         cx = ValidateX(cx);
+
+        if ((abs(cx - TEMP_x1) > 1) && (abs(cx - TEMP_x1) < 190))
+        {
+            TEMP_x1 = tmpObj->x;
+        }
 
         //If destination is out of bounds
         if (!IsInBounds(cx, cy))
@@ -269,6 +283,11 @@ void Field::ObjectTick(Object* tmpObj)
 
                 cx = ValidateX(cx);
 
+                if ((abs(cx - TEMP_x1) > 1) && (abs(cx - TEMP_x1) < 190))
+                {
+                    TEMP_x1 = tmpObj->x;
+                }
+
                 //Place object in a new place
                 MoveObject(tmpBot, cx, cy);
             }
@@ -278,7 +297,8 @@ void Field::ObjectTick(Object* tmpObj)
                 //InsaneJump: <- ignore this
                 // 
                 //If not in ocean
-                if (tmpBot->y < FieldCellsHeight - OceanHeight)
+                //if (tmpBot->y < FieldCellsHeight - OceanHeight)
+                if(true)
                 {
                     if (minerals)
                         return;
@@ -315,6 +335,11 @@ void Field::ObjectTick(Object* tmpObj)
                     }
                 }
             }
+        }
+
+        if ((abs(tmpBot->x - TEMP_x1) > 1) && (abs(tmpBot->x - TEMP_x1) < 190))
+        {
+            TEMP_x1 = tmpObj->x;
         }
     }
 }
@@ -489,8 +514,10 @@ inline void Field::tick_multiple_threads()
 }
 
 //Tick function
-void Field::tick()
+void Field::tick(uint thisFrame)
 {
+    Object::currentFrame = thisFrame;
+
 #ifdef UseOneThread
     tick_single_thread();
 #else

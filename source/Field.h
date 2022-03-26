@@ -111,7 +111,7 @@ public:
     void ObjectTick(Object* tmpObj);
 
     //Tick function
-    void tick();
+    void tick(uint thisFrame);
 
 
     //Draw simulation field with all its objects

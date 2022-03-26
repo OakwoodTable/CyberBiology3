@@ -111,6 +111,20 @@ class Bot:public Object
 	//Draw bot outline and his head
 	void drawOutlineAndHead(SDL_Rect rect);
 
+
+	//----------------------------------------------------------------------------------------------
+	//Функции для осуществления селекции, вызывается в конце функции tick(), либо не использовать
+
+	int selection_numTicks = 0;
+	int selection_numRightSteps = 0;
+	int selection_lastX;
+
+	bool SelectionWatcher();
+
+	public: static int selectionStep;
+	//----------------------------------------------------------------------------------------------
+
+
 public:
 
 	//Experimental
@@ -121,7 +135,7 @@ public:
 	BrainOutput think(BrainInput input);
 
 	//Bot tick function, it should always call parents tick function first
-	bool tick() override;
+	int tick() override;
 
 	//Bot main draw function
 	void draw() override;
@@ -195,6 +209,7 @@ public:
 
 	
 	static struct s_Color{ Uint8 rgb[3]; } GetRandomColor();
+
 
 };
 

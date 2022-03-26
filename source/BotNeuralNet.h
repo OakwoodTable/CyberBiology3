@@ -45,6 +45,7 @@ private:
 
 	//Activation functions
 	float Activation(float value);
+	float PlusMinusActivation(float value);
 	float RadialBasisActivation(float value);
 
 	//Clear memory

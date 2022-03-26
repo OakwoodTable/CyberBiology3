@@ -330,7 +330,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 			MakeStep:
 				prevTick = currentTick;
 
-				field->tick();
+				field->tick(ticknum);
 
 				++ticknum;
 				++secondTickCount;
@@ -343,6 +343,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 					changeSeasonCounter = 0;
 				}
 #endif
+
+				//Add data to chart
+				if (--timeBeforeNextDataToChart == 0)
+				{
+					AddToChart(field->GetNumObjects() * 1.0f);
+
+					timeBeforeNextDataToChart = AddToChartEvery;
+				}
 			}
 
 			//Calculate simulation speed
@@ -381,6 +389,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 		#endif
 
 		//Main window 
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f,InterfaceBorder * 1.0f });
 
@@ -419,6 +428,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//System window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 70.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 140.0f });
 
@@ -455,6 +465,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Controls window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 160.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 220.0f });
 
@@ -476,8 +487,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Selection window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 150.0f });
-		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 400.0f });
+		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 380.0f });
 
 		ImGui::Begin("Selection", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		{
@@ -540,6 +552,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Display window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 140.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 550.0f });
 
@@ -557,6 +570,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Console window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 700.0f });
 
@@ -568,6 +582,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Mouse function window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 130.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 830.0f });
 
@@ -585,6 +600,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 
 		//Additional windows window
+		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 110.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 970.0f });
 
@@ -595,10 +611,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 			{
 				showSaveLoad = !showSaveLoad;
 			}
+			ImGui::SameLine();
 
 			if (ImGui::Button("Dangerous commands", { 130, 30 }))
 			{
 				showDangerous = !showDangerous;
+			}
+
+			if (ImGui::Button("Selection int.", { 130, 30 }))
+			{
+				showSelectionInterface = !showSelectionInterface;
+			}
+			ImGui::SameLine();
+
+			if (ImGui::Button("Chart", { 130, 30 }))
+			{
+				showChart = !showChart;
 			}
 		}
 		ImGui::End();
@@ -608,6 +636,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 		if (showSaveLoad)
 		{
 			//Save/load window
+			ImGui::SetNextWindowBgAlpha(1.0f);
 			ImGui::SetNextWindowSize({ 330.0f, 200.0f });
 			ImGui::SetNextWindowPos({ 100 * 1.0f, 100.0f }, ImGuiCond_Once);
 			
@@ -673,6 +702,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 		//Dangerous commands window
 		if (showDangerous)
 		{
+			ImGui::SetNextWindowBgAlpha(1.0f);
 			ImGui::SetNextWindowSize({ 330.0f, 140.0f });
 			ImGui::SetNextWindowPos({ 100 * 1.0f, 300.0f }, ImGuiCond_Once);
 
@@ -703,6 +733,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 		//Summary window
 		if (showSummary)
 		{
+			ImGui::SetNextWindowBgAlpha(1.0f);
 			ImGui::SetNextWindowSize({ 330.0f, 180.0f });
 			ImGui::SetNextWindowPos({ 100 * 1.0f, 450.0f }, ImGuiCond_Once);
 
@@ -735,6 +766,35 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 					ImGui::Text("Nothing is selected");
 				}
 								
+			}
+			ImGui::End();
+		}
+
+		//Selection interface
+		if (showSelectionInterface)
+		{
+			ImGui::SetNextWindowBgAlpha(1.0f);
+			ImGui::SetNextWindowSize({ 200.0f, 60.0f });
+			ImGui::SetNextWindowPos({ 100 * 1.0f, 250.0f }, ImGuiCond_Once);
+
+			ImGui::Begin("Selection interface", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			{
+				ImGui::InputInt("Phase", &Bot::selectionStep);
+			}
+			ImGui::End();
+		}
+
+		//Chart window
+		if (showChart)
+		{
+			ImGui::SetNextWindowBgAlpha(1.0f);
+			ImGui::SetNextWindowSize({ 900.0f, 600.0f });
+			ImGui::SetNextWindowPos({ 300 * 1.0f, 250.0f }, ImGuiCond_Once);
+
+			ImGui::Begin("Population chart", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			{
+				ImGui::SetNextItemWidth(3.0f);
+				ImGui::PlotLines("Population", populationChartData, chart_numValues, chart_shift, (const char*)0, 0.0f, 14000.0f, {800, 500});
 			}
 			ImGui::End();
 		}
@@ -779,6 +839,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 			if (selection)
 			{
 				//Bot brain window
+				ImGui::SetNextWindowBgAlpha(1.0f);
 				ImGui::SetNextWindowSize({ 330.0f, 180.0f });
 				ImGui::SetNextWindowPos({ 650 * 1.0f, 800.0f });
 
@@ -848,6 +909,35 @@ exitfor:
 void Pause()
 {
 	simulate = !simulate;
+}
+
+void ClearChart()
+{
+	memset(populationChartData, 0, sizeof(populationChartData));
+
+	chart_numValues = 0;
+	chart_shift = 0;
+	chart_currentPosition = 0;
+}
+
+void AddToChart(float newVal)
+{
+
+	populationChartData[chart_currentPosition] = newVal;
+
+	if (chart_numValues < ChartNumValues)
+	{
+		++chart_numValues;
+		++chart_currentPosition;
+	}
+	else
+	{
+		if (chart_currentPosition == ChartNumValues)
+			chart_currentPosition = 0;
+		else
+			++chart_currentPosition;
+	}
+
 }
 
 void Deselect()
