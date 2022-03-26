@@ -74,7 +74,7 @@ Some more windows
 
 Using keyboard is more handy because interface becomes laggy during simulation
 
-"Space" - Start/Pause
-"Plus sign near numpad" - make 1 step
-"Backspace" - Spawn group of randoms
-"Numpad 1-4" - Select render method
++ "Space" - Start/Pause
++ "Plus sign near numpad" - make 1 step
++ "Backspace" - Spawn group of randoms
++ "Numpad 1-4" - Select render method
