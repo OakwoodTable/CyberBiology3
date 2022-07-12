@@ -8,17 +8,12 @@
 ![Screenshot1](/Screenshots/1.png?raw=true "Screenshot1")
 ![Screenshot2](/Screenshots/3.png?raw=true "Screenshot2")
 
-## Видео работы
-https://www.youtube.com/watch?v=_tdGKfAyRhw
-
 
 ## Что нужно чтобы запустить программу
 
 + библиотека SDL
-https://www.libsdl.org/
 
 + библиотека Dear Im GUI
-https://github.com/ocornut/imgui
 
 + sdl + ImGUI имплементация отсюда
 https://github.com/Tyyppi77/imgui_sdl
