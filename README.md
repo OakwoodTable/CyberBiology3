@@ -9,17 +9,12 @@ This is a little entertainment project, evolution simulator. The code itself is 
 ![Screenshot1](/Screenshots/1.png?raw=true "Screenshot1")
 ![Screenshot2](/Screenshots/3.png?raw=true "Screenshot2")
 
-## Video of work (Ru)
-https://www.youtube.com/watch?v=_tdGKfAyRhw
-
 
 ## What you need to build it
 
 + SDL
-https://www.libsdl.org/
 
 + Dear Im GUI
-https://github.com/ocornut/imgui
 
 + sdl + ImGUI Implementation from here
 https://github.com/Tyyppi77/imgui_sdl
