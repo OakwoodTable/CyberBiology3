@@ -1,0 +1,6 @@
+[submodule "imgui_sdl"]
+	path = imgui_sdl
+	url = https://github.com/Tyyppi77/imgui_sdl
+[submodule "SDL_ttf"]
+	path = SDL_ttf
+	url = https://github.com/libsdl-org/SDL_ttf.git
