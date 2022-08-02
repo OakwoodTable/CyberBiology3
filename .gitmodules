@@ -4,3 +4,6 @@
 [submodule "SDL_ttf"]
 	path = SDL_ttf
 	url = https://github.com/libsdl-org/SDL_ttf.git
+[submodule "imgui"]
+	path = imgui
+	url = https://github.com/ocornut/imgui.git
