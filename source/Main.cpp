@@ -27,7 +27,28 @@
 
 #include "Main.h"
 
+#ifdef UNIX
 
+uint32_t GetTickCount() {
+	struct timespec ts;
+	if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+		exit(-1);
+	}
+	uint32_t theTick  = ts.tv_nsec / 1000000;
+    theTick += ts.tv_sec * 1000;
+    return theTick;
+}
+
+// https://fire-monkey.ru/topic/6571-tthreadgettickcount64-%D1%85%D0%B5%D0%BB%D0%BF%D0%B5%D1%80-%D0%B4%D0%BB%D1%8F-tthread/
+uint32_t GetTickCount64() {
+	struct timespec ts;
+	if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+		exit(-1);
+	}
+    return (1000000000 * ts.tv_sec + ts.tv_nsec) / 1000000;
+}
+
+#endif
 
 
 void InitSDL()
@@ -50,7 +71,11 @@ void InitSDL()
 }
 
 
+#ifndef UNIX
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance,	_In_ LPWSTR    lpCmdLine,	_In_ int       nCmdShow)
+#else
+int main(int argc, char* argv[])
+#endif
 {
 
 	ConsoleInput((char*)"Started. Seed:\r\n");
@@ -573,7 +598,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 
 		ImGui::Begin("Console", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		{
-			ImGui::InputTextMultiline("", consoleText, ConsoleCharLength, ImVec2(240, 90), ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::InputTextMultiline("##", consoleText, ConsoleCharLength, ImVec2(240, 90), ImGuiInputTextFlags_EnterReturnsTrue);
 		}
 		ImGui::End();
 
@@ -642,13 +667,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance
 				//List of files
 				ImGui::Text("Select filename");
 
-				ImGui::ListBoxHeader("", ImVec2(290, 110));
+				ImGui::ListBoxHeader("##", ImVec2(290, 110));
 
 				for (int i = 0; i < numFilenames; ++i)
 				{
 					if (ImGui::Selectable(filenamesPartial[i], &selectedFilenames[i]))
 					{
-						ZeroMemory(selectedFilenames, sizeof(selectedFilenames));
+						memset(selectedFilenames, 0, sizeof(selectedFilenames));
 						selectedFilenames[i] = true;
 						selectedFilename = i;
 					}

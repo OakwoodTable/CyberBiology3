@@ -387,16 +387,16 @@ Bot::summary_return Bot::GetNeuronSummary()
 
 			switch (n->type)
 			{
-			case basic:
+			case NeuronType::basic:
 				toRet[0]++;
 				break;
-			case radialbasis:
+			case NeuronType::radialbasis:
 				toRet[1]++;
 				break;
-			case random:
+			case NeuronType::random:
 				toRet[2]++;
 				break;
-			case memory:
+			case NeuronType::memory:
 				toRet[3]++;
 				break;
 			}

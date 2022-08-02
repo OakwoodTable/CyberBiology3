@@ -1,11 +1,22 @@
 #pragma once
 
+
+
+#ifndef UNIX
+#include <windows.h>
+
 //Libs
 #pragma comment ( lib, "Winmm.Lib")
 #pragma comment ( lib, "Version.lib")
 #pragma comment ( lib, "Setupapi.lib")
-
-#include <windows.h>
+#else
+#include <cstdint>
+#define _In_
+#define _In_opt_
+#define ULONGLONG uint64_t
+#define strcpy_s(dest, n, src) strncpy(dest, src, n)
+#define sprintf_s snprintf
+#endif
 
 #include "Field.h"
 

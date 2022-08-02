@@ -14,7 +14,7 @@
 
 //ImGUI
 #include "imgui.h"
-#include "../imgui_sdl.h"
+#include "imgui_sdl.h"
 
 //SDL + OpenGL
 #include <glad/glad.h>

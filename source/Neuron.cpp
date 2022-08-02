@@ -30,19 +30,19 @@ void Neuron::SetRandomBias()
 
 void Neuron::SetRandomType()
 {
-	if ((type != input) && (type != output))
+	if ((type != NeuronType::input) && (type != NeuronType::output))
 	{
 		int refVal = RandomVal(14);
 
 		if (refVal <= 8)
-			type = basic;
+			type = NeuronType::basic;
 		else if (refVal <= 13)
-			type = radialbasis;
+			type = NeuronType::radialbasis;
 		else
-			type = memory;
+			type = NeuronType::memory;
 
 		if (RandomPercent(2))
-			type = random;
+			type = NeuronType::random;
 	}
 }
 
@@ -51,7 +51,7 @@ void Neuron::SetRandomConnections()
 
 	ClearConnections();
 
-	if (type == output)
+	if (type == NeuronType::output)
 		return;
 
 	uint connections = RandomVal(MaxConnectionsPerNeuron + 1);
