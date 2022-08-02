@@ -25,9 +25,38 @@ https://github.com/libsdl-org/SDL_ttf
 
 
 ## Как запустить то в итоге
+
+### Ручной режим
 + Создайте проект, добавьте туда все файлы из папки source и пропишите include директории для всех библиотек из списка, а также пути к их DLL, либо скопируйте нужные DLLки в папку с проектом 
 + Положите в папку с проектом файлы из библиотек imgui_sdl.h и imgui_sdl.cpp
 + Наслаждайтесь!
+
+### Cmake
+1. Скачать зависимости
+    - [Windows]: Скачать SDL2 Development Libraries [SDL2-devel-2*.zip]](https://www.libsdl.org/download-2.0.php) и распаковать в любое место.
+    - [Linux]: Установить пакеты `SDL2`, `cmake`, `g++` через пакетный менеджер.
+
+2. Склонировать субмодули
+
+```console
+$ git submodule update --init --recursive
+```
+
+3. Создать каталог build и перейти в него
+
+```console
+$ mkdir build && cd build
+```
+
+4. Сконфигурировать проект
+    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64 -DSDL2_LIBRARY="<path_to_SDL2>/lib/x64/SDL2.lib" -DSDL2_INCLUDE_DIR="<path_to_SDL2>/include"`
+    - [Linux]: `$ cmake ..`
+
+5. Собрать
+
+```console
+$ cmake --build .
+```
 
 ## Интерфейс
 
