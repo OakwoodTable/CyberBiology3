@@ -682,7 +682,7 @@ bool Field::SaveObject(Object* obj, char* filename)
         file.write((char*)&i, sizeof(int));
         i = NeuronsInLayer;
         file.write((char*)&i, sizeof(int));
-        i = sizeof Neuron;
+        i = sizeof(Neuron);
         file.write((char*)&i, sizeof(int));
 
         file.write((char*)((Bot*)obj)->GetNeuralNet(), NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
@@ -699,7 +699,7 @@ bool Field::SaveObject(Object* obj, char* filename)
 bool Field::LoadObject(Object* obj, char* filename)
 {
     //Open file for reading, binary type
-    std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::beg);
+    std::ifstream file(filename, std::ios::openmode(std::ios::in | std::ios::binary | std::ios::beg));
 
     if (file.is_open())
     {
@@ -722,7 +722,7 @@ bool Field::LoadObject(Object* obj, char* filename)
         if (i != NeuronsInLayer)
             return false;
         file.read((char*)&i, sizeof(int));
-        if (i != sizeof Neuron)
+        if (i != sizeof(Neuron))
             return false;
 
         file.read((char*)((Bot*)obj)->GetNeuralNet(), NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));

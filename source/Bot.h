@@ -113,7 +113,7 @@ class Bot:public Object
 
 
 	//----------------------------------------------------------------------------------------------
-	//Функции для осуществления селекции, вызывается в конце функции tick(), либо не использовать
+	//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ tick(), пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	int selection_numTicks = 0;
 	int selection_numRightSteps = 0;
@@ -186,7 +186,9 @@ public:
 	-dead end neurons
 	-total neurons
 	*/
-	struct summary_return{ int simple, radialBasis, random, memory, connections, deadend, neurons; } GetNeuronSummary();
+	struct summary_return{ int simple, radialBasis, random, memory, connections, deadend, neurons; };
+
+	summary_return GetNeuronSummary();
 
 	/*Find out how close these two are as relatives,
 	returns number of matching mutation markers*/
@@ -207,8 +209,8 @@ public:
 	void GiveInitialEnergyAndMarkers();
 
 
-	
-	static struct s_Color{ Uint8 rgb[3]; } GetRandomColor();
+	struct s_Color{ Uint8 rgb[3]; };
+	static s_Color GetRandomColor();
 
 
 };

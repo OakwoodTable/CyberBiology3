@@ -27,9 +27,38 @@ https://github.com/libsdl-org/SDL_ttf
 
 ## How to run this code
 
+### Manual mode
 + Set include directories for all libraries listed above. And paths for SDL dll-s.  
 + Place imgui_sdl.h, imgui_sdl.cpp and SDL2_ttf.dll at project root, or change #include paths in headers
 + Enjoy!
+
+
+### Cmake
+1. Download dependencies
+    - [Windows]: Download SDL2 Development Libraries [SDL2-devel-2*.zip]](https://www.libsdl.org/download-2.0.php) end extruct it somewere.
+    - [Linux]: Install packages `SDL2`, `cmake`, `g++` via package manager.
+
+2. Clone submodules
+
+```console
+$ git submodule update --init --recursive
+```
+
+3. Make dirrectrory build and enter into it
+
+```console
+$ mkdir build && cd build
+```
+
+4. Configure project
+    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64 -DSDL2_LIBRARY="<path_to_SDL2>/lib/x64/SDL2.lib" -DSDL2_INCLUDE_DIR="<path_to_SDL2>/include"`
+    - [Linux]: `$ cmake ..`
+
+5. Build
+
+```console
+$ cmake --build .
+```
 
 ## Interface
 

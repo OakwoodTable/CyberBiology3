@@ -3,7 +3,7 @@
 
 void Object::draw()
 {
-	SDL_Rect rect = { FieldX + x * FieldCellSize, FieldY + y * FieldCellSize, FieldCellSize, FieldCellSize };
+	const SDL_Rect rect = { FieldX + x * FieldCellSize, FieldY + y * FieldCellSize, FieldCellSize, FieldCellSize };
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 111);
 	SDL_RenderFillRect(renderer, &rect);

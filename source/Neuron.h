@@ -11,7 +11,7 @@ struct NeuronConnection
 };
 
 
-enum NeuronType
+enum class NeuronType
 {
 	basic,
 	input,
@@ -24,7 +24,7 @@ enum NeuronType
 
 struct Neuron
 {
-	NeuronType type = basic;
+	NeuronType type = NeuronType::basic;
 
 	float bias = 0.0f;
 
@@ -66,17 +66,17 @@ struct Neuron
 	{
 		switch (t)
 		{
-		case basic:
+		case NeuronType::basic:
 			return (char*)"basic";
-		case input:
+		case NeuronType::input:
 			return (char*)"input";
-		case output:
+		case NeuronType::output:
 			return (char*)"output";
-		case radialbasis:
+		case NeuronType::radialbasis:
 			return (char*)"radial basis";
-		case memory:
+		case NeuronType::memory:
 			return (char*)"memory";
-		case random:
+		case NeuronType::random:
 			return (char*)"random";
 		default:
 			return (char*)"other";
