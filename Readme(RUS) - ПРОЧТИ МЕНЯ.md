@@ -32,9 +32,9 @@ https://github.com/libsdl-org/SDL_ttf
 + Наслаждайтесь!
 
 ### Cmake
-1. Скачать зависимости
-    - [Windows]: Скачать SDL2 Development Libraries [SDL2-devel-2*.zip]](https://www.libsdl.org/download-2.0.php) и распаковать в любое место.
-    - [Linux]: Установить пакеты `SDL2`, `cmake`, `g++` через пакетный менеджер.
+1. Установить пакеты 
+    - `cmake` для конфигурирования проекта
+    - Компилятор С/С++, например `g++` или `clang++` / `Visual studio 2022` для Windows.
 
 2. Склонировать субмодули
 
@@ -49,7 +49,7 @@ $ mkdir build && cd build
 ```
 
 4. Сконфигурировать проект
-    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64 -DSDL2_LIBRARY="<path_to_SDL2>/lib/x64/SDL2.lib" -DSDL2_INCLUDE_DIR="<path_to_SDL2>/include"`
+    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64`
     - [Linux]: `$ cmake ..`
 
 5. Собрать
