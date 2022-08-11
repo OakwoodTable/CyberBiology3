@@ -2,7 +2,7 @@
 
 
 
-#ifndef UNIX
+#if defined(_WIN32)
 #include <windows.h>
 
 //Libs

@@ -27,7 +27,7 @@
 
 #include "Main.h"
 
-#ifdef UNIX
+#if !defined(_WIN32)
 
 uint32_t GetTickCount() {
 	struct timespec ts;
@@ -71,7 +71,7 @@ void InitSDL()
 }
 
 
-#ifndef UNIX
+#if defined(_WIN32)
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance,	_In_ LPWSTR    lpCmdLine,	_In_ int       nCmdShow)
 #else
 int main(int argc, char* argv[])

@@ -43,10 +43,3 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-
-if (UNIX)
-    target_compile_definitions(${CMAKE_PROJECT_NAME} 
-        PUBLIC 
-            UNIX
-    )
-endif (UNIX)
