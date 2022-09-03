@@ -2,13 +2,8 @@
 
 
 
-#ifndef UNIX
+#if defined(_WIN32)
 #include <windows.h>
-
-//Libs
-#pragma comment ( lib, "Winmm.Lib")
-#pragma comment ( lib, "Version.lib")
-#pragma comment ( lib, "Setupapi.lib")
 #else
 #include <cstdint>
 #define _In_

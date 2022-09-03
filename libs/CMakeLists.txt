@@ -1,16 +1,13 @@
 
+### options to build SDL ###
+option(SDL2_DISABLE_INSTALL "" ON)
+option(SDL2_DISABLE_SDL2MAIN "" ON)
 option(BUILD_SHARED_LIBS "" OFF)
-add_subdirectory(SDL_ttf)
+add_subdirectory(SDL)
 
 ###############################################################################
 
-if (UNIX)
-	find_package(SDL2 REQUIRED)
-else()
-	# from command line -DSDL2_LIBRARY=.. -DSDL2_INCLUDE_DIR=..
-	set(SDL2_LIBRARIES ${SDL2_LIBRARY})
-	set(SDL2_INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
-endif()
+add_subdirectory(SDL_ttf)
 
 ###############################################################################
 
@@ -25,6 +22,11 @@ add_library(imgui STATIC
 	imgui/imstb_rectpack.h
 	imgui/imstb_textedit.h
 	imgui/imstb_truetype.h
+
+	imgui/backends/imgui_impl_sdl.cpp
+	imgui/backends/imgui_impl_sdl.h
+	imgui/backends/imgui_impl_sdlrenderer.cpp
+	imgui/backends/imgui_impl_sdlrenderer.h
 )
 
 target_include_directories(imgui
@@ -33,20 +35,26 @@ target_include_directories(imgui
 		imgui/backends
 )
 
+target_link_libraries(imgui
+	PUBLIC
+		SDL2::SDL2-static
+)
+
 add_library(imgui_sdl STATIC
     imgui_sdl/imgui_sdl.cpp
     imgui_sdl/imgui_sdl.h
 )
 
+message(STATUS ${SDL2_INCLUDE_DIRS})
+
 target_link_libraries(imgui_sdl
     PUBLIC
-        ${SDL2_LIBRARIES}
+		SDL2::SDL2-static
 		imgui
 )
 
 target_include_directories(imgui_sdl 
     PUBLIC 
         imgui_sdl
-        ${SDL2_INCLUDE_DIRS}
 )
 
