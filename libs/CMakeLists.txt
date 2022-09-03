@@ -38,19 +38,3 @@ target_link_libraries(imgui
 	PUBLIC
 		SDL2::SDL2-static
 )
-
-add_library(imgui_sdl STATIC
-    imgui_sdl/imgui_sdl.cpp
-    imgui_sdl/imgui_sdl.h
-)
-
-target_link_libraries(imgui_sdl
-    PUBLIC
-		SDL2::SDL2-static
-		imgui
-)
-
-target_include_directories(imgui_sdl 
-    PUBLIC 
-        imgui_sdl
-)

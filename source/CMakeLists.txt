@@ -50,7 +50,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${IMGui_LIBRARIES}
         ${OPENGL_LIBRARIES}
         SDL2_ttf::SDL2_ttf-static
-        imgui_sdl
+        imgui
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
