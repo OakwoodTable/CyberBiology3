@@ -4,10 +4,9 @@
 
 #if defined(_WIN32)
 #include <windows.h>
+#include <string>
 #else
 #include <cstdint>
-#define _In_
-#define _In_opt_
 #define ULONGLONG uint64_t
 #define strcpy_s(dest, n, src) strncpy(dest, src, n)
 #define sprintf_s snprintf

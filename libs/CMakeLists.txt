@@ -1,4 +1,3 @@
-
 ### options to build SDL ###
 option(SDL2_DISABLE_INSTALL "" ON)
 option(SDL2_DISABLE_SDL2MAIN "" ON)
@@ -45,8 +44,6 @@ add_library(imgui_sdl STATIC
     imgui_sdl/imgui_sdl.h
 )
 
-message(STATUS ${SDL2_INCLUDE_DIRS})
-
 target_link_libraries(imgui_sdl
     PUBLIC
 		SDL2::SDL2-static
@@ -57,4 +54,3 @@ target_include_directories(imgui_sdl
     PUBLIC 
         imgui_sdl
 )
-
