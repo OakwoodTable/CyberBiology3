@@ -1,7 +1,7 @@
 ﻿
 //-----------------------------------------------------------------
 // 
-//Качество кода, мягко говоря, не идеально, но это хобби-проект, изначально публиковать не планировал.
+//Качество кода, мягко говоря, хромает, но это хобби-проект, изначально публиковать не планировал.
 //Программа выросла из одного файла, строго не судите.
 // 
 // 
@@ -14,16 +14,10 @@
 // -NeuralNetRenderer это класс, который рисует мозг бота в отдельном окошке
 // -MyTypes определение некоторых дополнительных типов данных для удобства
 // 
-// 
-// Также в коде есть места с костылями, места, где просто написано "игнорируйте" и немного безусловных переходов. Простите за это,
-// как уже говорил это хобби проект, когда начинал даже не знал что хочу получить. Также отдельно прошу прощения за макрос repeat(), это цикл for(;;)
-//  
-//email		OakwoodTable@outlook.com
 //
 //-----------------------------------------------------------------
 
 
-#include <string>
 
 #include "Main.h"
 
@@ -50,7 +44,6 @@ uint32_t GetTickCount64() {
 
 #endif
 
-
 void InitSDL()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -66,8 +59,8 @@ void InitSDL()
 
 	// GL 3.0 + GLSL 130
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, SDL_glCont_Major);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, SDL_glCont_Minor);
 }
 
 
@@ -80,7 +73,7 @@ int main(int argc, char* argv[])
 
 	ConsoleInput((char*)"Started. Seed:\r\n");
 
-	int seed;
+	int seed, id;
 
 	//Set seed
 	#ifdef RandomSeed		
@@ -89,7 +82,11 @@ int main(int argc, char* argv[])
 		seed = Seed;
 	#endif
 
+	Field::seed = seed;
 	srand(seed);
+
+	//Generate id
+	id = rand();
 
 	ConsoleInput(seed);
 
@@ -117,19 +114,10 @@ int main(int argc, char* argv[])
 	SDL_SetWindowMinimumSize(window, WindowWidth, WindowHeight);
 
 	//Create renderer
-	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-
+	//renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-	if (gl_context == NULL)
-		return -4;
-
-	SDL_GL_SetSwapInterval(0);	
-
-	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
-	{
-		return -3;
-	}
+	
+	SDL_GL_SetSwapInterval(0);
 
 	//Setup GL
 	glViewport(0, 0, WindowWidth, WindowHeight);
@@ -139,14 +127,17 @@ int main(int argc, char* argv[])
 
 	//Setup Dear ImGui context
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(renderer, WindowWidth, WindowHeight);
 
-	ImGuiIO& io = ImGui::GetIO(); //(void)io;
+	ImGuiIO& io = ImGui::GetIO();
 
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 	//Setup Dear ImGui style
 	ImGui::StyleColorsDark();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+	ImGui_ImplSDLRenderer_Init(renderer);
 	
 	//Main simulation field
 	Field* field = new Field();
@@ -213,7 +204,7 @@ int main(int argc, char* argv[])
 				{
 					if (!simulate)
 					{
-						goto MakeStep;	//Oh yeah, its a jump :)
+						goto MakeStep;
 					}
 				}
 				else if (key[Keyboard_RenderNatural])
@@ -257,11 +248,11 @@ int main(int argc, char* argv[])
 		*/
 
 		//Mouse down event
-		if (io.MouseDown[0])
+		if ((io.MouseDown[0]) && (!io.WantCaptureMouse))
 		{
 			if ((nn_renderer.MouseClick({ mouseX, mouseY })) && showBrain)
 			{
-
+				//TODO
 			}
 			else if (field->IsInBoundsScreenCoords(mouseX, mouseY))
 			{
@@ -272,8 +263,11 @@ int main(int argc, char* argv[])
 				{
 					if (obj)
 					{
-						selection = true;
-						selectedObject = obj;
+						if (obj->type == bot)
+						{
+							selection = true;
+							selectedObject = obj;
+						}
 					}
 					else
 					{
@@ -295,10 +289,25 @@ int main(int argc, char* argv[])
 				}
 				else if (mouseFunc == mouse_place_rock)
 				{
-					//TODO
+					for (int cx = -brushSize; cx < brushSize + 1; ++cx)
+					{
+						for (int cy = -brushSize; cy < brushSize + 1; ++cy)
+						{
+							if (field->IsInBounds(fieldCoords.x + cx, fieldCoords.y + cy))
+							{
+								obj = field->GetObjectLocalCoords(fieldCoords.x + cx, fieldCoords.y + cy);
+
+								if (!obj)
+								{
+									field->AddObject(new Rock(fieldCoords.x + cx, fieldCoords.y + cy));
+								}
+							}
+						}
+					}
 				}
 				else if (mouseFunc == mouse_from_file)
 				{
+					//Cell empty
 					if (!obj)
 					{
 						if (selectedFilename != -1)
@@ -331,7 +340,7 @@ int main(int argc, char* argv[])
 								{
 									if (obj->type == bot)
 									{
-										obj->Radiation();
+										obj->Mutagen();
 									}
 								}
 							}
@@ -357,14 +366,14 @@ int main(int argc, char* argv[])
 				++ticknum;
 				++secondTickCount;
 
-#ifdef ChangeSeasons	
+				#ifdef UseSeasons	
 				if (++changeSeasonCounter >= ChangeSeasonAfter)
 				{
 					ChangeSeason();
 
 					changeSeasonCounter = 0;
 				}
-#endif
+				#endif
 
 				//Add data to chart
 				if (--timeBeforeNextDataToChart == 0)
@@ -385,7 +394,21 @@ int main(int argc, char* argv[])
 			}
 
 			//Skip drawing
-			if (skipFrames)
+			if (renderType != noRender)
+			{
+				if (skipFrames)
+				{
+					if (--skipping > 0)
+					{
+						continue;
+					}
+					else
+					{
+						skipping = skipFrames;
+					}
+				}
+			}
+			else
 			{
 				if (--skipping > 0)
 				{
@@ -393,12 +416,50 @@ int main(int argc, char* argv[])
 				}
 				else
 				{
-					skipping = skipFrames;
+					skipping = SkipGUIFramesWhenNoRender;
 				}
 			}
 		}
 
 		//Begin frame
+
+		//Clear background
+		if (skippingRender == 0)
+		{
+			glClearColor(BackgroundColorFloat);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+
+		//Render
+		if (renderType != noRender)
+		{
+			if (simulate)
+				field->draw(renderType);
+			else
+			{
+				if (skippingRender-- == 0)
+				{
+					skippingRender = SkipRenderingFramesWhileOnPause;
+					field->draw(renderType);
+				}
+			}
+		}
+
+		//Highlight selected object
+		if (selection)
+		{
+			if (cursorShow)
+				selectedObject->Object::draw();
+
+			if (blink-- == 0)
+			{
+				blink = CursorBlinkRate;
+				cursorShow = !cursorShow;
+			}
+		}
+
+		ImGui_ImplSDLRenderer_NewFrame();		
+		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
 		//Draw GUI
@@ -412,7 +473,7 @@ int main(int argc, char* argv[])
 
 		//Main window 
 		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
+		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 135.0f });
 		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f,InterfaceBorder * 1.0f });
 
 		ImGui::Begin("Main", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -421,8 +482,10 @@ int main(int argc, char* argv[])
 			ImGui::Text("steps: %i", ticknum);
 			ImGui::Text("(interval %i, speed: %i ticks/sec)", interval, simulationSpeed);
 			ImGui::Text("Objects total: %i", field->GetNumObjects());
+			ImGui::Text("Bots total: %i", field->GetNumBots());
 
 			//Show season name
+			/*
 			switch (season)
 			{
 			case summer:
@@ -440,10 +503,13 @@ int main(int argc, char* argv[])
 			}
 
 			ImGui::SameLine();
-			ImGui::Text(" ( %i )", ChangeSeasonAfter - changeSeasonCounter);
+			ImGui::Text(" ( %i )", ChangeSeasonInterval - changeSeasonCounter);*/
 
-			//And neural net params
+			//Neural net params
 			ImGui::Text("Layers: %i, Neurons in layer: %i", NumNeuronLayers, NeuronsInLayer);
+
+			//Simulation seed and unique id
+			ImGui::Text("Seed: %i, simulation id: %i", seed, id);
 
 		}
 		ImGui::End();
@@ -463,25 +529,23 @@ int main(int argc, char* argv[])
 			ImGui::SameLine();
 
 			ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "CPU cores: %d", SDL_GetCPUCount());
-			//ImGui::Text("CPU cores: %d", SDL_GetCPUCount());
 
 			ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
-			//ImGui::Text("RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
 
 			ImGui::SameLine();
 
 			//Show number of threads
-#ifdef UseOneThread
+			#ifdef UseOneThread
 			ImGui::Text(", 1 thread used");
-#endif
+			#endif
 
-#ifdef UseFourThreads
+			#ifdef UseFourThreads
 			ImGui::Text(", 4 threads used");
-#endif
+			#endif
 
-#ifdef UseEightThreads
+			#ifdef UseEightThreads
 			ImGui::Text(", 8 threads used");
-#endif
+			#endif
 		}
 		ImGui::End();
 
@@ -503,7 +567,7 @@ int main(int argc, char* argv[])
 			ImGui::SliderInt("interval", &interval, GUI_Max_interval, 0, "%d", ImGuiSliderFlags_Logarithmic);
 			ImGui::SliderInt("food", &(field->foodBase), GUI_Max_food, 0, "%d", ImGuiSliderFlags_None);
 			ImGui::SliderInt("skip", &skipFrames, GUI_Max_skip, 0, "%d", ImGuiSliderFlags_None);
-			ImGui::SliderInt("brush", &brushSize, GUI_Max_brush, 1, "%d", ImGuiSliderFlags_None);
+			ImGui::SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d", ImGuiSliderFlags_None);
 		}
 		ImGui::End();
 
@@ -511,7 +575,7 @@ int main(int argc, char* argv[])
 		//Selection window
 		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 150.0f });
-		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 380.0f });
+		ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 390.0f });
 
 		ImGui::Begin("Selection", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 		{
@@ -613,7 +677,7 @@ int main(int argc, char* argv[])
 			ImGui::BeginGroup();
 			ImGui::RadioButton("Select", (int*)&mouseFunc, 0);
 			ImGui::RadioButton("Remove", (int*)&mouseFunc, 1);
-			//ImGui::RadioButton("Place rock", (int*)&mouseFunc, 2);
+			ImGui::RadioButton("Place rock", (int*)&mouseFunc, 2);
 			ImGui::RadioButton("Place creature from file", (int*)&mouseFunc, 3);
 			ImGui::RadioButton("Force mutate", (int*)&mouseFunc, 4);
 			ImGui::EndGroup();
@@ -631,6 +695,8 @@ int main(int argc, char* argv[])
 
 			if (ImGui::Button("Save/load", { 130, 30 }))
 			{
+				LoadFilenames();
+
 				showSaveLoad = !showSaveLoad;
 			}
 			ImGui::SameLine();
@@ -640,9 +706,9 @@ int main(int argc, char* argv[])
 				showDangerous = !showDangerous;
 			}
 
-			if (ImGui::Button("Selection int.", { 130, 30 }))
+			if (ImGui::Button("Adaptation", { 130, 30 }))
 			{
-				showSelectionInterface = !showSelectionInterface;
+				showAdaptation = !showAdaptation;
 			}
 			ImGui::SameLine();
 
@@ -742,11 +808,41 @@ int main(int argc, char* argv[])
 							field->RemoveObject(cx, cy);
 						}
 					}
+
+					ticknum = 0;
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Kill bots", { 130, 30 }))
+				{
+					Deselect();
+
+					for (int cx = 0; cx < FieldCellsWidth; ++cx)
+					{
+						for (int cy = 0; cy < FieldCellsHeight; ++cy)
+						{
+							Object* o = field->GetObjectLocalCoords(cx, cy);
+
+							if (o == NULL)
+								continue;
+
+							if(o->type == bot)
+								field->RemoveObject(cx, cy);
+						}
+					}
 				}
 
 				if (ImGui::Button("CloseApp", { 130, 30 }))
 				{
 					goto exitfor;
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Zero time", { 130, 30 }))
+				{
+					ticknum = 0;
 				}
 			}
 			ImGui::End();
@@ -792,16 +888,32 @@ int main(int argc, char* argv[])
 			ImGui::End();
 		}
 
-		//Selection interface
-		if (showSelectionInterface)
+		//Adaptation window
+		if (showAdaptation)
 		{
 			ImGui::SetNextWindowBgAlpha(1.0f);
-			ImGui::SetNextWindowSize({ 200.0f, 60.0f });
+			ImGui::SetNextWindowSize({ 450.0f, 240.0f });
 			ImGui::SetNextWindowPos({ 100 * 1.0f, 250.0f }, ImGuiCond_Once);
 
-			ImGui::Begin("Selection interface", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			ImGui::Begin("Adaptation", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
-				ImGui::InputInt("Phase", &Bot::selectionStep);
+				//Caption
+				ImGui::Text("Divers");
+
+				//Input box
+				//ImGui::InputInt("Phase", &Bot::adaptationStep);
+
+				//Sliders
+				ImGui::SliderInt("Land birth penalty", &Bot::adaptationStep, 0, 1000);
+				ImGui::SliderInt("Sea birth penalty", &Bot::adaptationStep2, 0, 1000);
+				ImGui::SliderInt("New bot should wait penalty", &Bot::adaptationStep3, 0, 20);
+
+				ImGui::NewLine();
+
+				ImGui::SliderInt("Ocean PS chance", &Bot::adaptationStep4, 0, 1000, "%d", ImGuiSliderFlags_Logarithmic);
+				ImGui::SliderInt("Ocean level", &Bot::adaptationStep5, 0, FieldCellsHeight);
+				ImGui::SliderInt("Mud level", &Bot::adaptationStep7, 0, FieldCellsHeight);
+				ImGui::SliderInt("Force move", &Bot::adaptationStep6, 0, 1000);
 			}
 			ImGui::End();
 		}
@@ -816,44 +928,9 @@ int main(int argc, char* argv[])
 			ImGui::Begin("Population chart", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
 				ImGui::SetNextItemWidth(3.0f);
-				ImGui::PlotLines("Population", populationChartData, chart_numValues, chart_shift, (const char*)0, 0.0f, 14000.0f, {800, 500});
+				ImGui::PlotLines("Objects", populationChartData, chart_numValues, chart_shift, (const char*)0, 0.0f, 26000.0f, {800, 550});
 			}
 			ImGui::End();
-		}
-
-		//Clear background
-		if (skippingRender==0)
-		{
-			SDL_SetRenderDrawColor(renderer, BackgroundColor);
-			SDL_RenderClear(renderer);
-		}
-
-		//Render
-		if (renderType != noRender)
-		{
-			if(simulate)
-				field->draw(renderType);
-			else
-			{
-				if (skippingRender-- == 0)
-				{
-					skippingRender = SkipRenderingFramesWhileOnPause;
-					field->draw(renderType);
-				}
-			}
-		}
-
-		//Highlight selected object
-		if (selection)
-		{
-			if(cursorShow)
-				selectedObject->Object::draw();
-
-			if (blink-- == 0)
-			{
-				blink = CursorBlinkRate;
-				cursorShow = !cursorShow;
-			}
 		}
 
 		if (showBrain)
@@ -905,9 +982,9 @@ int main(int argc, char* argv[])
 
 		//Present scene
 		ImGui::Render();
-		ImGuiSDL::Render(ImGui::GetDrawData());
+		
+		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());		
 		SDL_RenderPresent(renderer);
-				
 
 		//Delay so it would not eat too many resourses while on pause
 		if(!simulate)
@@ -917,6 +994,7 @@ int main(int argc, char* argv[])
 exitfor:
 
 	//Clear memory
+	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui::DestroyContext();
 
 	SDL_DestroyRenderer(renderer);
@@ -975,7 +1053,7 @@ void ClearConsole()
 	consoleText[0] = '\0';
 }
 
-//This is temporary (костыли господа)
+//This is temporary
 void ConsoleInput(const char* str, bool newLine)
 {
 	if (strlen(consoleText) > (ConsoleCharLength/2 - 50))
@@ -1023,14 +1101,14 @@ void LoadFilenames()
 
 void CreateNewFile()
 {
-	std::string fileName = "New1.cb_creature";
+	std::string fileName = "New1";
 	int fileCounter = 1;
 
 	for (;;)
 	{
 		if (std::filesystem::exists(DirectoryName + fileName))
 		{
-			fileName = "New" + std::to_string(++fileCounter) + ".cb_creature";
+			fileName = "New" + std::to_string(++fileCounter);
 		}
 		else
 		{

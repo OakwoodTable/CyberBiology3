@@ -32,7 +32,18 @@ void Neuron::SetRandomType()
 {
 	if ((type != NeuronType::input) && (type != NeuronType::output))
 	{
+		if (RandomPercent(2))
+		{
+			type = NeuronType::random;
+
+			return;
+		}
+
+	#ifdef UseMemoryNeuron
+		int refVal = RandomVal(15);
+	#else
 		int refVal = RandomVal(14);
+	#endif
 
 		if (refVal <= 8)
 			type = NeuronType::basic;
@@ -40,9 +51,6 @@ void Neuron::SetRandomType()
 			type = NeuronType::radialbasis;
 		else
 			type = NeuronType::memory;
-
-		if (RandomPercent(2))
-			type = NeuronType::random;
 	}
 }
 

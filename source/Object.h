@@ -5,15 +5,18 @@
 #include "MyTypes.h"
 
 
-
+//temporary
 extern SDL_Renderer* renderer;
 
 
-//Only 2 object types atm
+//Object types
 enum ObjectTypes
 {
 	abstract,
-	bot
+	bot,
+	rock,
+	organic_waste,
+	apple
 };
 
 
@@ -28,7 +31,6 @@ protected:
 	//Time in ticks since object was created
 	uint lifetime = 0;
 
-	//static SDL_Renderer* renderer;
 
 public:
 
@@ -39,7 +41,6 @@ public:
 	ObjectTypes type;
 
 	Object(int X, int Y) :x(X), y(Y), type(abstract) {};
-
 
 	//Basic 'dummy' draw function if needed
 	virtual void draw();
@@ -52,6 +53,8 @@ public:
 	1 - object destroyed
 	2 - nothing to do(last tick frame matches current frame)*/
 	virtual int tick();
+
+
 
 	static uint currentFrame;
 

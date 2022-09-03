@@ -22,12 +22,12 @@ enum EnergySource
 {
 	PS,
 	kills,
-	mineral,
+	organics,
 	unknown
 };
 
 
-//Preselected colors for bots
+//Preset colors
 const Uint8 presetColors[][4] =
 {
 	{255, 0, 0},
@@ -70,21 +70,21 @@ class Bot:public Object
 	//if this is not 0, bot does nothing at his turn
 	int stunned;
 
-	//How long a bot should wait to give birth after his own birth 
+	//How long a bot should wait before multiply
 	int fertilityDelay;
 
-	Uint8 color[3] = {0, 111, 0};
+	//Default color
+	Uint8 color[3] = { 0, 0 , 0 };
 
 	//Energy acquired from different sources
 	int energyFromPS = 0;
 	int energyFromKills = 0;
-	int energyFromMinerals = 0;
+	int energyFromOrganics = 0;
 
 
 	//Mutation markers used to decide how close two bots are to each other as relatives
 	int mutationMarkers[NumberOfMutationMarkers];
 	uint nextMarker;
-
 
 
 	void ChangeMutationMarker();
@@ -95,8 +95,10 @@ class Bot:public Object
 	//Set random color
 	void RandomizeColor();
 
-	//Experimental
-	//Total mutation function - rarely used
+	//Set random direction
+	void RandomDirection();
+
+	//Severe mutation function - Experimental
 	void TotalMutation();
 
 	//Shift color a little (-10 to +10)
@@ -113,25 +115,38 @@ class Bot:public Object
 
 
 	//----------------------------------------------------------------------------------------------
-	//������� ��� ������������� ��������, ���������� � ����� ������� tick(), ���� �� ������������
+	//These functions are used for experiments such as adaptation,
+	//you are supposed to call them at the end of tick() function, or do not use
 
-	int selection_numTicks = 0;
-	int selection_numRightSteps = 0;
-	int selection_lastX;
+	int adaptation_numTicks = 0;
+	int adaptation_numRightSteps = 0;
+	int addaptation_lastX;
 
-	bool SelectionWatcher();
+	const int adaptation_ticks = 1;
 
-	public: static int selectionStep;
+	bool ArtificialSelectionWatcher();
+
+	public: 
+		static int adaptationStep;
+		static int adaptationStep2;
+		static int adaptationStep3;
+		static int adaptationStep4;
+		static int adaptationStep5;
+		static int adaptationStep6;
+		static int adaptationStep7;
 	//----------------------------------------------------------------------------------------------
 
 
 public:
 
-	//Experimental
-	//This function is used to simulate mutagen
-	void Radiation();
+	//How many times bot used attack and move commands
+	int numAttacks = 0;
+	int numMoves = 0;
 
-	//Use neural network
+	//Experimental
+	void Mutagen();
+
+	//Use neural network (feed forward)
 	BrainOutput think(BrainInput input);
 
 	//Bot tick function, it should always call parents tick function first
@@ -140,10 +155,10 @@ public:
 	//Bot main draw function
 	void draw() override;
 
-	//Bot draw function is energy mode
+	//Bot draw function in energy mode
 	void drawEnergy();
 
-	//Bot draw function is predators mode
+	//Bot draw function in predators mode
 	void drawPredators();
 
 	//Change rotation function
@@ -171,6 +186,7 @@ public:
 
 	//Get rotation
 	Point GetDirection();
+	uint GetRotationVal();
 
 	//Take away bot energy, return true if 0 or below (bot dies)
 	bool TakeEnergy(int val);

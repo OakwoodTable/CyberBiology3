@@ -21,6 +21,12 @@ set(SRC
     Object.cpp
     Object.h
 
+    Organics.cpp
+    Organics.h
+
+    Rock.cpp
+    Rock.h
+
     MyTypes.h
     Settings.h
     Systems.h
@@ -39,7 +45,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${IMGui_LIBRARIES}
         SDL2_ttf::SDL2_ttf-static
         imgui_sdl
-        glad
+        #glad
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

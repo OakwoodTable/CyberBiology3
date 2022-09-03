@@ -1,10 +1,10 @@
-#ifndef _h_Field
-#define _h_Field
-
+#pragma once
 
 
 #include "Bot.h"
-
+#include "Rock.h"
+#include "Organics.h"
+#include "Apple.h"
 
 
 //Don't touch
@@ -47,29 +47,36 @@ class Field
     Object* allCells[FieldCellsWidth][FieldCellsHeight];
 
     //Rectangles
-    SDL_Rect mainRect = { FieldX , FieldY, FieldWidth, FieldHeight };
-    SDL_Rect oceanRect = { FieldX , FieldY + FieldHeight - OceanHeight * FieldCellSize, FieldWidth, OceanHeight * FieldCellSize };
+    const SDL_Rect mainRect = { FieldX , FieldY, FieldWidth, FieldHeight };
+    SDL_Rect oceanRect = { FieldX , FieldY + (FieldHeight - (OceanHeight * FieldCellSize)), FieldWidth, OceanHeight * FieldCellSize };
+    SDL_Rect mudLayerRect = { FieldX , FieldY + (FieldHeight - (MudLayerHeight * FieldCellSize)), FieldWidth, MudLayerHeight * FieldCellSize };
 
-    //Needed to calculate number of active objects (calculated on every frame)
+    //Needed to calculate number of active objects and bots (calculated on every frame)
     uint objectsTotal = 0;
+    uint botsTotal = 0;
 
+    //Apple spawn timer
+    uint spawnApplesInterval = 0;
 
     //threads
     bool threadGoMarker[NumThreads];
     std::thread* threads[NumThreads];
     uint objectCounters[NumThreads];
+    uint botsCounters[NumThreads];
     bool terminateThreads = false;
 
 
     //Find empty cell nearby, otherwise return {-1, -1}
     Point FindFreeNeighbourCell(int X, int Y);
 
+    //How may free cells are available around given one
+    int FindHowManyFreeCellsAround(int X, int Y);
 
     //tick function for single threaded build
     inline void tick_single_thread();
 
-    //Process function for 4 threaded simulation
-    void ProcessPart_4Threads(const uint X1, const uint Y1, const uint X2, const uint Y2, const uint index);
+    //Process function for multi threaded simulation
+    void ProcessPart_MultipleThreads(const uint X1, const uint Y1, const uint X2, const uint Y2, const uint index);
 
     //Start all threads
     void StartThreads();
@@ -103,6 +110,9 @@ public:
     //Remove object and delete object class
     void RemoveObject(int X, int Y);
 
+    //Remove a bot (same as remove object but for a bot)
+    void RemoveBot(int X, int Y, int energyVal = 0);
+
     //Repaint bot
     void RepaintBot(Bot* b, Uint8 newColor[3], int differs = 1);
 
@@ -112,7 +122,6 @@ public:
 
     //Tick function
     void tick(uint thisFrame);
-
 
     //Draw simulation field with all its objects
     void draw(RenderTypes render = natural);
@@ -140,11 +149,14 @@ public:
     //How many objects on field, last frame
     uint GetNumObjects();
 
+    //Same for bots
+    uint GetNumBots();
+
 
     /*Save / load
     TODO!!!
     File format:
-    4b - 0xfafa458e (no meaning)
+    4b - 0xfafa458e (magic number)
     4b - creature type 
     4b - uint num layers
     4b - uint neurons in layer
@@ -159,10 +171,14 @@ public:
     void SpawnControlGroup();
 
 
+    //Spawn apples
+    void SpawnApples();
+
+
     //Create field
     Field();
 
+    static int seed;
+
 };
 
-
-#endif

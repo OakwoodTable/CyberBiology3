@@ -62,6 +62,7 @@ struct Neuron
 	void SlightlyChange();
 
 
+	//Get neuron description by type (for GUI)
 	static char* GetTextFromType(NeuronType t)
 	{
 		switch (t)

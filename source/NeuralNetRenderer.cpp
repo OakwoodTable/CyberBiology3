@@ -2,24 +2,17 @@
 
 
 
-
-NeuralNetRenderer::NeuralNetRenderer()
-{
-	Font1 = TTF_OpenFont("../ImGUI/misc/fonts/ProggyClean.tff", 24);
-}
-
-
-NeuralNetRenderer::~NeuralNetRenderer()
-{
-	//SDL_FreeSurface(surfaceMessage);
-	//SDL_DestroyTexture(Message);
-}
-
 bool NeuralNetRenderer::MouseClick(Point p)
 {
 	MouseXY = p;
 
 	return bg_rect.IsInBounds(p);
+}
+
+void NeuralNetRenderer::DrawThickLine(int x1, int y1, int x2, int y2)
+{
+	repeat(Render_LineThickness)
+		SDL_RenderDrawLine(renderer, x1, y1+i-(Render_LineThickness/2), x2, y2 + i - (Render_LineThickness/2));
 }
 
 void NeuralNetRenderer::Render(BotNeuralNet* brain)
@@ -56,7 +49,7 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 					SDL_SetRenderDrawColor(renderer, Render_NeutralWeightColor, 255);
 				}
 
-				SDL_RenderDrawLine(renderer, drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2), drawTo.x + xi * Render_LayerDistance + Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + c->num * Render_VerticalDistance + (Render_NeuronSize/2));
+				DrawThickLine(drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2), drawTo.x + xi * Render_LayerDistance + Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + c->num * Render_VerticalDistance + (Render_NeuronSize/2));
 			}
 		}
 	}

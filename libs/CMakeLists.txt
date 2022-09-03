@@ -4,10 +4,6 @@ add_subdirectory(SDL_ttf)
 
 ###############################################################################
 
-add_subdirectory(glad)
-
-###############################################################################
-
 if (UNIX)
 	find_package(SDL2 REQUIRED)
 else()
@@ -34,6 +30,7 @@ add_library(imgui STATIC
 target_include_directories(imgui
 	PUBLIC
 		imgui
+		imgui/backends
 )
 
 add_library(imgui_sdl STATIC

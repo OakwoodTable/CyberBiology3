@@ -19,7 +19,7 @@ struct BrainInput
 
 union BrainOutput
 {
-	static const int numFields = 5;
+	static const int numFields = NeuronsInLayer;
 
 	struct
 	{
@@ -31,6 +31,11 @@ union BrainOutput
 	};
 
 	int fields[numFields];
+
+	static BrainOutput GetEmptyBrain()
+	{
+		return {0, 0, 0, 0, 0};
+	};
 };
 
 

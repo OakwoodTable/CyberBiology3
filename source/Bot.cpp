@@ -1,5 +1,7 @@
 #include "Bot.h"
 
+
+
 void Bot::ChangeMutationMarker()
 {
 	mutationMarkers[nextMarker++] = rand();
@@ -8,9 +10,9 @@ void Bot::ChangeMutationMarker()
 	{
 		nextMarker = 0;
 
-#ifdef RandomColorEveryNewMarkersSet
+		#ifdef RandomColorEveryNewMarkersSet
 		RandomizeColor();
-#endif
+		#endif
 	}
 }
 
@@ -52,10 +54,16 @@ void Bot::RandomizeColor()
 	color[2] = c.rgb[2];
 }
 
+void Bot::RandomDirection()
+{
+	direction = RandomVal(8);
+}
+
 
 void Bot::TotalMutation()
 {
-	//RandomizeMarkers();
+	RandomizeMarkers();
+
 	repeat(3)
 		ChangeMutationMarker();
 
@@ -85,9 +93,9 @@ void Bot::SlightlyMutate()
 {
 	brain.MutateSlightly();
 
-#ifdef ChangeColorSlightly
+	#ifdef ChangeColorSlightly
 	ChangeColor(10);
-#endif
+	#endif
 }
 
 
@@ -121,22 +129,23 @@ void Bot::Mutate()
 void Bot::drawOutlineAndHead(SDL_Rect rect)
 {
 	//Draw outline
-#ifdef DrawBotOutline
-	SDL_SetRenderDrawColor(renderer, BotOutlineColor);
-	SDL_RenderDrawRect(renderer, &rect);
-#endif
+	#ifdef DrawBotOutline
+		SDL_SetRenderDrawColor(renderer, BotOutlineColor);
+		SDL_RenderDrawRect(renderer, &rect);
+	#endif
 
-	//Draw direction marker
-#ifdef DrawBotHead
-	SDL_RenderDrawLine(renderer, FieldX + x * FieldCellSize + FieldCellSizeHalf, FieldY + y * FieldCellSize + FieldCellSizeHalf, FieldX + x * FieldCellSize + FieldCellSizeHalf + Rotations[direction].x * FieldCellSizeHalf, FieldY + y * FieldCellSize + FieldCellSizeHalf + Rotations[direction].y * FieldCellSizeHalf);
-#endif
+	//Draw direction line
+	#ifdef DrawBotHead
+		SDL_RenderDrawLine(renderer, FieldX + x * FieldCellSize + FieldCellSizeHalf, FieldY + y * FieldCellSize + FieldCellSizeHalf, FieldX + x * FieldCellSize + FieldCellSizeHalf + Rotations[direction].x * FieldCellSizeHalf, FieldY + y * FieldCellSize + FieldCellSizeHalf + Rotations[direction].y * FieldCellSizeHalf);
+	#endif
 }
 
 
 
-void Bot::Radiation()
+void Bot::Mutagen()
 {
-	Mutate();
+	if (RandomPercent(10))
+		Mutate();
 }
 
 
@@ -146,7 +155,8 @@ BrainOutput Bot::think(BrainInput input)
 	if (stunned)
 	{
 		--stunned;
-		return { 0, 0, 0, 0 };
+
+		return BrainOutput::GetEmptyBrain();
 	}
 
 	//Clear all neuron values
@@ -155,19 +165,19 @@ BrainOutput Bot::think(BrainInput input)
 	//Input data
 	{
 		//Energy
-		brain.allValues[0][0] = ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
+		brain.allValues[NeuronInputLayerIndex][0] = ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
 
 		//Sight
-		brain.allValues[0][1] = input.vision;
+		brain.allValues[NeuronInputLayerIndex][1] = input.vision;
 
 		//Is relative
-		brain.allValues[0][2] = input.isRelative;
+		brain.allValues[NeuronInputLayerIndex][2] = input.isRelative;
 
 		//Rotation
-		brain.allValues[0][3] = (direction * 1.0f) / 7.0f;
+		brain.allValues[NeuronInputLayerIndex][3] = (direction * 1.0f) / 7.0f;
 
 		//Height
-		brain.allValues[0][4] = (y * 1.0f) / (FieldCellsHeight * 1.0f);
+		brain.allValues[NeuronInputLayerIndex][4] = (y * 1.0f) / (FieldCellsHeight * 1.0f);
 	}
 
 	//Compute
@@ -186,36 +196,104 @@ BrainOutput Bot::think(BrainInput input)
 		fertilityDelay = FertilityDelay;
 	}
 
-	//if(toRet.attack == 1)
-		//return toRet;
-
 	return toRet;
 }
 
-int Bot::selectionStep = 0;
+int Bot::adaptationStep = 0;	
+int Bot::adaptationStep2 = 0;	
+int Bot::adaptationStep3 = 0;	
+int Bot::adaptationStep4 = 1000;	
+int Bot::adaptationStep5 = OceanHeight;	
+int Bot::adaptationStep6 = 0;	
+int Bot::adaptationStep7 = MudLayerHeight;	
 
-bool Bot::SelectionWatcher()
+/*
+//Winds project
+bool Bot::ArtificialSelectionWatcher()
 {
 	if (y >= FieldCellsHeight - OceanHeight)
 	{
-		if (selection_lastX < x)
+		if (addaptation_lastX < x)
 		{
-			++selection_numRightSteps;	
-			
+			++adaptation_numRightSteps;
+
 		}
 
-		selection_lastX = x;
+		addaptation_lastX = x;
 
-		if (selection_numTicks++ == 2)
+		if (adaptation_numTicks++ == adaptation_ticks)
 		{
-			if (selection_numRightSteps == 0)
+			if (adaptation_numRightSteps == 0)
 			{
-				if(RandomPercent(selectionStep))
+				if (RandomPercentX10(adaptationStep))
 					return true;
 			}
 
-			selection_numRightSteps = 0;
-			selection_numTicks = 0;
+			adaptation_numRightSteps = 0;
+			adaptation_numTicks = 0;
+		}
+	}
+
+	return false;
+}*/
+
+/*
+//Force predators
+bool Bot::ArtificialSelectionWatcher()
+{
+	if (y >= FieldCellsHeight - OceanHeight)
+	{
+		if (adaptation_numTicks++ == adaptation_ticks)
+		{
+			if (numAttacks == 0)
+			{
+				if (RandomPercentX10(adaptationStep))
+					return true;
+			}
+
+			adaptation_numTicks = 0;
+		}
+	}
+
+	return false;
+}*/
+
+//Divers project
+bool Bot::ArtificialSelectionWatcher()
+{
+	//Is on land
+	if (y < FieldCellsHeight - Bot::adaptationStep5)
+	{
+		if (lifetime == 1)
+		{
+			if (RandomPercentX10(adaptationStep))
+				return true;
+		}
+	}
+	//Is in ocean
+	else if ((y >= FieldCellsHeight - Bot::adaptationStep5) && (y < FieldCellsHeight - Bot::adaptationStep7))
+	{
+		if (lifetime == 1)
+		{
+			if (RandomPercentX10(adaptationStep2))
+				return true;
+		}
+	}	
+
+	//New bot wait
+	if (lifetime < adaptationStep3)
+	{
+		if (RandomPercentX10(250))
+			return true;
+	}
+
+	//Force move
+	if (lifetime > 20)
+	{
+		if (numMoves == 0)
+		{
+			if (RandomPercentX10(adaptationStep6))
+				energy -= 50;
 		}
 	}
 
@@ -230,10 +308,10 @@ int Bot::tick()
 
 	energy -= EveryTickEnergyPenalty;
 
-	if (SelectionWatcher())
-		energy = 0;
+	if (ArtificialSelectionWatcher())
+		return 1;
 
-	if(((energy) <= 0) || (lifetime >= MaxBotLifetime))
+	if (((energy) <= 0) || (lifetime >= MaxBotLifetime))
 		return 1;
 
 	return 0;
@@ -272,14 +350,12 @@ void Bot::drawPredators()
 	SDL_Rect rect = { FieldX + x * FieldCellSize, FieldY + y * FieldCellSize, FieldCellSize, FieldCellSize };
 
 	//Draw body
-	int energySumm = energyFromKills + energyFromPS;
+	int energySumm = energyFromKills + energyFromPS + energyFromOrganics;
 
-	if (energyFromMinerals > 0)
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	else if (energySumm < 20)
+	if (energySumm < 20)
 		SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
 	else
-		SDL_SetRenderDrawColor(renderer, 255.0f * ((energyFromKills * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f)), 0, 255);
+		SDL_SetRenderDrawColor(renderer, 255.0f * ((energyFromKills * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromOrganics * 1.0f) / (energySumm * 1.0f)), 255);
 
 	SDL_RenderFillRect(renderer, &rect);
 
@@ -305,7 +381,12 @@ void Bot::GiveEnergy(int num, EnergySource src)
 
 	if (energy > MaxPossibleEnergyForABot)
 	{
+	#ifdef BotDiesIfEnergyOverflow
+		energy = 0;
+		return;
+	#else
 		energy = MaxPossibleEnergyForABot;
+	#endif
 	}
 
 	if (src == PS)
@@ -316,9 +397,9 @@ void Bot::GiveEnergy(int num, EnergySource src)
 	{
 		energyFromKills += num;
 	}
-	else if (src == mineral)
+	else if (src == organics)
 	{
-		energyFromMinerals += num;
+		energyFromOrganics += num;
 	}
 }
 
@@ -362,6 +443,11 @@ bool Bot::TakeEnergy(int val)
 Point Bot::GetDirection()
 {
 	return Rotations[direction];
+}
+
+uint Bot::GetRotationVal()
+{
+	return direction;
 }
 
 /*Get neuron summary(info)
@@ -422,10 +508,8 @@ int Bot::FindKinship(Bot* stranger)
 			++numMarkers;
 	}
 
-#ifdef OneMarkerDifferenceCantBeTold
-	if (numMarkers == NumberOfMutationMarkers - 1)
+	if (numMarkers >= (NumberOfMutationMarkers - HowMuchDifferenseCantBeTold))
 		numMarkers = NumberOfMutationMarkers;
-#endif
 
 	return numMarkers;
 }
@@ -453,37 +537,31 @@ Bot::Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate) :Object(X, Y), 
 
 	memcpy(color, prototype->color, sizeof(color));
 
+	//Random direction
+	RandomDirection();
+
 	//Now mutate
 	#ifndef ForbidMutations
-		if (mutate)
+	if (mutate)
+	{
+		#ifdef UseTotalMutation
+		if (RandomPercentX10(TotalMutationChancePercentX10))
+			TotalMutation();
+		else
+		#endif
 		{
-	#ifdef UseTotalMutation
-			if (RandomPercentX10(TotalMutationChancePercentX10))
-				TotalMutation();
-			else
-	#endif
-			{
-				Mutate();
-			}
+			Mutate();
 		}
+	}
 	#endif
 
-	selection_lastX = X;
+	addaptation_lastX = X;
 }
 
 
 Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 {
 	type = bot;
-
-	//Ignore
-	//brain.allNeurons[1][1].type = random;
-	//brain.allNeurons[1][1].bias = 0.5f;
-	//brain.allNeurons[1][1].AddConnection(2, -1.0f);
-
-	//brain.allNeurons[2][2].bias = 1.0f;
-
-	//brain.allNeurons[4][1].bias = 1.0f;
 
 	RandomizeMarkers();
 
@@ -502,10 +580,10 @@ Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 	//Random color
 	RandomizeColor();
 
-	//for (int m = 0; m < NeuronsInLayer*NumNeuronLayers; ++m)
-		//Mutate();
+	//Random direction
+	RandomDirection();
 
-	selection_lastX = X;
+	addaptation_lastX = X;
 }
 
 
@@ -522,7 +600,7 @@ void Bot::GiveInitialEnergyAndMarkers()
 	energyFromKills = 0;
 
 	direction = 0;
-	RandomizeColor(); // Temporary
+	RandomizeColor();
 }
 
 

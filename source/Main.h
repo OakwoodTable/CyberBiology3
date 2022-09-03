@@ -19,7 +19,6 @@
 #endif
 
 #include "Field.h"
-
 #include "NeuralNetRenderer.h"
 
 
@@ -53,10 +52,10 @@ bool showSaveLoad = false;
 bool showDangerous = false;
 bool showSummary = false;
 bool showBrain = false;
-bool showSelectionInterface = false;
+bool showAdaptation = false;
 bool showChart = false;
 
-//Population chart
+//Chart
 float populationChartData[ChartNumValues];
 int chart_numValues = 0;
 int chart_shift = 0;
@@ -72,8 +71,7 @@ void AddToChart(float newVal);
 NeuralNetRenderer nn_renderer;
 
 
-
-//Selection
+//Bot selection
 bool selection = false;
 Object* selectedObject;
 

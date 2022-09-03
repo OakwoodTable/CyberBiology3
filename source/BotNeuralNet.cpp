@@ -238,10 +238,11 @@ BrainOutput BotNeuralNet::GetOutput()
 
 void BotNeuralNet::SetDummy()
 {
-	allNeurons[NeuronOutputLayerIndex][2].bias = 1.0f;
+	allNeurons[NeuronOutputLayerIndex][2].bias = 0.5f;
 	allNeurons[NeuronInputLayerIndex][0].SetTunnel(3);
 	allNeurons[1][3].SetTunnel(3);
 	allNeurons[2][3].SetTunnel(3);
 	allNeurons[3][3].SetTunnel(3);
-	allNeurons[4][3].SetTunnel(3);
+	allNeurons[4][3].bias = 0.0f;
+	allNeurons[4][3].AddConnection(3, 0.5f);
 }
