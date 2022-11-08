@@ -49,7 +49,10 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 					SDL_SetRenderDrawColor(renderer, Render_NeutralWeightColor, 255);
 				}
 
-				DrawThickLine(drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2), drawTo.x + xi * Render_LayerDistance + Render_LayerDistance + (Render_NeuronSize/2), drawTo.y + c->num * Render_VerticalDistance + (Render_NeuronSize/2));
+				DrawThickLine(drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2),
+					drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2),
+					drawTo.x + xi * Render_LayerDistance + Render_LayerDistance + (Render_NeuronSize/2),
+					drawTo.y + c->dest * Render_VerticalDistance + (Render_NeuronSize/2));
 			}
 		}
 	}
@@ -108,6 +111,7 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 				SDL_RenderDrawRect(renderer, &rect);
 
 				selectedNeuron = n;
+				selectedBrain = brain;
 			}
 
 		}

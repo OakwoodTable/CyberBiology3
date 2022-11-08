@@ -1,19 +1,17 @@
 #pragma once
-
-#include "Object.h"
-
+//#pragma message("	Rock_h")
 
 
-//Rock class
+#include "Field.h"
+
+
 class Rock :public Object
 {
 
 public:
 
-	//Draw rock
 	void draw() override; 
 
-	//New rock
 	Rock(int X, int Y);
 
 };

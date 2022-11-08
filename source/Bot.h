@@ -1,7 +1,10 @@
 #pragma once
+//#pragma message("	Bot_h")
 
 
+#include "Field.h"
 #include "BotNeuralNet.h"
+
 
 
 //Rotations array, contains where a bot would look with every
@@ -21,7 +24,7 @@ const Point Rotations[] =
 enum EnergySource
 {
 	PS,
-	kills,
+	predation,
 	organics,
 	unknown
 };
@@ -56,16 +59,22 @@ const Uint8 presetColors[][4] =
 
 
 
-//Bot class
-class Bot:public Object
+class Bot final:public Object
 {
 	//Rotation, see Rotations[]
 	uint direction=0;
 
-	BotNeuralNet brain;
+	//That is what a bot is looking at
+	Point lookAt;
+	int lookAt_x, lookAt_y;
 
-	//Bot energy, if this is 0 bot dies
-	int energy;
+	void CalculateLookAt();
+
+
+	//Active brain - one that is used during simulation, may be changed or optimized
+	BotNeuralNet activeBrain;
+	//Bot gets initial brain from his parent, it is his original genes
+	BotNeuralNet initialBrain;
 
 	//if this is not 0, bot does nothing at his turn
 	int stunned;
@@ -73,29 +82,21 @@ class Bot:public Object
 	//How long a bot should wait before multiply
 	int fertilityDelay;
 
-	//Default color
-	Uint8 color[3] = { 0, 0 , 0 };
+	Color color;
 
 	//Energy acquired from different sources
 	int energyFromPS = 0;
-	int energyFromKills = 0;
+	int energyFromPredation = 0;
 	int energyFromOrganics = 0;
-
 
 	//Mutation markers used to decide how close two bots are to each other as relatives
 	int mutationMarkers[NumberOfMutationMarkers];
 	uint nextMarker;
 
-
 	void ChangeMutationMarker();
 
-	//Set random mutation markers
 	void RandomizeMarkers();
-
-	//Set random color
 	void RandomizeColor();
-
-	//Set random direction
 	void RandomDirection();
 
 	//Severe mutation function - Experimental
@@ -107,11 +108,18 @@ class Bot:public Object
 	//Experimental
 	void SlightlyMutate();
 
-	//Main mutate function
 	void Mutate();
 
-	//Draw bot outline and his head
-	void drawOutlineAndHead(SDL_Rect rect);
+
+	void drawOutlineAndHead();
+
+
+	//Create brain input data
+	BrainInput FillBrainInput();
+
+	void Multiply(int numChildren);
+	void Attack();
+	void Photosynthesis();
 
 
 	//----------------------------------------------------------------------------------------------
@@ -122,27 +130,23 @@ class Bot:public Object
 	int adaptation_numRightSteps = 0;
 	int addaptation_lastX;
 
-	const int adaptation_ticks = 1;
-
-	bool ArtificialSelectionWatcher();
-
-	public: 
-		static int adaptationStep;
-		static int adaptationStep2;
-		static int adaptationStep3;
-		static int adaptationStep4;
-		static int adaptationStep5;
-		static int adaptationStep6;
-		static int adaptationStep7;
-	//----------------------------------------------------------------------------------------------
-
-
-public:
+	int adaptationCounter = 0;
 
 	//How many times bot used attack and move commands
 	int numAttacks = 0;
 	int numMoves = 0;
 
+	//Bot visited land
+	bool wasOnLand = false;
+
+	bool ArtificialSelectionWatcher_Winds();
+	bool ArtificialSelectionWatcher_Divers();
+		
+	//----------------------------------------------------------------------------------------------
+
+
+public:
+	
 	//Experimental
 	void Mutagen();
 
@@ -151,46 +155,30 @@ public:
 
 	//Bot tick function, it should always call parents tick function first
 	int tick() override;
+	
 
-	//Bot main draw function
 	void draw() override;
+	void drawEnergy() override;
+	void drawPredators() override;
+		
 
-	//Bot draw function in energy mode
-	void drawEnergy();
-
-	//Bot draw function in predators mode
-	void drawPredators();
-
-	//Change rotation function
 	void Rotate(int dir = 1);
+	
 
-	//Give a bot some energy
 	void GiveEnergy(int num, EnergySource src = unknown);
 
 	//Return current energy amount from different sources
-	int GetEnergy();
 	int GetEnergyFromPS();
 	int GetEnergyFromKills();
 
-	//Returns a pointer to mutation markers array
 	int* GetMarkers();
+	Color* GetColor();
 
-	//Get bot color
-	Uint8* GetColor();
-
-	//Get neural net pointer
-	Neuron* GetNeuralNet();
-
-	//Get brain
-	BotNeuralNet* GetBrain();
-
-	//Get rotation
-	Point GetDirection();
-	uint GetRotationVal();
+	BotNeuralNet* GetActiveBrain();
+	BotNeuralNet* GetInitialBrain();
 
 	//Take away bot energy, return true if 0 or below (bot dies)
 	bool TakeEnergy(int val);
-
 
 	/*Get neuron summary(info)
 	Format: (all integers)
@@ -202,30 +190,28 @@ public:
 	-dead end neurons
 	-total neurons
 	*/
-	struct summary_return{ int simple, radialBasis, random, memory, connections, deadend, neurons; } GetNeuronSummary();
+	struct summary_return
+	{ 
+		int simple, radialBasis, random, memory, connections, deadend, neurons; 
+	} 
+	GetNeuronSummary();
 
 	/*Find out how close these two are as relatives,
 	returns number of matching mutation markers*/
 	int FindKinship(Bot* stranger);
 
-	//Change bot color
-	void Repaint(Uint8 [3]);
+	void SetColor(Color);
+	void SetColor(Uint8, Uint8, Uint8);
+
 
 	//Inherit from a parent
 	Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate = false);
 
 	//New bot
-	Bot(int X, int Y, uint Energy = 100);
+	Bot(int X, int Y, uint Energy = MaxPossibleEnergyForABot);
 
 
-
-	//This function is used only after a bot was loaded from file!!
-	void GiveInitialEnergyAndMarkers();
-
-
-	//Random color
-	static struct s_Color{ Uint8 rgb[3]; } GetRandomColor();
-
+	static Color GetRandomColor();
 
 };
 

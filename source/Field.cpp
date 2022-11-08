@@ -1,8 +1,26 @@
+
 #include "Field.h"
 
 
 int Field::seed;
+int Field::renderX=0;
 
+Season season;
+
+
+void Field::shiftRenderPoint(int cx)
+{
+    renderX += cx;
+
+    if (renderX < 0)
+    {
+        renderX = FieldCellsWidth - 1;
+    }
+    else if (renderX >= FieldCellsWidth)
+    {
+        renderX = 0;
+    }
+}
 
 
 Point Field::FindFreeNeighbourCell(int X, int Y)
@@ -13,6 +31,8 @@ Point Field::FindFreeNeighbourCell(int X, int Y)
         return { X,Y };
     }
 
+    //Form an array of nearby free cells
+
     int tx;
     Point tmpArray[9];
     int i = 0;
@@ -21,7 +41,6 @@ Point Field::FindFreeNeighbourCell(int X, int Y)
     {
         for (int cy = -1; cy < 2; ++cy)
         {
-
             tx = ValidateX(X + cx);
 
             if (IsInBounds(tx, Y + cy))
@@ -35,6 +54,39 @@ Point Field::FindFreeNeighbourCell(int X, int Y)
     }
 
     //Get random free cell from array
+    if (i > 0)
+    {
+        return tmpArray[RandomVal(i)];
+    }
+
+    //No free cells nearby
+    return { -1, -1 };
+}
+
+Point Field::FindRandomNeighbourBot(int X, int Y)
+{
+    int tx;
+    Point tmpArray[9];
+    int i = 0;
+
+    for (int cx = -1; cx < 2; ++cx)
+    {
+        for (int cy = -1; cy < 2; ++cy)
+        {
+            tx = ValidateX(X + cx);
+
+            if (IsInBounds(tx, Y + cy))
+            {
+                if (allCells[tx][Y + cy] != NULL)
+                {
+                    if(allCells[tx][Y + cy]->type == bot)
+                        tmpArray[i++].Set(tx, Y + cy);
+                }
+            }
+        }
+    }
+
+    //Get random bot from array
     if (i > 0)
     {
         return tmpArray[RandomVal(i)];
@@ -80,7 +132,6 @@ int Field::FindHowManyFreeCellsAround(int X, int Y)
 
 int Field::MoveObject(int fromX, int fromY, int toX, int toY)
 {
-
     if (!IsInBounds(toX, toY))
         return -2;
 
@@ -130,6 +181,17 @@ void Field::RemoveObject(int X, int Y)
     }
 }
 
+void Field::RemoveAllObjects()
+{
+    for (int cx = 0; cx < FieldCellsWidth; ++cx)
+    {
+        for (int cy = 0; cy < FieldCellsHeight; ++cy)
+        {
+            RemoveObject(cx, cy);
+        }
+    }
+}
+
 void Field::RemoveBot(int X, int Y, int energyVal)
 {
     RemoveObject(X, Y);
@@ -140,7 +202,7 @@ void Field::RemoveBot(int X, int Y, int energyVal)
     #endif
 }
 
-void Field::RepaintBot(Bot* b, Uint8 newColor[3], int differs)
+void Field::RepaintBot(Bot* b, Color newColor, int differs)
 {
     Object* tmpObj;
 
@@ -156,7 +218,7 @@ void Field::RepaintBot(Bot* b, Uint8 newColor[3], int differs)
                 {
                     if (((Bot*)tmpObj)->FindKinship(b) >= (NumberOfMutationMarkers - differs))
                     {
-                        ((Bot*)tmpObj)->Repaint(newColor);
+                        ((Bot*)tmpObj)->SetColor(newColor);
                     }
                 }
             }
@@ -165,8 +227,7 @@ void Field::RepaintBot(Bot* b, Uint8 newColor[3], int differs)
     }
 }
 
-//Tick function for every object,
-//Returns true if object was destroyed
+
 void Field::ObjectTick(Object* tmpObj)
 {
     int t = tmpObj->tick();
@@ -175,345 +236,23 @@ void Field::ObjectTick(Object* tmpObj)
     {
         //Object destroyed
         if (tmpObj->type == bot)
-            RemoveBot(tmpObj->x, tmpObj->y, ((Bot*)tmpObj)->GetEnergy());
+            RemoveBot(tmpObj->x, tmpObj->y, tmpObj->energy);
         else
             RemoveObject(tmpObj->x, tmpObj->y);
 
         return;
-    }
-    else if (t == 2)
-    {
-        //Skip tick
-        return;
-    }
-    else if (tmpObj->type == bot)   //Object is a bot
-    {
-        int TEMP_x1 = tmpObj->x;
-
-        Bot* tmpBot = (Bot*)tmpObj;
-        BrainOutput tmpOut;
-        Point lookAt = tmpBot->GetDirection();
-
-        //Fill brain input structure
-        BrainInput input;
-
-        //Desired destination,
-        //that is what bot is lookinig at
-        int
-        cx = tmpBot->x + lookAt.x,
-        cy = tmpBot->y + lookAt.y;
-
-        cx = ValidateX(cx);
-
-        //If destination is out of bounds
-        if (!IsInBounds(cx, cy))
-        {
-            //1 if unpassable
-            input.vision = 1.0f;
-        }
-        else
-        {
-            //Destination cell is empty
-            if (!allCells[cx][cy])
-            {
-                //0 if empty
-                input.vision = 0.0f;
-            }
-            else
-            {
-                //Destination not empty
-                switch (allCells[cx][cy]->type)
-                {
-                case bot:
-                    //0.5 if someone in that cell
-                    input.vision = .5f;
-
-                    //Calculate how close they are as relatives, based on mutation markers
-                    input.isRelative = 1.0f - ((((Bot*)allCells[cx][cy])->FindKinship(tmpBot)) * 1.0f) / (NumberOfMutationMarkers * 1.0f);
-                    break;
-
-                case rock:
-                    //1.0 if cell is unpassable
-                    input.vision = 1.0f;
-                    break;
-
-                case organic_waste:
-                    //-.5 if cell contains organics
-                    input.vision = -.5f;
-                    break;
-
-                case apple:
-                    //-1.0 if cell contains an apple
-                    input.vision = -1.0f;
-                    break;
-                }
-            }
-        }
-
-        //Bot brain does its stuff
-        tmpOut = tmpBot->think(input);
-
-        //Multiply first
-        for (int b = 0; b < tmpOut.divide; ++b)
-        {
-            //Dies if energy is too low
-            if (tmpBot->GetEnergy() <= EnergyPassedToAChild + GiveBirthCost)
-            {
-                RemoveBot(tmpObj->x, tmpObj->y);
-                return;
-            }
-            else
-            {
-                //Gives birth otherwise
-                //Ignore all commented lines
-                //Point freeSpace = FindFreeNeighbourCell(tmpObj->x, tmpObj->y);
-                Point freeSpace;
-                //Point freeSpace = { tmpObj->x - 1, tmpObj->y };
-                //freeSpace.x = ValidateX(freeSpace.x);
-
-                //if(allCells[freeSpace.x][freeSpace.y] != NULL)
-                   // freeSpace = FindFreeNeighbourCell(tmpObj->x, tmpObj->y);
-
-                //if ((tmpOut.divideDirX == 0) && (tmpOut.divideDirY == 0))
-                //{
-                    freeSpace = FindFreeNeighbourCell(tmpObj->x, tmpObj->y);
-
-                    if (freeSpace.x != -1)
-                    {
-                        tmpBot->TakeEnergy(EnergyPassedToAChild + GiveBirthCost);
-                        AddObject(new Bot(freeSpace.x, freeSpace.y, EnergyPassedToAChild, tmpBot, RandomPercent(MutationChancePercent)));
-                        return;
-                    }
-                /* }
-                else
-                {
-                    //freeSpace = { tmpObj->x -1, tmpObj->y };
-
-                    cx = tmpObj->x + tmpOut.divideDirX;
-                    cy = tmpObj->y + tmpOut.divideDirY;
-
-                    if (IsInBounds(cx, cy))
-                    {
-                        if (allCells[cx][cy] == NULL)
-                        {
-                            tmpBot->TakeEnergy(EnergyPassedToAChild + GiveBirthCost);
-                            AddObject(new Bot(freeSpace.x, freeSpace.y, EnergyPassedToAChild, tmpBot, RandomPercent(MutationChancePercent)));
-                            return;
-                        }
-                    }
-                }*/
-            }
-        }
-
-        //Then attack
-        if (tmpOut.attack)
-        {
-            //If dies of low energy
-            if (tmpBot->TakeEnergy(AttackCost))
-            {
-                RemoveBot(tmpObj->x, tmpObj->y);
-                return;
-            }
-            else
-            {
-                //Get direction of attack
-                Point dir = tmpBot->GetDirection();
-
-                cx = ValidateX(tmpBot->x + dir.x);
-                cy = tmpBot->y + dir.y;
-
-                if (IsInBounds(cx, cy))
-                {
-                    //If there is an object
-                    if (allCells[cx][cy])
-                    {
-                        if (allCells[cx][cy]->type == bot)
-                        {
-                            //New rule: attack only from behind
-                            /*int diff = tmpBot->GetRotationVal() - ((Bot*)allCells[cx][cy])->GetRotationVal();
-
-                            diff = abs(diff);
-
-                            if ((diff <= 1) || (diff >= 6))
-                            {*/
-                                //Kill an object
-                                tmpBot->GiveEnergy(((Bot*)allCells[cx][cy])->GetEnergy(), kills);
-                                RemoveBot(cx, cy);
-
-                                tmpBot->numAttacks++;
-                            //}
-                        }
-                        else if (allCells[cx][cy]->type == organic_waste)
-                        {
-                            //Eat organics
-                            tmpBot->GiveEnergy(((Organics*)allCells[cx][cy])->energy, organics);
-                            RemoveObject(cx, cy);
-                        }
-                        else if (allCells[cx][cy]->type == apple)
-                        {
-                            //Eat apple
-                            tmpBot->GiveEnergy(((Apple*)allCells[cx][cy])->energy, organics);
-                            RemoveObject(cx, cy);
-                        }
-                        #ifdef RockCanBeEaten
-                        else if (allCells[cx][cy]->type == rock)
-                        {
-                            //Eat rock
-                            RemoveObject(cx, cy);
-                        }
-                        #endif
-                    }
-                }
-            }
-        }
-        /*else if(tmpOut.eatOrganicWaste)
-        {
-            //Now eat organics
-            //Get direction 
-            Point dir = tmpBot->GetDirection();
-
-            cx = ValidateX(tmpBot->x + dir.x);
-            cy = tmpBot->y + dir.y;
-
-            if (IsInBounds(cx, cy))
-            {
-                //If there is an object
-                if (allCells[cx][cy])
-                {
-                    if (allCells[cx][cy]->type == organic_waste)
-                    {
-                        //Eat organics
-                        tmpBot->GiveEnergy(((Organics*)allCells[cx][cy])->energy, organics);
-                        RemoveObject(cx, cy);
-                    }
-                }
-            }
-        }*/
-        else
-        {
-            //Rotate after
-            if (tmpOut.rotate != 0.0f)
-            {
-                //If dies of low energy
-                if (tmpBot->TakeEnergy(RotateCost))
-                {
-                    RemoveBot(tmpObj->x, tmpObj->y);
-                    return;
-                }
-
-                tmpBot->Rotate(tmpOut.rotate);
-            }
-
-            //Move
-            if (tmpOut.move)
-            {
-                if (tmpBot->TakeEnergy(MoveCost))
-                {
-                    RemoveBot(tmpObj->x, tmpObj->y);
-                    return;
-                }
-
-                Point dir = tmpBot->GetDirection();
-
-                cx = tmpBot->x + dir.x;
-                cy = tmpBot->y + dir.y;
-
-                cx = ValidateX(cx);
-
-                //Place object in a new place
-                if(MoveObject(tmpBot, cx, cy) == 0)
-                    ++tmpBot->numMoves;
-                
-            }
-            //Photosynthesis
-            else if (tmpOut.photosynthesis)
-            {
-                #ifdef NoPhotosynthesis
-                return;
-                #endif
-
-                //If not in ocean
-                //if (tmpBot->y < FieldCellsHeight - OceanHeight)
-                if (tmpBot->y < (FieldCellsHeight - Bot::adaptationStep5))
-                {
-                    int toGive;
-
-                    //Give energy depending on a season
-                    switch (season)
-                    {
-                    case summer:
-                        #ifdef UseSeasons
-                        toGive = PhotosynthesisReward_Summer;
-                        #else
-                        toGive = foodBase;
-                        //toGive = FindHowManyFreeCellsAround(tmpBot->x, tmpBot->y) - 3;
-
-                        //if (toGive < 0) toGive = 0;
-                        #endif
-                        break;
-                    case autumn: case spring:
-                        toGive = PhotosynthesisReward_Autumn;
-                        break;
-                    case winter:
-                        //toGive = (ticknum%4 == 0)?PhotosynthesisReward/8:0;
-                        toGive = PhotosynthesisReward_Winter;
-                        //toGive = (ticknum % 5 == 0) ? 2 : 1;
-                        break;
-                    }
-
-                    tmpBot->GiveEnergy(toGive, PS);
-                }
-                else
-                {
-                    //tmpBot->GiveEnergy(foodBase/2, PS);
-                #ifndef NoPhotosyntesisInOcean
-                    if(RandomPercentX10(Bot::adaptationStep4))
-                        tmpBot->GiveEnergy(foodBase, PS);
-                #endif
-                }
-            }
-        }
-    }
-    else if (tmpObj->type == organic_waste)
-    {
-        //Organic waste should fall until it hits an obstacle
-        Organics* tmpOrg = (Organics*)tmpObj;
-
-        int
-        x = tmpOrg->x,
-        y = tmpOrg->y + 1;
-
-        //If not done falling
-        if (!tmpOrg->doneFalling)
-        {
-            //What is underneath?
-            if (IsInBounds(x, y))
-            {
-                if (allCells[x][y] == NULL)
-                {
-                    //Fall
-                    MoveObject(tmpOrg, x, y);
-                }
-                else
-                {
-                    #ifndef OrganicWasteAlwaysFalls
-                        tmpOrg->doneFalling = true;
-                    #endif
-                }
-            }
-            else
-                tmpOrg->doneFalling = true; //Once done it shouldn't fall anymore
-        }
     }
 }
 
 //tick function for single threaded build
 inline void Field::tick_single_thread()
 {
-
     Object* tmpObj;
+
     objectsTotal = 0;
     botsTotal = 0;
+    applesTotal = 0;
+    organicsTotal = 0;
 
     for (uint ix = 0; ix < FieldCellsWidth; ++ix)
     {
@@ -527,13 +266,16 @@ inline void Field::tick_single_thread()
 
                 if (tmpObj->type == bot)
                     ++botsTotal;
+                else if (tmpObj->type == apple)
+                    ++applesTotal;
+                else if (tmpObj->type == organic_waste)
+                    ++organicsTotal;
 
                 ObjectTick(tmpObj);
             }
         }
 
     }
-
 }
 
 //Wait for a signal 
@@ -574,10 +316,14 @@ Again:
             if (tmpObj == NULL)
                 continue;
 
-            ++objectCounters[index];
+            ++counters[index][0];
 
             if (tmpObj->type == bot)
-                ++botsTotal;
+                ++counters[index][1];
+            else if (tmpObj->type == apple)
+                ++counters[index][2];
+            else if (tmpObj->type == organic_waste)
+                ++counters[index][3];
 
             ObjectTick(tmpObj);
 
@@ -600,10 +346,14 @@ Again:
             if (tmpObj == NULL)
                 continue;
 
-            ++objectCounters[index];
+            ++counters[index][0];
 
             if (tmpObj->type == bot)
-                ++botsTotal;
+                ++counters[index][1];
+            else if (tmpObj->type == apple)
+                ++counters[index][2];
+            else if (tmpObj->type == organic_waste)
+                ++counters[index][3];
 
             ObjectTick(tmpObj);
 
@@ -629,7 +379,6 @@ void Field::StartThreads()
 //Wait for all threads to finish their calculations
 void Field::WaitForThreads()
 {
-
     uint threadsReady;
 
     for (;;)
@@ -649,7 +398,6 @@ void Field::WaitForThreads()
         std::this_thread::yield();
 
     }
-
 }
 
 //Multithreaded tick function
@@ -659,13 +407,28 @@ inline void Field::tick_multiple_threads()
     {
         repeat(NumThreads)
         {
-            objectCounters[i] = 0;
-            botsCounters[i] = 0;
+            counters[i][0] = 0;
+            counters[i][1] = 0;
+            counters[i][2] = 0;
+            counters[i][3] = 0;
         }
     };
 
     objectsTotal = 0;
     botsTotal = 0;
+    applesTotal = 0;
+    organicsTotal = 0;
+
+    auto addToCounters = [&]()
+    {
+        repeat(NumThreads)
+        {
+            objectsTotal += counters[i][0];
+            botsTotal += counters[i][1];
+            applesTotal += counters[i][2];
+            organicsTotal += counters[i][3];
+        }
+    };
 
     //Clear object counters
     clear_counters();
@@ -677,11 +440,7 @@ inline void Field::tick_multiple_threads()
     WaitForThreads();
 
     //Add object counters
-    repeat(NumThreads)
-    {
-        objectsTotal += objectCounters[i];
-        botsTotal += botsCounters[i];
-    }
+    addToCounters();
 
     //Clear object counters
     clear_counters();
@@ -693,13 +452,11 @@ inline void Field::tick_multiple_threads()
     WaitForThreads();
 
     //Add object counters
-    repeat(NumThreads)
-    {
-        objectsTotal += objectCounters[i];
-        botsTotal += botsCounters[i];
-    }
+    addToCounters();
 
 }
+
+void Field::TerminateThread() {};
 
 //Tick function
 void Field::tick(uint thisFrame)
@@ -727,7 +484,6 @@ void Field::tick(uint thisFrame)
 //Draw simulation field with all its objects
 void Field::draw(RenderTypes render)
 {
-
     //Background
     SDL_SetRenderDrawColor(renderer, FieldBackgroundColor);
     SDL_RenderFillRect(renderer, &mainRect);
@@ -735,66 +491,52 @@ void Field::draw(RenderTypes render)
     //Ocean
 #ifdef DrawOcean
     SDL_SetRenderDrawColor(renderer, OceanColor);
-    oceanRect.y = (FieldHeight + FieldY) - (Bot::adaptationStep5 * FieldCellSize);
-    oceanRect.h = Bot::adaptationStep5 * FieldCellSize;
+    oceanRect.y = (FieldHeight + FieldY) - (params.oceanLevel * FieldCellSize);
+    oceanRect.h = params.oceanLevel * FieldCellSize;
     SDL_RenderFillRect(renderer, &oceanRect);
 #endif
 
     //Mud layer
 #ifdef DrawMudLayer
     SDL_SetRenderDrawColor(renderer, MudColor);
-    mudLayerRect.y = (FieldHeight + FieldY) - (Bot::adaptationStep7 * FieldCellSize);
-    mudLayerRect.h = Bot::adaptationStep7 * FieldCellSize;
+    mudLayerRect.y = (FieldHeight + FieldY) - (params.mudLevel * FieldCellSize);
+    mudLayerRect.h = params.mudLevel * FieldCellSize;
     SDL_RenderFillRect(renderer, &mudLayerRect);
 #endif
 
-    //Bots
+    //Objects
     Object* tmpObj;
+    int ix = renderX;
 
-    for (uint ix = 0; ix < FieldCellsWidth; ++ix)
+    for (uint i = 0; i < FieldRenderCellsWidth; ++i)
     {
         for (uint iy = 0; iy < FieldCellsHeight; ++iy)
         {
+
+            if (ix >= FieldCellsWidth)
+                ix -= FieldCellsWidth;
 
             tmpObj = allCells[ix][iy];
 
             if (tmpObj)
             {
-
-                if (tmpObj->type == bot)
+                //Draw function switch, based on selected render type
+                switch (render)
                 {
-                    //Draw function switch, based on selected render type
-                    switch (render)
-                    {
-                    case natural:
-                        tmpObj->draw();
-                        break;
-                    case predators:
-                        ((Bot*)tmpObj)->drawPredators();
-                        break;
-                    case energy:
-                        ((Bot*)tmpObj)->drawEnergy();
-                        break;
-                    }
-
-                }
-                else if (tmpObj->type == organic_waste)
-                {
-                    switch (render)
-                    {
-                    case energy:
-                        ((Organics*)tmpObj)->drawEnergy();
-                        break;
-                    default:
-                        tmpObj->draw();
-                        break;
-                    }
-                }
-                else
+                case natural:
                     tmpObj->draw();
-
+                    break;
+                case predators:
+                    tmpObj->drawPredators();
+                    break;
+                case energy:
+                    tmpObj->drawEnergy();
+                    break;
+                }
             }
         }
+
+        ++ix;
     }
 }
 
@@ -809,31 +551,41 @@ bool Field::IsInBounds(Point p)
     return IsInBounds(p.x, p.y);
 }
 
+bool Field::IsInWater(int Y)
+{
+    return (Y >= (FieldCellsHeight - params.oceanLevel));
+}
 
-//This function is needed to tile world horizontally (change X = -1 to X = FieldCellsWidth etc.)
+bool Field::IsInMud(int Y)
+{
+    return (Y >= (FieldCellsHeight - params.mudLevel));
+}
+
+
+
 int Field::ValidateX(int X)
 {
 #ifdef TileWorldHorizontally
     if (X < 0)
     {
-        return (X % FieldCellsWidth) + FieldCellsWidth;
+        return X + FieldCellsWidth;
     }
     else if (X >= FieldCellsWidth)
     {
-        return (X % FieldCellsWidth);
+        return (X - FieldCellsWidth);
     }
 #endif      
 
     return X;
 }
 
-//Is cell out of bounds, given absolute screen space coordinates
+
 bool Field::IsInBoundsScreenCoords(int X, int Y)
 {
     return ((X >= mainRect.x) && (X <= mainRect.x + mainRect.w) && (Y >= mainRect.y) && (Y <= mainRect.y + mainRect.h));
 }
 
-//Transform absolute screen coords to cell position on field
+
 Point Field::ScreenCoordsToLocal(int X, int Y)
 {
     X -= FieldX;
@@ -842,16 +594,20 @@ Point Field::ScreenCoordsToLocal(int X, int Y)
     X /= FieldCellSize;
     Y /= FieldCellSize;
 
+    X += renderX;
+
+    X = ValidateX(X);
+
     return { X, Y };
 }
 
-//Get object at certain point on field
+
 Object* Field::GetObjectLocalCoords(int X, int Y)
 {
     return allCells[X][Y];
 }
 
-//Validates if object exists
+
 bool Field::ValidateObjectExistance(Object* obj)
 {
     for (uint ix = 0; ix < FieldCellsWidth; ++ix)
@@ -866,125 +622,49 @@ bool Field::ValidateObjectExistance(Object* obj)
     return false;
 }
 
-//How many objects on field, previous frame
+
 uint Field::GetNumObjects()
 {
     return objectsTotal;
 }
 
-//How many bots
 uint Field::GetNumBots()
 {
     return botsTotal;
 }
 
-
-/*Save / load
-TODO!!!
-File format:
-4b - 0xfafa458e (no meaning)
-4b - creature type
-4b - uint num layers
-4b - uint neurons in layer
-4b - sizeof (Neuron)
-following all neurons from first to last layer by layer
-*/
-bool Field::SaveObject(Object* obj, char* filename)
+uint Field::GetNumApples()
 {
-    if (obj->type != bot)
-        return false;
-
-    //Open file for writing, binary type, all contents to be deleted
-    std::ofstream file(filename, std::ios::in | std::ios::binary | std::ios::trunc);
-
-    if (file.is_open())
-    {
-        int i = 0xfafa458e;
-
-        file.write((char*)&i, sizeof(int));
-        i = 1;
-        file.write((char*)&i, sizeof(int));
-        i = NumNeuronLayers;
-        file.write((char*)&i, sizeof(int));
-        i = NeuronsInLayer;
-        file.write((char*)&i, sizeof(int));
-        i = sizeof Neuron;
-        file.write((char*)&i, sizeof(int));
-
-        file.write((char*)((Bot*)obj)->GetNeuralNet(), NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
-
-        file.close();
-
-        return true;
-    }
-
-    return false;
-
+    return applesTotal;
 }
 
-bool Field::LoadObject(Object* obj, char* filename)
+uint Field::GetNumOrganics()
 {
-    //Open file for reading, binary type
-    std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::beg);
-
-    if (file.is_open())
-    {
-        int i = 0;
-
-        file.read((char*)&i, sizeof(int));
-
-        if (i != 0xfafa458e)
-            return false;
-
-        file.read((char*)&i, sizeof(int));
-
-        if (i != 1)
-            return false;
-
-        file.read((char*)&i, sizeof(int));
-        if (i != NumNeuronLayers)
-            return false;
-        file.read((char*)&i, sizeof(int));
-        if (i != NeuronsInLayer)
-            return false;
-        file.read((char*)&i, sizeof(int));
-        if (i != sizeof Neuron)
-            return false;
-
-        file.read((char*)((Bot*)obj)->GetNeuralNet(), NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
-
-        file.close();
-
-        ((Bot*)obj)->GiveInitialEnergyAndMarkers();
-
-        return true;
-
-    }
-
-    return false;
-
+    return organicsTotal;
 }
 
 
-//Spawn group of random bots
+
+
 void Field::SpawnControlGroup()
 {
     for (int i = 0; i < ControlGroupSize; ++i)
     {
-        Bot* tmpBot = new Bot(RandomVal(FieldCellsWidth), RandomVal(FieldCellsHeight), 100);
+        Bot* tmpBot = new Bot(RandomVal(FieldCellsWidth), RandomVal(FieldCellsHeight), MaxPossibleEnergyForABot);
 
         if (!AddObject(tmpBot))
             delete tmpBot;
     }
 }
 
+
 void Field::SpawnApples()
 {
-    Object* tmpObj;
+    Object* tmpObj; 
 
     for (uint ix = 0; ix < FieldCellsWidth; ++ix)
     {
-        for (uint iy = 0; iy < FieldCellsHeight; ++iy)
+        for (uint iy = 0; iy < (FieldCellsHeight - params.oceanLevel); ++iy)
         {
 
             tmpObj = allCells[ix][iy];
@@ -1026,10 +706,10 @@ Field::Field()
     repeat(NumThreads)
         threadGoMarker[i] = false;
 
-    threads[0] = new std::thread(&Field::ProcessPart_4Threads, this, 0, 0, FieldCellsWidth / 4, FieldCellsHeight, 0);
-    threads[1] = new std::thread(&Field::ProcessPart_4Threads, this, FieldCellsWidth / 2, 0, (FieldCellsWidth / 4) * 3, FieldCellsHeight, 1);
-    threads[2] = new std::thread(&Field::ProcessPart_4Threads, this, FieldCellsWidth / 4, 0, FieldCellsWidth / 2, FieldCellsHeight, 2);
-    threads[3] = new std::thread(&Field::ProcessPart_4Threads, this, (FieldCellsWidth / 4) * 3, 0, FieldCellsWidth, FieldCellsHeight, 3);
+    threads[0] = new std::thread(&Field::ProcessPart_MultipleThreads, this, 0, 0, FieldCellsWidth / 4, FieldCellsHeight, 0);
+    threads[1] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 2, 0, (FieldCellsWidth / 4) * 3, FieldCellsHeight, 1);
+    threads[2] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 4, 0, FieldCellsWidth / 2, FieldCellsHeight, 2);
+    threads[3] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 4) * 3, 0, FieldCellsWidth, FieldCellsHeight, 3);
 
     #endif
 
@@ -1047,4 +727,7 @@ Field::Field()
     threads[6] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 4) * 3, 0, (FieldCellsWidth / 8) * 7, FieldCellsHeight, 6);
     threads[7] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 8) * 7, 0, FieldCellsWidth, FieldCellsHeight, 7);
     #endif
+
+    Object::SetPointers(this, (Object***)allCells);
+
 }

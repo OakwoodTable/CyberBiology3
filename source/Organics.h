@@ -1,25 +1,24 @@
 #pragma once
-#include "Object.h"
+//#pragma message("	Organics_h")
 
 
+#include "Field.h"
 
-//Organics class
+
 class Organics :public Object
 {
 
 public:
 
 	bool doneFalling = false;
-	int energy;
 
 
-	//Draw
+	int tick() override;
+
 	void draw() override;
+	void drawEnergy() override;
 
-	//Draw energy
-	void drawEnergy();
 
-	//New organic waste
 	Organics(int, int, int);
 
 };

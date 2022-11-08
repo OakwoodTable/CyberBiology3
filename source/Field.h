@@ -1,10 +1,23 @@
 #pragma once
+//#pragma message("   Field_h")
 
 
+class Object;
+class Bot;
+class Apple;
+class Rock;
+class Organics;
+class ObjectSaver;
+
+
+
+#include "Object.h"
 #include "Bot.h"
+#include "Apple.h"
 #include "Rock.h"
 #include "Organics.h"
-#include "Apple.h"
+
+#include "ObjectSaver.h"
 
 
 //Don't touch
@@ -38,22 +51,45 @@ enum Season
 
 extern Season season;
 
+struct FieldDynamicParams
+{
+    int oceanLevel = InitialOceanHeight;
+    int mudLevel = InitialMudLayerHeight;
+    int appleEnergy = DefaultAppleEnergy;
+
+    int adaptation_DeathChance_Winds = 0;
+    int adaptation_StepsNum_Winds = 2;
+
+    int adaptation_landBirthBlock = 0;
+    int adaptation_seaBirthBlock = 0;
+    int adaptation_PSInOceanBlock = 0;
+    int adaptation_PSInMudBlock = 0;
+    int adaptation_botShouldBeOnLandOnceToMultiply = 0;
+    int adaptation_forceBotMovements = 0;
+};
+
 
 
 //Simulation field class
-class Field
+class Field final
 {
     //All cells as 2d array
     Object* allCells[FieldCellsWidth][FieldCellsHeight];
 
     //Rectangles
     const SDL_Rect mainRect = { FieldX , FieldY, FieldWidth, FieldHeight };
-    SDL_Rect oceanRect = { FieldX , FieldY + (FieldHeight - (OceanHeight * FieldCellSize)), FieldWidth, OceanHeight * FieldCellSize };
-    SDL_Rect mudLayerRect = { FieldX , FieldY + (FieldHeight - (MudLayerHeight * FieldCellSize)), FieldWidth, MudLayerHeight * FieldCellSize };
+
+    SDL_Rect oceanRect = { FieldX , FieldY + (FieldHeight - (InitialOceanHeight * FieldCellSize)),
+        FieldWidth, InitialOceanHeight * FieldCellSize };
+
+    SDL_Rect mudLayerRect = { FieldX , FieldY + (FieldHeight - (InitialMudLayerHeight * FieldCellSize)),
+        FieldWidth, InitialMudLayerHeight * FieldCellSize };
 
     //Needed to calculate number of active objects and bots (calculated on every frame)
     uint objectsTotal = 0;
     uint botsTotal = 0;
+    uint applesTotal = 0;
+    uint organicsTotal = 0;
 
     //Apple spawn timer
     uint spawnApplesInterval = 0;
@@ -61,16 +97,9 @@ class Field
     //threads
     bool threadGoMarker[NumThreads];
     std::thread* threads[NumThreads];
-    uint objectCounters[NumThreads];
-    uint botsCounters[NumThreads];
+    uint counters[NumThreads][4];
     bool terminateThreads = false;
 
-
-    //Find empty cell nearby, otherwise return {-1, -1}
-    Point FindFreeNeighbourCell(int X, int Y);
-
-    //How may free cells are available around given one
-    int FindHowManyFreeCellsAround(int X, int Y);
 
     //tick function for single threaded build
     inline void tick_single_thread();
@@ -88,13 +117,15 @@ class Field
     inline void tick_multiple_threads();
 
     //Terminator function
-    [[noreturn]] static void TerminateThread() {};
+    [[noreturn]] static void TerminateThread();
 
     //Wait for a signal 
     inline void ThreadWait(const uint index);
     
 
 public:
+
+    void shiftRenderPoint(int cx);
 
     //Number of food for photosynthesis and other means
     int foodBase = FoodbaseInitial;
@@ -104,20 +135,19 @@ public:
     int MoveObject(int fromX, int fromY, int toX, int toY);
     int MoveObject(Object* obj, int toX, int toY);
 
-    //Add new object
     bool AddObject(Object* obj);
 
     //Remove object and delete object class
     void RemoveObject(int X, int Y);
+    void RemoveAllObjects();
 
     //Remove a bot (same as remove object but for a bot)
     void RemoveBot(int X, int Y, int energyVal = 0);
 
     //Repaint bot
-    void RepaintBot(Bot* b, Uint8 newColor[3], int differs = 1);
+    void RepaintBot(Bot* b, Color newColor, int differs = 1);
 
-    //Tick function for every object,
-    //Returns true if object was destroyed
+    //Tick function for every object
     void ObjectTick(Object* tmpObj);
 
     //Tick function
@@ -130,6 +160,16 @@ public:
     bool IsInBounds(int X, int Y);
     bool IsInBounds(Point p);
 
+    bool IsInWater(int Y);
+    bool IsInMud(int Y);
+
+    //Find empty cell nearby, otherwise return {-1, -1}
+    Point FindFreeNeighbourCell(int X, int Y);
+
+    Point FindRandomNeighbourBot(int X, int Y);
+
+    //How may free cells are available around a given one
+    int FindHowManyFreeCellsAround(int X, int Y);
 
     //This function is needed to tile world horizontally (change X = -1 to X = FieldCellsWidth etc.)
     int ValidateX(int X);
@@ -140,45 +180,31 @@ public:
     //Transform absolute screen coords to cell position on field
     Point ScreenCoordsToLocal(int X, int Y);
 
-    //Get object at certain point on field
     Object* GetObjectLocalCoords(int X, int Y);
 
-    //Validates if object exists
     bool ValidateObjectExistance(Object* obj);
 
-    //How many objects on field, last frame
+
+    //How many objects on field, prev. frame
     uint GetNumObjects();
-
-    //Same for bots
     uint GetNumBots();
+    uint GetNumApples();
+    uint GetNumOrganics();
 
 
-    /*Save / load
-    TODO!!!
-    File format:
-    4b - 0xfafa458e (magic number)
-    4b - creature type 
-    4b - uint num layers
-    4b - uint neurons in layer
-    4b - sizeof (Neuron)
-    following all neurons from first to last layer by layer
-    */
-    bool SaveObject(Object* obj, char* filename);
-    bool LoadObject(Object* obj, char* filename);
-
+    //Save/load interface
+    ObjectSaver saver;
 
     //Spawn group of random bots
     void SpawnControlGroup();
-
-
-    //Spawn apples
     void SpawnApples();
 
 
-    //Create field
     Field();
 
     static int seed;
+    static int renderX;
 
+    FieldDynamicParams params;
 };
 

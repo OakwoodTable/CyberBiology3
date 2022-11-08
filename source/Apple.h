@@ -1,24 +1,17 @@
 #pragma once
-#include "Object.h"
+//#pragma message("	Apple_h")
 
 
+#include "Field.h"
 
-//Apple class
+
 class Apple :public Object
 {
 
 public:
 
-	int energy;
-
-
-	//Draw
 	void draw() override;
 
-	//Draw energy
-	//void drawEnergy();
-
-	//New apple
-	Apple(int, int, int = 0);
+	Apple(int X, int Y, int Energy = 0);
 
 };

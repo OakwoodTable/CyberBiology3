@@ -1,13 +1,17 @@
 #pragma once
 
-#include "Object.h"
 
+#include "Settings.h"
+#include "MyTypes.h"
 
 
 struct NeuronConnection
 {
-	uint num;
+	uint dest;
 	float weight;
+
+	void ChangeWeight();
+	void SetRandomWeight();
 };
 
 
@@ -21,6 +25,16 @@ enum NeuronType
 	memory
 };
 
+const int MaxConnectionsPerNeuronType[] = 
+{ 
+	MaxConnections_Basic, 
+	MaxConnections_Input, 
+	0,
+	MaxConnections_Random,
+	MaxConnections_RadialBasis,
+	MaxConnections_Memory 
+};
+
 
 struct Neuron
 {
@@ -29,58 +43,53 @@ struct Neuron
 	float bias = 0.0f;
 
 	uint numConnections = 0;
-	NeuronConnection allConnections[NeuronsInLayer];	
+	NeuronConnection allConnections[NeuronsInLayer];
 
+	int reserved = 0;
 
-	//Self explanatory
-	void AddConnection(uint NUM, float WEIGHT);
+	Neuron();
+
+	void Clone(Neuron* source);
+
+	void AddConnection(uint DEST, float WEIGHT);
+	bool AddRandomConnection();
+	void RemoveConnection(uint index);
 
 	//Sort connections by index
 	void SortConnections();
 
-	//Does neuron have a connection
-	bool IsConnected(uint index);
+	//Does neuron have a connection,
+	//returns connection index or -1
+	int IsConnected(uint index);
 
 
-	//Set to random
 	void SetRandomBias();
 	void SetRandomType();
 	void SetRandomConnections();
-
-	//Randomize entire neuron
 	void SetRandom();
 
-	//Zero connections
-	void ClearConnections();
-	//Zero bias and connections
+	void MakeFullyConnected();	
+
+	//Clear bias and connections
 	void SetZero();
+
+	void ClearConnections();	
 
 	//Tunnel neuron - one with no bias and only 1 connection to same neuron in next layer with weight = 1.0f
 	void SetTunnel(int num);
 
-	//Change neuron a little
 	void SlightlyChange();
+
+	
+	//Mutation functions
+	void mutate_ChangeType();
+	void mutate_ChangeBias();
+	void mutate_ChangeOneConnection();
+	void mutate_DeleteNeuron();
+
 
 
 	//Get neuron description by type (for GUI)
-	static char* GetTextFromType(NeuronType t)
-	{
-		switch (t)
-		{
-		case basic:
-			return (char*)"basic";
-		case input:
-			return (char*)"input";
-		case output:
-			return (char*)"output";
-		case radialbasis:
-			return (char*)"radial basis";
-		case memory:
-			return (char*)"memory";
-		case random:
-			return (char*)"random";
-		default:
-			return (char*)"other";
-		}
-	}
+	static char* GetTextFromType(NeuronType t);
+	
 };

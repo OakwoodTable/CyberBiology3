@@ -1,7 +1,7 @@
 #include "Apple.h"
 
 
-
+//TODO!!!
 //Temporary, very slow
 void RenderFilledCircle(SDL_Renderer* renderer, int x, int y, int radius)
 {
@@ -26,16 +26,20 @@ void RenderFilledCircle(SDL_Renderer* renderer, int x, int y, int radius)
 
 void Apple::draw()
 {
-	//Draw
+    CalcScreenX();
+
 	SDL_SetRenderDrawColor(renderer, AppleDrawColor);
 	
-    RenderFilledCircle(renderer, FieldX + x * FieldCellSize + FieldCellSizeHalf, FieldY + y * FieldCellSize + FieldCellSizeHalf, FieldCellSizeHalf);
+    RenderFilledCircle(renderer, FieldX + screenX * FieldCellSize + FieldCellSizeHalf,
+        FieldY + y * FieldCellSize + FieldCellSizeHalf, FieldCellSizeHalf);
 }
 
-Apple::Apple(int X, int Y, int Energy): Object(X, Y), energy(Energy)
+Apple::Apple(int X, int Y, int Energy): Object(X, Y)
 {
+    energy = Energy;
+
     if (energy == 0)
-        energy = DefaultAppleEnergy;
+        energy = pField->params.appleEnergy;
 
     type = apple;
 }
