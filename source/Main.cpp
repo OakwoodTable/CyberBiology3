@@ -35,8 +35,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	CreateRenderer();
 
-	//Setup Dear ImGui context
 	InitImGUI();
+
+	Apple::CreateImage();
+	Bot::CreateImage();
+	Organics::CreateImage();
 
 	//Main loop	
 	SDL_Event e;
@@ -58,13 +61,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 			}
 			else if (e.type == SDL_KEYDOWN)
 			{
-				simulation.CatchKeypress(SDL_GetKeyboardState(NULL));
+				simulation.CatchKeyboard();
 			}
 			else if (e.type == SDL_TEXTINPUT)
 			{
 				io->AddInputCharacter(*e.text.text);
 			}
-
 		}
 
 		//Mouse down event
@@ -74,15 +76,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		}
 
 		//Simulation
-		if(simulation.simulate)
+		if (simulation.simulate)
+		{
 			simulation.MakeStep();
+		}
+		else
+		{
+			//Delay so it would not eat too many resourses while on pause
+			SDL_Delay(1);
+		}
 
 		simulation.Render();
+
+		if (simulation.terminate)
+			goto exitfor;
 
 	}
 exitfor:
 
 	//Clear memory
+	Apple::DeleteImage();
+	Bot::DeleteImage();
+	Organics::DeleteImage();
+
 	DeInitImGUI();
 	DeInitSDL();
 
@@ -100,26 +116,43 @@ void Main::ChangeSeason()
 	}
 }
 
-//Pause/unpause
+
 void Main::Pause()
 {
 	simulate = !simulate;
+
+	if (simulate)
+	{
+		field->UnpauseThreads();
+	}
+	else
+	{
+		field->PauseThreads();
+	}
 }
 
 void Main::MakeStep()
 {
 	//Simulation step
-	currentTick = GetTickCount64();
+	currentTick = clock.now();
 
-	if (((currentTick - prevTick) >= simulation.interval) || (simulation.interval == 0) || (simulation.renderType == noRender))
+	if (limit_ticks_per_second > 0)
 	{
-	MakeStep:
+		limit_interval = 1000 / limit_ticks_per_second;
+	}
+	else
+	{
+		limit_interval = 0;
+	}
+
+	if ((TimeMSBetween(currentTick, prevTick) >= limit_interval) || (limit_interval == 0) || (renderType == noRender))
+	{
 		prevTick = currentTick;
 
-		simulation.field->tick(simulation.ticknum);
+		field->tick(ticknum);
 
-		++simulation.ticknum;
-		++secondTickCount;
+		++ticknum;
+		++tpsTickCounter;
 
 	#ifdef UseSeasons	
 		if (++changeSeasonCounter >= ChangeSeasonAfter)
@@ -131,22 +164,22 @@ void Main::MakeStep()
 	#endif
 
 		//Add data to chart
-		if (--simulation.timeBeforeNextDataToChart == 0)
+		if (--timeBeforeNextDataToChart == 0)
 		{
-			simulation.AddToChart(simulation.field->GetNumBots() * 1.0f,
-				simulation.field->GetNumApples() * 1.0f, simulation.field->GetNumOrganics() * 1.0f);
+			AddToChart(field->GetNumBots() * 1.0f,
+				field->GetNumApples() * 1.0f, field->GetNumOrganics() * 1.0f);
 
-			simulation.timeBeforeNextDataToChart = AddToChartEvery;
+			timeBeforeNextDataToChart = AddToChartEvery;
 		}
 	}
 
 	//Calculate simulation speed
-	if ((currentTick - lastSecond) >= 1000)
+	if (TimeMSBetween(currentTick, lastSecondTick) >= 1000)
 	{
-		lastSecond = currentTick;
+		lastSecondTick = currentTick;
 
-		simulation.simulationSpeed = secondTickCount;
-		secondTickCount = 0;
+		realTPS = tpsTickCounter;
+		tpsTickCounter = 0;
 	}
 }
 
@@ -158,7 +191,7 @@ void Main::HighlightSelection()
 		SDL_RenderFillRect(renderer, &screenRect);
 	}
 
-	if (selection)
+	if (selectedObject)
 	{
 		if (cursorShow)
 			selectedObject->Object::draw();
@@ -167,7 +200,7 @@ void Main::HighlightSelection()
 
 void Main::SelectionShadowScreen()
 {
-	if (selection)
+	if (selectedObject)
 	{
 		if (selectionShadowScreen < 200)
 			selectionShadowScreen += 5;
@@ -179,9 +212,9 @@ void Main::SelectionShadowScreen()
 	}
 
 	//Cursor blinking
-	if (blink-- == 0)
+	if (cursorBlink-- == 0)
 	{
-		blink = CursorBlinkRate;
+		cursorBlink = CursorBlinkRate;
 		cursorShow = !cursorShow;
 	}
 }
@@ -218,39 +251,31 @@ void Main::AddToChart(float newVal_bots, float newVal_apples, float newVal_organ
 
 void Main::Deselect()
 {
-	selection = false;
 	selectedObject = NULL;
 	showBrain = false;
 	nn_renderer.selectedNeuron = NULL;
 }
 
 
-void Main::ClearConsole()
+void Main::ClearLog()
 {
-	consoleText[0] = '\0';
+	logText.clear();
 }
 
-//This is temporary
-void Main::ConsoleInput(const char* str, bool newLine)
+void Main::LogPrint(const char* str, bool newLine)
 {
-	if (strlen(consoleText) > (ConsoleCharLength/2 - 50))
-		ClearConsole();
-
-	strcpy_s(consoleText + strlen(consoleText), ConsoleCharLength / 2, str);
+	logText.append(str);
 
 	if (newLine)
-		ConsoleInput("\r\n");
+		LogPrint("\r\n");
 }
 
-void Main::ConsoleInput(int num, bool newLine)
+void Main::LogPrint(int num, bool newLine)
 {
-	if (strlen(consoleText) > (ConsoleCharLength / 2 - 50))
-		ClearConsole();
-
-	sprintf_s(consoleText + strlen(consoleText), ConsoleCharLength / 2, "%i", num);
-
+	logText.appendf("%i", num);
+	
 	if(newLine)
-		ConsoleInput("\r\n");
+		LogPrint("\r\n");
 }
 
 void Main::LoadFilenames()
@@ -263,46 +288,66 @@ void Main::LoadFilenames()
 	}
 
 	//Load list of filenames
-	numFilenames = 0;
+	allFilenames.clear();
 
 	for (const auto& entry : std::filesystem::directory_iterator(DirectoryName))
 	{
-		#ifdef DoNotShowFolders
+		//Skip folders
 		if (entry.is_directory())
 			continue;
-		#endif
+
+		listed_file f;
 
 		//Full paths to files
-		filenamesFull[numFilenames] = entry.path().string();
+		f.nameFull = entry.path().string();
 
-		//Only file names and sizes
-		filenamesPartial[numFilenames] = entry.path().filename().string();
+		//Only file name
+		f.nameShort = entry.path().filename().string();
 
-		filenamesPartial[numFilenames].resize(30, ' ');
+		//File size
+		uint size = entry.file_size();
+		string unit;		
 
-		uint filesize = entry.file_size();
-		std::string units;
-
-		//bytes, kb or mb
-		if (filesize > 1000000)
+		//Units
+		if (size > 1000000)
 		{
-			filesize /= 1000000;
-			units = "MB";
+			size /= 1000000;
+			unit += "MB";
 		}
-		else if (filesize > 1000)
+		else if (size > 1000)
 		{
-			filesize /= 1000;
-			units = "KB";
+			size /= 1000;
+			unit += "KB";
 		}
 		else
 		{
-			units = "b";
-		}
+			unit += "b";
+		}			
 
-		filenamesPartial[numFilenames] += std::to_string(filesize);
-		filenamesPartial[numFilenames] += units;
+		f.fileSize += std::to_string(size);
+		f.fileSize += unit;
 
-		++numFilenames;
+		//Is world (open file briefly and look for file type)
+		MyInputStream file((char*)f.nameFull.c_str(), std::ios::in | std::ios::binary | std::ios::beg);
+
+		if (!file.is_open())
+			continue;
+
+		if (size > 0)
+			f.isWorld = (file.ReadInt() == MagicNumber_WorldFile);
+		else
+			f.isWorld = false;
+
+		file.close();		
+
+		//Full file description
+		f.fullCaption = f.nameShort;
+		f.fullCaption.resize(25, ' ');
+		f.fullCaption += f.fileSize;
+		f.fullCaption.resize(40, ' ');
+		f.fullCaption += (f.isWorld) ? ("[world]") : ("");
+
+		allFilenames.push_back(f);
 	}
 }
 
@@ -335,7 +380,7 @@ void Main::CreateNewFile()
 
 Main::Main()
 {
-	ConsoleInput((char*)"Started. Seed:\r\n");
+	LogPrint((char*)"Started. Seed:\r\n");
 
 	//Set seed
 	#ifdef RandomSeed		
@@ -349,26 +394,48 @@ Main::Main()
 
 	id = rand();
 
-	ConsoleInput(seed);
+	LogPrint(seed);
 
 	field = new Field();
 
 	#ifdef StartOnPause
-		simulate = false;
+		Pause();
 	#endif
 
 	LoadFilenames();
+
+	keyboard = SDL_GetKeyboardState(NULL);
 }
 
-void Main::CatchKeypress(const Uint8* keyboard)
+Main::~Main()
 {
-	if (keyboard[Keyboard_Pause])
+	delete field;
+}
+
+void Main::CatchKeyboard()
+{
+	if (keyboard[Keyboard_Pause] || keyboard[Keyboard_Pause2])
 	{
 		Pause();
 	}
 	else if (keyboard[Keyboard_SpawnRandoms])
 	{
 		field->SpawnControlGroup();
+	}
+	else if (keyboard[Keyboard_PlaceWall])
+	{
+		repeat(FieldCellsHeight)
+			field->AddObject(new Rock(0, i));
+	}
+	else if (keyboard[Keyboard_DropOrganics])
+	{
+		for (int X = 0; X < FieldCellsWidth; ++X)
+		{
+			for (int Y = 0; Y < 25 + RandomVal(20); ++Y)
+			{
+				field->AddObject(new Organics(X, Y, MaxPossibleEnergyForABot/2));
+			}
+		}
 	}
 	else if (keyboard[Keyboard_NextFrame])
 	{
@@ -413,9 +480,15 @@ void Main::CatchKeypress(const Uint8* keyboard)
 	{
 		field->shiftRenderPoint(-MoveCameraJump);
 	}
+	else if (keyboard[Keyboard_Jump_To_First_bot])
+	{
+		field->jumpToFirstBot();
+	}
 	//Additional windows hotkeys
 	else if (keyboard[Keyboard_ShowSaveLoad_Window])
 	{
+		LoadFilenames();
+
 		showSaveLoad = !showSaveLoad;
 	}
 	else if (keyboard[Keyboard_ShowDangerous_Window])
@@ -430,4 +503,8 @@ void Main::CatchKeypress(const Uint8* keyboard)
 	{
 		showChart = !showChart;
 	}
+	else if (keyboard[Keyboard_ShowBrain_Window])
+	{
+		showBrain = !showBrain;
+	}	
 }

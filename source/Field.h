@@ -19,6 +19,8 @@ class ObjectSaver;
 
 #include "ObjectSaver.h"
 
+#include "SDL.h"
+
 
 //Don't touch
 #define NumThreads 1
@@ -53,19 +55,30 @@ extern Season season;
 
 struct FieldDynamicParams
 {
-    int oceanLevel = InitialOceanHeight;
-    int mudLevel = InitialMudLayerHeight;
-    int appleEnergy = DefaultAppleEnergy;
+    int oceanLevel;
+    int mudLevel;
+    int appleEnergy;
 
-    int adaptation_DeathChance_Winds = 0;
-    int adaptation_StepsNum_Winds = 2;
+    int adaptation_DeathChance_Winds;
+    int adaptation_StepsNum_Winds;
 
-    int adaptation_landBirthBlock = 0;
-    int adaptation_seaBirthBlock = 0;
-    int adaptation_PSInOceanBlock = 0;
-    int adaptation_PSInMudBlock = 0;
-    int adaptation_botShouldBeOnLandOnceToMultiply = 0;
-    int adaptation_forceBotMovements = 0;
+    int adaptation_landBirthBlock;
+    int adaptation_seaBirthBlock;
+    int adaptation_PSInOceanBlock;
+    int adaptation_PSInMudBlock;
+    int adaptation_botShouldBeOnLandOnceToMultiply;
+    int adaptation_botShouldDoPSOnLandOnceToMultiply;
+    int adaptation_forceBotMovements;
+
+    int adaptation_organicSpawnRate;
+
+    bool spawnApples;
+
+    int reserved[38];
+
+    void Reset();
+
+    FieldDynamicParams();
 };
 
 
@@ -95,10 +108,12 @@ class Field final
     uint spawnApplesInterval = 0;
 
     //threads
-    bool threadGoMarker[NumThreads];
+    abool threadGoMarker[NumThreads];
     std::thread* threads[NumThreads];
     uint counters[NumThreads][4];
-    bool terminateThreads = false;
+    abool threadTerminated[NumThreads];
+    abool terminateThreads = false;
+    abool pauseThreads = false;
 
 
     //tick function for single threaded build
@@ -116,9 +131,6 @@ class Field final
     //Multithreaded tick function
     inline void tick_multiple_threads();
 
-    //Terminator function
-    [[noreturn]] static void TerminateThread();
-
     //Wait for a signal 
     inline void ThreadWait(const uint index);
     
@@ -127,8 +139,9 @@ public:
 
     void shiftRenderPoint(int cx);
 
-    //Number of food for photosynthesis and other means
-    int foodBase = FoodbaseInitial;
+    void jumpToFirstBot();
+
+    int photosynthesisReward = FoodbaseInitial;
 
 
     //Move objects from one cell to another
@@ -191,16 +204,15 @@ public:
     uint GetNumApples();
     uint GetNumOrganics();
 
-
-    //Save/load interface
-    ObjectSaver saver;
-
     //Spawn group of random bots
     void SpawnControlGroup();
     void SpawnApples();
 
+    void PauseThreads();
+    void UnpauseThreads();
 
     Field();
+    ~Field();
 
     static int seed;
     static int renderX;

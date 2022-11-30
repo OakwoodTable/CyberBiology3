@@ -8,10 +8,11 @@
 class Organics :public Object
 {
 
-public:
-
 	bool doneFalling = false;
 
+	static SDL_Texture* image;
+
+public:
 
 	int tick() override;
 
@@ -19,7 +20,11 @@ public:
 	void drawEnergy() override;
 
 
-	Organics(int, int, int);
+	Organics(int X, int Y, int Energy);
+
+
+	static void CreateImage();
+	static void DeleteImage();
 
 };
 

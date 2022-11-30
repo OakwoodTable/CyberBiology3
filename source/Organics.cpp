@@ -1,16 +1,72 @@
 #include "Organics.h"
 
+SDL_Texture* Organics::image = NULL;
 
+
+void Organics::CreateImage()
+{
+    SDL_Surface* surf;
+
+    //Create bot 'body' image (white rectangle)
+
+    //Another surface
+    surf = SDL_CreateRGBSurface(0, FieldCellSize, FieldCellSize, 32,
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+    SDL_LockSurface(surf);
+
+    //Clear surface
+    SDL_memset(surf->pixels, 0xFF, surf->w * surf->h * 4);
+
+    //Create pixels array
+    std::vector<uint32_t> pixels(surf->h * surf->w, 0x00000000);
+
+    //Draw outlined rectangle 
+
+    for (int _x = 1; _x < FieldCellSize - 1; ++_x)
+    {
+        for (int _y = 1; _y < FieldCellSize - 1; ++_y)
+        {
+            pixels[(_y * surf->w + _x)] = OrganicWasteOutlineColor;
+        }
+    }
+
+    for (int _x = 2; _x < FieldCellSize - 2; ++_x)
+    {
+        for (int _y = 2; _y < FieldCellSize - 2; ++_y)
+        {
+            pixels[(_y * surf->w + _x)] = OrganicWasteDrawColor;
+        }
+    }
+
+    //Copy pixels on surface
+    SDL_memcpy(surf->pixels, pixels.data(), surf->w * surf->h * 4);
+
+    SDL_UnlockSurface(surf);
+
+    //Create static texture
+    image = SDL_CreateTextureFromSurface(renderer, surf);
+
+    //Free surface
+    SDL_FreeSurface(surf);
+
+    //Free render target
+    SDL_SetRenderTarget(renderer, NULL);
+}
+
+void Organics::DeleteImage()
+{
+    SDL_DestroyTexture(image);
+}
 
 
 void Organics::draw()
 {
     CalcScreenX();
-    CalcObjectRectShrinked(1);
+    CalcObjectRect();
 
-	//Draw
-	SDL_SetRenderDrawColor(renderer, OrganicWateDrawColor);
-	SDL_RenderFillRect(renderer, &object_rect);
+    //Draw from texture
+    SDL_RenderCopy(renderer, image, &image_rect, &object_rect);
 }
 
 void Organics::drawEnergy()
@@ -59,7 +115,9 @@ int Organics::tick()
             #endif
         }
         else
+        {
             doneFalling = true; //Once done it shouldn't fall anymore
+        }
     }
 
     return 0;

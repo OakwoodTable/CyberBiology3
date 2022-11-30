@@ -1,6 +1,98 @@
 
 #include "Bot.h"
 
+SDL_Texture* Bot::sprite_head[8];
+SDL_Texture* Bot::sprite_body;
+
+
+void Bot::CreateImage()
+{
+	SDL_Surface* surf;
+	SDL_Texture* tmpTexTarget;
+	SDL_Texture* tmpTex2;
+
+	//Create rotation sprites (outline and head positions)
+	repeat(8)
+	{
+		//Target texture
+		tmpTexTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, FieldCellSize, FieldCellSize);
+		
+		//Set render target
+		SDL_SetRenderTarget(renderer, tmpTexTarget);
+
+		//Clear texture
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+
+		//Render outline
+	#ifdef DrawBotOutline
+			SDL_SetRenderDrawColor(renderer, BotOutlineColor);
+			SDL_RenderDrawRect(renderer, &image_rect);
+	#endif
+
+		//Render head
+	#ifdef DrawBotHead
+			SDL_RenderDrawLine(renderer, 
+				FieldCellSizeHalf,
+				FieldCellSizeHalf,
+				FieldCellSizeHalf + Rotations[i].x * FieldCellSizeHalf,
+				FieldCellSizeHalf + Rotations[i].y * FieldCellSizeHalf);
+	#endif
+
+		//Create surface
+		surf = SDL_CreateRGBSurface(0, FieldCellSize, FieldCellSize, 32,
+			0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+		//Copy previously rendered texture on surface
+		SDL_LockSurface(surf);
+
+		int32_t pixels[FieldCellSize * FieldCellSize];
+		
+		SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA8888, pixels, surf->pitch);
+
+		SDL_memcpy(surf->pixels, pixels, surf->w * surf->h * 4);
+
+		SDL_UnlockSurface(surf);
+
+		//Create static texture
+		tmpTex2 = SDL_CreateTextureFromSurface(renderer, surf);
+
+		//Save texture
+		sprite_head[i] = tmpTex2;
+
+		//Free target texture and surface
+		SDL_DestroyTexture(tmpTexTarget);
+		SDL_FreeSurface(surf);
+	}
+
+	//Create bot 'body' image (white rectangle)
+	
+	//Another surface
+	surf = SDL_CreateRGBSurface(0, FieldCellSize, FieldCellSize, 32,
+		0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+	//Clear surface
+	SDL_LockSurface(surf);
+	SDL_memset(surf->pixels, 255, surf->w* surf->h * 4);
+	SDL_UnlockSurface(surf);
+
+	//Create static texture
+	sprite_body = SDL_CreateTextureFromSurface(renderer, surf);
+
+	//Free surface
+	SDL_FreeSurface(surf);
+	
+	//Free render target
+	SDL_SetRenderTarget(renderer, NULL);
+}
+
+void Bot::DeleteImage()
+{
+	repeat(8)
+		SDL_DestroyTexture(sprite_head[i]);
+
+	SDL_DestroyTexture(sprite_body);
+}
 
 void Bot::CalculateLookAt()
 {
@@ -126,17 +218,7 @@ void Bot::Mutate()
 
 void Bot::drawOutlineAndHead()
 {
-	#ifdef DrawBotOutline
-		SDL_SetRenderDrawColor(renderer, BotOutlineColor);
-		SDL_RenderDrawRect(renderer, &object_rect);
-	#endif
-
-	#ifdef DrawBotHead
-		SDL_RenderDrawLine(renderer, FieldX + screenX * FieldCellSize + FieldCellSizeHalf,
-			FieldY + y * FieldCellSize + FieldCellSizeHalf,
-			FieldX + screenX * FieldCellSize + FieldCellSizeHalf + Rotations[direction].x * FieldCellSizeHalf,
-			FieldY + y * FieldCellSize + FieldCellSizeHalf + Rotations[direction].y * FieldCellSizeHalf);
-	#endif
+	SDL_RenderCopy(renderer, sprite_head[direction], &image_rect, &object_rect);
 }
 
 BrainInput Bot::FillBrainInput()
@@ -201,6 +283,9 @@ BrainInput Bot::FillBrainInput()
 
 void Bot::Multiply(int numChildren)
 {
+	if (ArtificialSelectionWatcher_OnDivide())
+		return;
+
 	for (int b = 0; b < numChildren; ++b)
 	{
 		if (energy <= 1 + GiveBirthCost)
@@ -216,7 +301,7 @@ void Bot::Multiply(int numChildren)
 			#ifndef NewbornGetsHalf
 				TakeEnergy(EnergyPassedToAChild + GiveBirthCost);
 
-				if ((!RandomPercentX10(botShouldBeOnLandOnceToMultiply)) || (wasOnLand))
+				if ((!RandomPercentX10(pField->params.adaptation_botShouldBeOnLandOnceToMultiply)) || (wasOnLand))
 					pField->AddObject(new Bot(freeSpace.x, freeSpace.y, EnergyPassedToAChild, this, RandomPercent(MutationChancePercent)));
 			#else
 				TakeEnergy(energy / 2 + GiveBirthCost);
@@ -287,7 +372,7 @@ void Bot::Photosynthesis()
 		#ifdef UseSeasons
 			toGive = PhotosynthesisReward_Summer;
 		#else
-			toGive = pField->foodBase;
+			toGive = pField->photosynthesisReward;
 			//toGive = FindHowManyFreeCellsAround(x, y) - 3;
 			//if (toGive < 0) toGive = 0;
 		#endif
@@ -302,6 +387,8 @@ void Bot::Photosynthesis()
 		}
 
 		GiveEnergy(toGive, PS);
+
+		++numPSonLand;
 	}
 	//Below water
 	else
@@ -319,7 +406,7 @@ void Bot::Photosynthesis()
 				return;
 		}
 
-		GiveEnergy(pField->foodBase, PS);
+		GiveEnergy(pField->photosynthesisReward, PS);
 
 		#endif
 	}
@@ -384,9 +471,9 @@ BrainOutput Bot::think(BrainInput input)
 
 
 
-//Winds project
-bool Bot::ArtificialSelectionWatcher_Winds()
+bool Bot::ArtificialSelectionWatcher_OnTick()
 {
+	//Winds
 	if (pField->IsInWater(y))
 	{
 		if (addaptation_lastX < x)
@@ -407,43 +494,45 @@ bool Bot::ArtificialSelectionWatcher_Winds()
 		}
 	}
 
-	return false;
-}
+	//Divers
+	FieldDynamicParams& params = pField->params;	
 
-
-
-//Divers project
-bool Bot::ArtificialSelectionWatcher_Divers()
-{
-	FieldDynamicParams &params = pField->params;
-
-	//Is on land
-	if (y < FieldCellsHeight - params.oceanLevel)
+	//Force movements Y
+	if (lifetime > 3)
 	{
-		if (lifetime == 1)
-		{
-			if (RandomPercentX10(params.adaptation_landBirthBlock))
-				return true;
-		}
-	}
-	//Is in ocean
-	else if ((y >= FieldCellsHeight - params.oceanLevel) && (y < FieldCellsHeight - params.mudLevel))
-	{
-		if (lifetime == 1)
-		{
-			if (RandomPercentX10(params.adaptation_seaBirthBlock))
-				return true;
-		}
-	}	
-
-	//Force movements
-	if (lifetime > 5)
-	{
-		if (numMoves*4 < (lifetime - 5) )
+		if (numMovesY * 3 < (lifetime - 3))
 		{
 			if (RandomPercentX10(params.adaptation_forceBotMovements))
 				return true;
 		}
+	}
+
+	return false;
+}
+
+
+bool Bot::ArtificialSelectionWatcher_OnDivide()
+{
+	FieldDynamicParams& params = pField->params;
+
+	//Is on land
+	if (y < FieldCellsHeight - params.oceanLevel)
+	{
+		if (RandomPercentX10(params.adaptation_landBirthBlock))
+			return true;
+	}
+	//Is in ocean
+	else if ((y >= FieldCellsHeight - params.oceanLevel) && (y < FieldCellsHeight - params.mudLevel))
+	{
+		if (RandomPercentX10(params.adaptation_seaBirthBlock))
+			return true;
+	}
+	 
+	//Force photosynthesis on land
+	if (numPSonLand < 4)
+	{
+		if (RandomPercentX10(params.adaptation_botShouldDoPSOnLandOnceToMultiply))
+			return true;
 	}
 
 	return false;
@@ -460,10 +549,7 @@ int Bot::tick()
 
 	energy -= EveryTickEnergyPenalty;
 
-	if (ArtificialSelectionWatcher_Winds())
-		return 1;
-
-	if (ArtificialSelectionWatcher_Divers())
+	if (ArtificialSelectionWatcher_OnTick())
 		return 1;
 
 	if (((energy) <= 0) || (lifetime >= MaxBotLifetime))
@@ -521,8 +607,13 @@ int Bot::tick()
 				return 1;
 
 			//Place object in a new place
+			int tmpY = y;
+
 			if (pField->MoveObject(this, lookAt_x, lookAt_y) == 0)
-				++numMoves;
+			{
+				if(lookAt_y!=tmpY)
+					++numMovesY;
+			}
 
 		}
 		//Photosynthesis
@@ -546,8 +637,8 @@ void Bot::draw()
 	CalcObjectRect();
 
 	//Draw body
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	SDL_RenderFillRect(renderer, &object_rect);
+	SDL_SetTextureColorMod(sprite_body, color.r, color.g, color.b);
+	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
 	//Draw outlines
 	drawOutlineAndHead();
@@ -560,9 +651,8 @@ void Bot::drawEnergy()
 	CalcObjectRect();
 
 	//Draw body
-	SDL_SetRenderDrawColor(renderer, 255, (1.0f - ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f))) * 255.0f, 0, 255);
-
-	SDL_RenderFillRect(renderer, &object_rect);
+	SDL_SetTextureColorMod(sprite_body, 255, (1.0f - ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f))) * 255.0f, 0);
+	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
 	//Draw outlines
 	drawOutlineAndHead();
@@ -578,12 +668,12 @@ void Bot::drawPredators()
 	int energySumm = energyFromPredation + energyFromPS + energyFromOrganics;
 
 	if (energySumm < 20)
-		SDL_SetRenderDrawColor(renderer, 180, 180, 180, 255);
+		SDL_SetTextureColorMod(sprite_body, 180, 180, 180);
 	else
-		SDL_SetRenderDrawColor(renderer, 255.0f * ((energyFromPredation * 1.0f) / (energySumm * 1.0f)),
-			255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromOrganics * 1.0f) / (energySumm * 1.0f)), 255);
+		SDL_SetTextureColorMod(sprite_body, 255.0f * ((energyFromPredation * 1.0f) / (energySumm * 1.0f)),
+			255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromOrganics * 1.0f) / (energySumm * 1.0f)));
 
-	SDL_RenderFillRect(renderer, &object_rect);
+	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
 	//Draw outlines
 	drawOutlineAndHead();
@@ -823,6 +913,9 @@ Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 	RandomDirection();
 
 	addaptation_lastX = X;
+
+	//Temporary
+	numMovesY = 1000;
 }
 
 

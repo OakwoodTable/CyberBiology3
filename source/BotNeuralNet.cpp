@@ -47,6 +47,14 @@ BotNeuralNet::BotNeuralNet()
 		allNeurons[NeuronInputLayerIndex][yi].type = input;
 	}
 
+	for (uint nx = 0; nx < NumNeuronLayers; ++nx)
+	{
+		for (uint ny = 0; ny < NeuronsInLayer; ++ny)
+		{
+			allNeurons[nx][ny].layer = nx;
+		}
+	}
+
 	ClearMemory();
 }
 
@@ -108,12 +116,12 @@ void BotNeuralNet::Process()
 
 			case memory:
 
-				if ((*value + n->bias) < .5f)
+				if ((*value + n->bias) < -1.0f)
 				{
 					//Wipe memory
 					*m = 0.0f;
 				}
-				else if ((*value + n->bias) >= .5f)
+				else if ((*value + n->bias) > 1.0f)
 				{
 					//Write in memory
 					*m = 1.0f;
@@ -127,13 +135,13 @@ void BotNeuralNet::Process()
 
 			//Feed forward
 
-			NeuronConnection* tmpConnection;
+			NeuronConnection* tmpC;
 
 			for (uint i = 0; i < n->numConnections; ++i)
 			{
-				tmpConnection = &n->allConnections[i];
+				tmpC = &n->allConnections[i];
 
-				allValues[xi + 1][tmpConnection->dest] += *value * tmpConnection->weight;
+				allValues[tmpC->dest_layer][tmpC->dest_neuron] += *value * tmpC->weight;
 			}
 		}
 	}
@@ -197,39 +205,57 @@ void BotNeuralNet::Mutate()
 				roll = RandomVal(101);
 								
 				if(roll <= 5)
+				{
+					//5% - set neuron to random
 					n->SetRandom();
+				}
 				else if (roll <= 7)
+				{
+					//2% - clear neuron
 					n->mutate_DeleteNeuron();
+				}
 				else if (roll <= 12)
+				{
+					//5% - change neuron type
 					n->mutate_ChangeType();
+				}
 				else if (roll <= 30)
+				{
+					//18% - change bias
 					n->mutate_ChangeBias();
+				}
+				else if (roll <= 35)
+				{
+					//5% - 1 connection set to next layer 
+					//TODO
+					if (n->numConnections > 0)
+					{
+						uint connection = n->GetRandomConnectionIndex();
+
+						byte lx = n->allConnections[connection].dest_layer;
+						byte nx = n->allConnections[connection].dest_neuron;
+
+						Neuron* n2 = &allNeurons[lx][nx];
+
+						if (n2->numConnections > 0)
+						{
+							uint connection_dest = n2->GetRandomConnectionIndex();
+
+							n->allConnections[connection].dest_layer = n2->allConnections[connection_dest].dest_layer;
+							n->allConnections[connection].dest_neuron = n2->allConnections[connection_dest].dest_neuron;
+						}
+						else
+						{
+							goto def;
+						}
+					}
+				}
 				else
+				{
+				def:
+					//change 1 connection
 					n->mutate_ChangeOneConnection();
-
-				//IGNORE THE FOLLOWING!
-				//Some other variants of mutate function 
-				//Sorry!
-
-				/*
-				if (roll <= 5)
-					n->SetRandom();
-				else if (roll <= 20)
-					n->mutate_ChangeBias();
-				else
-					n->mutate_ChangeOneConnection();*/
-					
-				/*	
-				if (roll <= 5)
-					n->SetRandom();
-				else if (roll <= 20)
-					n->mutate_ChangeBias();
-				else
-					n->mutate_ChangeOneConnection();*/
-
-				/*
-					n->SetRandom();
-				*/
+				}
 			}
 		}
 	}
@@ -270,14 +296,17 @@ void BotNeuralNet::Optimize()
 				//Clear bias
 				n->SetZero();
 
-				//Clear all connections to this neuron in prev. layer
-				for (int cy = 0; cy < NeuronsInLayer; ++cy)
+				//Clear all connections to this neuron in prev. layers
+				for (int cx = 0; cx < x; ++cx)
 				{
-					int ind = allNeurons[x - 1][cy].IsConnected(y);
-
-					if (ind != -1)
+					for (int cy = 0; cy < NeuronsInLayer; ++cy)
 					{
-						allNeurons[x - 1][cy].RemoveConnection(ind);
+						int ind = allNeurons[cx][cy].IsConnected(x, y);
+
+						if (ind != -1)
+						{
+							allNeurons[cx][cy].RemoveConnection(ind);
+						}
 					}
 				}
 			}

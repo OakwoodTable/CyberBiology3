@@ -57,7 +57,7 @@ void Main::DrawMainWindow()
 	{
 		//FPS text 
 		ImGui::Text("steps: %i", ticknum);
-		ImGui::Text("(interval %i, speed: %i ticks/sec)", interval, simulationSpeed);
+		ImGui::Text("(interval %i, ticks/sec: %i, fps: %i)", limit_interval, realTPS, realFPS);
 		ImGui::Text("Objects total: %i", field->GetNumObjects());
 		ImGui::Text("Bots total: %i", field->GetNumBots());
 
@@ -144,14 +144,11 @@ void Main::DrawControlsWindow()
 
 		//Sliders
 		ImGui::PushItemWidth(200);
-		ImGui::SliderInt("interval", &interval, GUI_Max_interval, 0, "%d", ImGuiSliderFlags_Logarithmic);
-		ImGui::InputInt("PS reward", &(field->foodBase), 0, 5);
+		ImGui::SliderInt("limit TPS", &limit_ticks_per_second, 0, GUI_Max_tps, "%d");
+		ImGui::SliderInt("limit FPS", &limitFPS, 0, GUI_Max_fps, "%d");
 
-		if (field->foodBase > GUI_Max_food)
-			field->foodBase = GUI_Max_food;
-
-		ImGui::SliderInt("skip", &skipFrames, GUI_Max_skip, 0, "%d", ImGuiSliderFlags_None);
-		ImGui::SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d", ImGuiSliderFlags_None);
+		ImGui::SliderInt("PS reward", &(field->photosynthesisReward), 0, GUI_Max_food);		
+		ImGui::SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d");
 	}
 	ImGui::End();
 }
@@ -164,7 +161,7 @@ void Main::DrawSelectionWindow()
 
 	ImGui::Begin("Selection", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		if (selection)
+		if (selectedObject)
 		{
 			if (field->ValidateObjectExistance(selectedObject))
 			{
@@ -189,6 +186,7 @@ void Main::DrawSelectionWindow()
 
 				//Color
 				Uint8 c[3];
+
 				memcpy(c, ((Bot*)selectedObject)->GetColor(), sizeof(c));
 				ImGui::Text("color: {%i, %i, %i}", c[0], c[1], c[2]);
 
@@ -201,14 +199,7 @@ void Main::DrawSelectionWindow()
 					field->RepaintBot((Bot*)selectedObject, Bot::GetRandomColor(), 1);
 				}
 
-				if (ImGui::Button("Show summary", { 100, 30 }))
-				{
-					showSummary = !showSummary;
-				}
-
-				ImGui::SameLine();
-
-				if (ImGui::Button("Show brain", { 100, 30 }))
+				if (ImGui::Button("Show brain", { 100, 25 }))
 				{
 					showBrain = !showBrain;
 				}
@@ -253,9 +244,20 @@ void Main::DrawConsoleWindow()
 	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
 	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 700.0f});
 
-	ImGui::Begin("Console", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("Log", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		ImGui::InputTextMultiline("##", consoleText, ConsoleCharLength, ImVec2(240, 90), ImGuiInputTextFlags_EnterReturnsTrue);
+		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(LogBackgroundColor));
+
+		ImGui::BeginChild("scrolling", ImVec2(240, 80), true);
+		{
+			ImGui::TextUnformatted(logText.Buf.Data);
+
+			if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+				ImGui::SetScrollHereY(1.0f);
+		}
+		ImGui::EndChild();
+
+		ImGui::PopStyleColor();
 	}
 	ImGui::End();
 }
@@ -288,7 +290,7 @@ void Main::DrawMouseFunctionWindow()
 void Main::DrawAdditionalsWindow()
 {
 	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 110.0f });
+	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 100.0f });
 	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 970.0f });
 
 	ImGui::Begin("Additional windows", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -328,110 +330,121 @@ void Main::DrawSaveLoadWindow()
 	{
 		//Save/load window
 		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 330.0f, 200.0f });
+		ImGui::SetNextWindowSize({ 400.0f, 200.0f });
 		ImGui::SetNextWindowPos({ 100 * 1.0f, 100.0f }, ImGuiCond_Once);
 
 		ImGui::Begin("Save/load", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
 			//List of files
-			ImGui::Text("Select filename");
+			ImGui::Text("Select file");
 
-			ImGui::ListBoxHeader("##", ImVec2(290, 110));
+			ImGui::ListBoxHeader("##", ImVec2(380, 110));
 
-			for (int i = 0; i < numFilenames; ++i)
+			for (int i = 0; i < allFilenames.size(); ++i)
 			{
-				if (ImGui::Selectable(filenamesPartial[i].c_str(), &selectedFilenames[i]))
+				if (ImGui::Selectable(allFilenames[i].fullCaption.c_str(), &allFilenames[i].isSelected))
 				{
-					ZeroMemory(selectedFilenames, sizeof(selectedFilenames));
+					for (int b = 0; b < allFilenames.size(); ++b)
+						allFilenames[b].isSelected = false;
 
-					selectedFilenames[i] = true;
-					selectedFilename = i;
+					allFilenames[i].isSelected = true;
+					selectedFile = &allFilenames[i];
 				}
 			}
+
 			ImGui::ListBoxFooter();
 
 			//Buttons
-			if (ImGui::Button("Save", { 50, 30 }))
-			{
-				if (selection)
-				{
-					if (selectedFilename != -1)
-					{
-						if (field->saver.SaveObject(selectedObject, (char*)filenamesFull[selectedFilename].c_str()))
-							ConsoleInput("Object saved\r\n");
-						else
-							ConsoleInput("Error while saving object\r\n");
-					}
-				}
-			}
-
-			ImGui::SameLine();
 
 			if (ImGui::Button("Load", { 50, 30 }))
 			{
-				if (selection)
+				if (selectedFile)
 				{
-					if (selectedFilename != -1)
+					if (selectedFile->isWorld)
+					{
+						ObjectSaver::WorldParams ret = saver.LoadWorld(field, (char*)selectedFile->nameFull.c_str());
+
+						if (ret.id != -1)
+						{
+							if (ret.width != FieldCellsWidth)
+								LogPrint("World loaded(width mismatch)\r\n");
+							else
+								LogPrint("World loaded\r\n");
+
+							seed = ret.seed;
+							ticknum = ret.tick;
+							id = ret.id;
+
+							field->seed = seed;
+						}
+						else
+							LogPrint("Error while loading world\r\n");
+					}
+					else
 					{
 						if (selectedObject)
 						{
 							delete selectedObject;
 						}
 
-						selectedObject = field->saver.LoadObject((char*)filenamesFull[selectedFilename].c_str());
+						selectedObject = saver.LoadObject((char*)selectedFile->nameFull.c_str());
 
 						if (selectedObject)
-							ConsoleInput("Object loaded\r\n");
+							LogPrint("Object loaded\r\n");
 						else
-							ConsoleInput("Error while loading object\r\n");
+							LogPrint("Error while loading object\r\n");
+					}
+				}
+			}			
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Save bot", { 100, 30 }))
+			{
+				if (selectedObject)
+				{
+					if (selectedFile)
+					{
+						if (saver.SaveObject(selectedObject, (char*)selectedFile->nameFull.c_str()))
+						{
+							LogPrint("Object saved\r\n");
+
+							LoadFilenames();
+						}
+						else
+						{
+							LogPrint("Error while saving object\r\n");
+						}
 					}
 				}
 			}
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("New", { 50, 30 }))
+			if (ImGui::Button("Save world", { 100, 30 }))
+			{
+				if (selectedFile)
+				{
+					if (saver.SaveWorld(field, (char*)selectedFile->nameFull.c_str(), id, ticknum))
+					{
+						LogPrint("World saved\r\n");
+
+						LoadFilenames();
+					}
+					else
+					{
+						LogPrint("Error while saving world\r\n");
+					}
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("New file", { 100, 30 }))
 			{
 				CreateNewFile();
-			}
 
-			ImGui::SameLine();
-
-			if (ImGui::Button("Save world", { 70, 30 }))
-			{
-				if (selectedFilename != -1)
-				{
-					if (field->saver.SaveWorld(field, (char*)filenamesFull[selectedFilename].c_str(), id, ticknum))
-						ConsoleInput("World saved\r\n");
-					else
-						ConsoleInput("Error while saving world\r\n");
-				}
-			}
-			
-			ImGui::SameLine();
-
-			if (ImGui::Button("Load world", { 70, 30 }))
-			{
-				if (selectedFilename != -1)
-				{
-					ObjectSaver::WorldParams ret = field->saver.LoadWorld(field, (char*)filenamesFull[selectedFilename].c_str());
-
-					if (ret.id != -1)
-					{
-						if(ret.width != FieldCellsWidth)
-							ConsoleInput("World loaded(width mismatch)\r\n");
-						else
-							ConsoleInput("World loaded\r\n");
-
-						seed = ret.seed;
-						ticknum = ret.tick;
-						id = ret.id;
-
-						field->seed = seed;
-					}
-					else
-						ConsoleInput("Error while loading world\r\n");
-				}
+				LoadFilenames();
 			}
 		}
 		ImGui::End();
@@ -477,11 +490,7 @@ void Main::DrawDangerousWindow()
 
 			if (ImGui::Button("CloseApp", { 130, 30 }))
 			{
-				//TODO - rework this
 				terminate = true;
-
-				SDL_Quit();
-				exit(0);
 			}
 
 			ImGui::SameLine();
@@ -497,7 +506,7 @@ void Main::DrawDangerousWindow()
 
 void Main::DrawSummaryWindow()
 {
-	if (showSummary)
+	if (showBrain)
 	{
 		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ 330.0f, 180.0f });
@@ -505,7 +514,7 @@ void Main::DrawSummaryWindow()
 
 		ImGui::Begin("Bot summary", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
-			if (selection)
+			if (selectedObject)
 			{
 				if (field->ValidateObjectExistance(selectedObject))
 				{
@@ -542,37 +551,60 @@ void Main::DrawAdaptationWindow()
 	if (showAdaptation)
 	{
 		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 470.0f, 400.0f });
+		ImGui::SetNextWindowSize({ 500.0f, 500.0f });
 		ImGui::SetNextWindowPos({ 100 * 1.0f, 250.0f }, ImGuiCond_Once);
 
 		ImGui::Begin("Adaptation", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
+			if(ImGui::CollapsingHeader("Winds"))			
+			{
+				ImGui::SliderInt("Phase", &field->params.adaptation_DeathChance_Winds, 0, 1000);
+				ImGui::SliderInt("Steps", &field->params.adaptation_StepsNum_Winds, 0, 20);
+			}
 
-			ImGui::Text("Winds");
+			ImGui::NewLine();
+			
+			if (ImGui::CollapsingHeader("Divers", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::SliderInt("Land mulpitly block", &field->params.adaptation_landBirthBlock, 0, 1000);
+				ImGui::SliderInt("Sea mulpitly block", &field->params.adaptation_seaBirthBlock, 0, 1000);
 
-			ImGui::SliderInt("Phase", &field->params.adaptation_DeathChance_Winds, 0, 1000);
-			ImGui::SliderInt("Steps", &field->params.adaptation_StepsNum_Winds, 0, 20);
+				ImGui::NewLine();
+
+				ImGui::SliderInt("no PS in ocean", &field->params.adaptation_PSInOceanBlock, 0, 1000, "%d");
+				ImGui::SliderInt("no PS in mud", &field->params.adaptation_PSInMudBlock, 0, 1000, "%d");
+				ImGui::SliderInt("On land at least once", &field->params.adaptation_botShouldBeOnLandOnceToMultiply, 0, 1000, "%d");
+				ImGui::SliderInt("On land PS at least once", &field->params.adaptation_botShouldDoPSOnLandOnceToMultiply, 0, 1000, "%d");
+				ImGui::SliderInt("Force movements Y", &field->params.adaptation_forceBotMovements, 0, 1000);
+
+				ImGui::NewLine();
+
+				ImGui::SliderInt("Ocean level", &field->params.oceanLevel, 0, FieldCellsHeight);
+				ImGui::SliderInt("Mud level", &field->params.mudLevel, 0, FieldCellsHeight);
+			}
 
 			ImGui::NewLine();
 
-			ImGui::Text("Divers");
-
-			ImGui::SliderInt("Land mulpitly block", &field->params.adaptation_landBirthBlock, 0, 1000);
-			ImGui::SliderInt("Sea mulpitly block", &field->params.adaptation_seaBirthBlock, 0, 1000);
-
-			ImGui::NewLine();
-
-			ImGui::SliderInt("no PS in ocean", &field->params.adaptation_PSInOceanBlock, 0, 1000, "%d");
-			ImGui::SliderInt("no PS in mud", &field->params.adaptation_PSInMudBlock, 0, 1000, "%d");
-			ImGui::SliderInt("On land at least once", &field->params.adaptation_botShouldBeOnLandOnceToMultiply, 0, 1000, "%d");
-			ImGui::SliderInt("Force movements", &field->params.adaptation_forceBotMovements, 0, 1000);
+			if (ImGui::CollapsingHeader("Organics"))
+			{
+				ImGui::SliderInt("Organics spawn rate", &field->params.adaptation_organicSpawnRate, 0, 1000);
+			}
 
 			ImGui::NewLine();
 
-			ImGui::SliderInt("Ocean level", &field->params.oceanLevel, 0, FieldCellsHeight);
-			ImGui::SliderInt("Mud level", &field->params.mudLevel, 0, FieldCellsHeight);			
+			if (ImGui::CollapsingHeader("Apples"))
+			{
+				ImGui::SliderInt("Apple energy", &field->params.appleEnergy, 1, 200);
 
-			ImGui::SliderInt("Apple energy", &field->params.appleEnergy, 1, 200);
+				ImGui::Checkbox("Spawn apples", &field->params.spawnApples);
+			}
+
+			ImGui::NewLine();
+
+			if (ImGui::Button("Reset", { 70, 20 }))
+			{
+				field->params.Reset();
+			}
 		}
 		ImGui::End();
 	}
@@ -584,13 +616,13 @@ void Main::DrawChartWindow()
 	{
 		ImGui::SetNextWindowBgAlpha(1.0f);
 		ImGui::SetNextWindowSize({ 900.0f, 600.0f });
-		ImGui::SetNextWindowPos({ 300 * 1.0f, 250.0f }, ImGuiCond_Once);
+		ImGui::SetNextWindowPos({ 700.0f, 250.0f }, ImGuiCond_Once);
 
 		ImGui::Begin("Population chart", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
 			if (ImPlot::BeginPlot("Objects", { 800, 550 }))
 			{
-
+				
 				//Axes
 				ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, 250.0, ImPlotCond_Always);
 				ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 26000.0);
@@ -601,30 +633,38 @@ void Main::DrawChartWindow()
 				//Bots number
 				ImPlot::SetNextLineStyle({ 1, 0, 0, 1 }, ChartLineThickness);
 
-				ImPlot::PlotLine("Bots", chartData_bots, chart_numValues, 1.0f, 0.0f, ImPlotLineFlags_None);
+				ImPlot::PlotLine("Bots", chartData_bots, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
 
 				//Apples number
-#ifdef UseApples
-				ImPlot::SetNextLineStyle({ 0, 1, 0, 1 }, 1.5f);
+				if(chartShow_apples)
+				{
+					ImPlot::SetNextLineStyle({ 0, 1, 0, 1 }, ChartLineThickness);
 
-				ImPlot::PlotLine("Apples", chartData_apples, chart_numValues, 1.0f, 0.0f, ImPlotLineFlags_None);
-#endif
+					ImPlot::PlotLine("Apples", chartData_apples, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
+				}
 
 				//Organics number
-#ifdef SpawnOrganicWasteWhenBotDies
-				ImPlot::SetNextLineStyle({ 0, 0, 1, 1 }, 1.5f);
+				if(chartShow_organics)
+				{
+					ImPlot::SetNextLineStyle({ 0, 0, 1, 1 }, ChartLineThickness);
 
-				ImPlot::PlotLine("Organics", chartData_organics, chart_numValues, 1.0f, 0.0f, ImPlotLineFlags_None);
-#endif
+					ImPlot::PlotLine("Organics", chartData_organics, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
+				}
 
 				ImPlot::EndPlot();
 			}
 
-			//Buttons
 			ImGui::SameLine();
+
+			ImGui::BeginGroup();			
 
 			if (ImGui::Button("Clear", { 70.0f, 30.0f }))
 				ClearChart();
+
+			ImGui::Checkbox("Apples", &chartShow_apples);
+			ImGui::Checkbox("Organics", &chartShow_organics);
+
+			ImGui::EndGroup();
 		}
 		ImGui::End();
 	}
@@ -634,12 +674,12 @@ void Main::DrawBotBrainWindow()
 {	
 	if (showBrain)
 	{
-		if (selection)
+		if (selectedObject)
 		{
 			//Bot brain window
 			ImGui::SetNextWindowBgAlpha(1.0f);
 			ImGui::SetNextWindowSize({ 330.0f, 240.0f });
-			ImGui::SetNextWindowPos({ 650 * 1.0f, 500.0f });
+			ImGui::SetNextWindowPos({ 650 * 1.0f, 350.0f });
 
 			ImGui::Begin("Bot brain data", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
@@ -663,7 +703,8 @@ void Main::DrawBotBrainWindow()
 					//Show connections
 					repeat(nn_renderer.selectedNeuron->numConnections)
 					{
-						ImGui::Text("Connection to %i, weight: %f", nn_renderer.selectedNeuron->allConnections[i].dest, nn_renderer.selectedNeuron->allConnections[i].weight);
+						ImGui::Text("Connection to l: %i, n: %i, weight: %f", nn_renderer.selectedNeuron->allConnections[i].dest_layer,
+							nn_renderer.selectedNeuron->allConnections[i].dest_neuron, nn_renderer.selectedNeuron->allConnections[i].weight);
 					}
 
 					//Show memory data
@@ -676,7 +717,10 @@ void Main::DrawBotBrainWindow()
 						{
 							nn_renderer.selectedNeuron->SetRandom();
 						}
-						else if (ImGui::Button("set zero", { 100,30 }))
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("set zero", { 100,30 }))
 						{
 							nn_renderer.selectedNeuron->SetZero();
 						}
@@ -730,6 +774,16 @@ void Main::MouseClick()
 		if (field->IsInBoundsScreenCoords(mouseState.mouseX, mouseState.mouseY))
 		{
 			Point fieldCoords = field->ScreenCoordsToLocal(mouseState.mouseX, mouseState.mouseY);
+
+			if (fieldCoords.x < 0)
+			{
+				fieldCoords.x = 0;
+			}
+			else if (fieldCoords.x >= FieldCellsWidth)
+			{
+				fieldCoords.x = FieldCellsWidth - 1;
+			}
+
 			Object* obj = field->GetObjectLocalCoords(fieldCoords.x, fieldCoords.y);
 
 			if (mouseFunc == mouse_select)
@@ -738,7 +792,6 @@ void Main::MouseClick()
 				{
 					if (obj->type == bot)
 					{
-						selection = true;
 						selectedObject = obj;
 					}
 				}
@@ -780,12 +833,12 @@ void Main::MouseClick()
 			}
 			else if (mouseFunc == mouse_from_file)
 			{
-				//Cell is empty
+				//Cell is empty				
 				if (!obj)
 				{
-					if (selectedFilename != -1)
+					if (selectedFile)
 					{
-						obj = field->saver.LoadObject((char*)filenamesFull[selectedFilename].c_str());
+						obj = saver.LoadObject((char*)selectedFile->nameFull.c_str());
 
 						if (obj)
 						{
@@ -795,18 +848,15 @@ void Main::MouseClick()
 
 							if (field->AddObject(obj))
 							{
-								ConsoleInput("Object loaded\r\n");
-
-								selection = true;
-								selectedObject = obj;
+								LogPrint("Object loaded\r\n");
 							}
 						}
 						else
 						{
-							ConsoleInput("Error while loading object\r\n");
+							LogPrint("Error while loading object\r\n");
 						}
 					}
-				}
+				}				
 			}
 			else if (mouseFunc == mouse_force_mutation)
 			{
@@ -835,63 +885,50 @@ void Main::MouseClick()
 
 void Main::Render()
 {
-	//Skip drawing
-	if (simulation.renderType != noRender)
+	
+	//Limit FPS
+	TimePoint currentTickFps = clock.now();
+
+	if (renderType == noRender)
 	{
-		if (simulation.skipFrames)
-		{
-			if (--skipping > 0)
-			{
-				return;
-			}
-			else
-			{
-				skipping = simulation.skipFrames;
-			}
-		}
+		fpsInterval = 1000 / GUI_FPSWhenNoRender;
 	}
 	else
 	{
-		if (--skipping > 0)
+		if (limitFPS > 0)
 		{
-			return;
+			fpsInterval = 1000 / limitFPS;
 		}
 		else
 		{
-			skipping = SkipGUIFramesWhenNoRender;
+			fpsInterval = 0;
 		}
+	}
+
+	if (TimeMSBetween(currentTickFps, lastTickFps) < fpsInterval)
+	{
+		return;
+	}
+	else
+	{
+		lastTickFps = currentTickFps;
 	}
 
 	//Begin frame
 
 	//Clear background
-	if (skippingRender == 0)
-	{
-		glClearColor(BackgroundColorFloat);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+	glClearColor(BackgroundColorFloat);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Render
 	if (renderType != noRender)
 	{
-		if (simulate)
-		{
-			field->draw(renderType);
+		field->draw(renderType);
 
-			//Highlight selected object
-			HighlightSelection();
-		}
-		else
-		{
-			if (skippingRender-- == 0)
-			{
-				skippingRender = SkipRenderingFramesWhileOnPause;
-				field->draw(renderType);
+		//Highlight selected object
+		HighlightSelection();
 
-				//Highlight selected object
-				HighlightSelection();
-			}
-		}
+		++fpsCounter;
 	}
 
 	SelectionShadowScreen();
@@ -906,9 +943,14 @@ void Main::Render()
 	//Present scene
 	SDLPresentScene();
 
-	//Delay so it would not eat too many resourses while on pause
-	if (!simulate)
-		SDL_Delay(20);
+	//Calculate fps
+	if (TimeMSBetween(currentTickFps, lastSecondTickFps) >= 1000)
+	{
+		lastSecondTickFps = currentTickFps;
+
+		realFPS = fpsCounter;
+		fpsCounter = 0;
+	}
 }
 
 

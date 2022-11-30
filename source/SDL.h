@@ -10,6 +10,7 @@ extern SDL_Window* window;
 //Input output
 extern ImGuiIO* io;
 
+
 extern struct MouseState
 {
 	int
@@ -18,6 +19,8 @@ extern struct MouseState
 	mouseX, mouseY;
 } mouseState;
 
+bool ReadMouseState();
+
 
 void InitSDL();
 void DeInitSDL();
@@ -25,7 +28,6 @@ void DeInitSDL();
 bool CreateWindowSDL();
 bool CreateRenderer();
 
-bool ReadMouseState();
 
 
 extern inline void SDLPresentScene();

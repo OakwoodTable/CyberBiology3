@@ -22,6 +22,29 @@ void Field::shiftRenderPoint(int cx)
     }
 }
 
+void Field::jumpToFirstBot()
+{
+    Object* obj;
+
+    for (int X = 0; X < FieldCellsWidth; ++X)
+    {
+        for (int Y = 0; Y < FieldCellsHeight; ++Y)
+        {
+            obj = allCells[X][Y];
+
+            if (obj)
+            {
+                if (obj->type == bot)
+                {
+                    renderX = X;
+
+                    return;
+                }
+            }
+        }
+    }
+}
+
 
 Point Field::FindFreeNeighbourCell(int X, int Y)
 {
@@ -196,10 +219,11 @@ void Field::RemoveBot(int X, int Y, int energyVal)
 {
     RemoveObject(X, Y);
 
-    #ifdef SpawnOrganicWasteWhenBotDies
-    if (energyVal > 0)
-        AddObject(new Organics(X, Y, energyVal));
-    #endif
+    if(RandomPercentX10(params.adaptation_organicSpawnRate))
+    {
+        if (energyVal > 0)
+            AddObject(new Organics(X, Y, energyVal));
+    }
 }
 
 void Field::RepaintBot(Bot* b, Color newColor, int differs)
@@ -286,84 +310,74 @@ inline void Field::ThreadWait(const uint index)
         if (threadGoMarker[index])
             return;
 
-        if (terminateThreads)
-            TerminateThread();
-
         std::this_thread::yield();
+
+        if (pauseThreads)
+        {
+            //Delay so it would not eat too many resourses while on pause
+            SDL_Delay(1);
+        }
     }
 }
 
-//Process function for 4 threaded simulation
+//Process function for 4 or 8 threaded simulation
 void Field::ProcessPart_MultipleThreads(const uint X1, const uint Y1, const uint X2, const uint Y2, const uint index)
 {
 
     srand(seed + index);
 
-    Object* tmpObj;
-
-Again:
-
-    ThreadWait(index);
-
-    for (int X = X1; X < X1 + ((X2 - X1) / 2); ++X)
+    auto obj_cals = [&](Object* tmpObj)
     {
+        if (tmpObj == NULL)
+            return;
 
-        for (int Y = Y1; Y < Y2; ++Y)
+        ++counters[index][0];
+
+        if (tmpObj->type == bot)
+            ++counters[index][1];
+        else if (tmpObj->type == apple)
+            ++counters[index][2];
+        else if (tmpObj->type == organic_waste)
+            ++counters[index][3];
+
+        ObjectTick(tmpObj);
+    };
+
+    for(;;)
+    {
+        
+        ThreadWait(index);
+
+        for (int X = X1; X < X1 + ((X2 - X1) / 2); ++X)
         {
+            for (int Y = Y1; Y < Y2; ++Y)
+            {
+                obj_cals(allCells[X][Y]);
+            }
+        }
 
-            tmpObj = allCells[X][Y];
+        threadGoMarker[index] = false;
 
-            if (tmpObj == NULL)
-                continue;
+        ThreadWait(index);
 
-            ++counters[index][0];
+        for (int X = X1 + ((X2 - X1) / 2); X < X2; ++X)
+        {
+            for (int Y = Y1; Y < Y2; ++Y)
+            {
+                obj_cals(allCells[X][Y]);
+            }
+        }
 
-            if (tmpObj->type == bot)
-                ++counters[index][1];
-            else if (tmpObj->type == apple)
-                ++counters[index][2];
-            else if (tmpObj->type == organic_waste)
-                ++counters[index][3];
+        threadGoMarker[index] = false;
 
-            ObjectTick(tmpObj);
+        if (terminateThreads)
+        {
+            threadTerminated[index] = true;
 
+            return;
         }
 
     }
-
-    threadGoMarker[index] = false;
-
-    ThreadWait(index);
-
-    for (int X = X1 + ((X2 - X1) / 2); X < X2; ++X)
-    {
-
-        for (int Y = Y1; Y < Y2; ++Y)
-        {
-
-            tmpObj = allCells[X][Y];
-
-            if (tmpObj == NULL)
-                continue;
-
-            ++counters[index][0];
-
-            if (tmpObj->type == bot)
-                ++counters[index][1];
-            else if (tmpObj->type == apple)
-                ++counters[index][2];
-            else if (tmpObj->type == organic_waste)
-                ++counters[index][3];
-
-            ObjectTick(tmpObj);
-
-        }
-
-    }
-
-    threadGoMarker[index] = false;
-
-    goto Again;
 
 }
 
@@ -456,22 +470,20 @@ inline void Field::tick_multiple_threads()
 
 }
 
-void Field::TerminateThread() {};
-
 //Tick function
 void Field::tick(uint thisFrame)
 {
     Object::currentFrame = thisFrame;
 
-    #ifdef UseApples
-
+    if(params.spawnApples)
+    {
         if (spawnApplesInterval++ == AppleSpawnInterval)
         {
             SpawnApples();
 
             spawnApplesInterval = 0;
         }
-    #endif
+    }
 
     #ifdef UseOneThread
         tick_single_thread();
@@ -481,13 +493,13 @@ void Field::tick(uint thisFrame)
 }
 
 
-//Draw simulation field with all its objects
+
 void Field::draw(RenderTypes render)
 {
     //Background
     SDL_SetRenderDrawColor(renderer, FieldBackgroundColor);
     SDL_RenderFillRect(renderer, &mainRect);
-
+    
     //Ocean
 #ifdef DrawOcean
     SDL_SetRenderDrawColor(renderer, OceanColor);
@@ -565,7 +577,6 @@ bool Field::IsInMud(int Y)
 
 int Field::ValidateX(int X)
 {
-#ifdef TileWorldHorizontally
     if (X < 0)
     {
         return X + FieldCellsWidth;
@@ -574,7 +585,6 @@ int Field::ValidateX(int X)
     {
         return (X - FieldCellsWidth);
     }
-#endif      
 
     return X;
 }
@@ -681,6 +691,16 @@ void Field::SpawnApples()
     }
 }
 
+void Field::PauseThreads()
+{
+    pauseThreads = true;
+}
+
+void Field::UnpauseThreads()
+{
+    pauseThreads = false;
+}
+
 
 //Create field
 Field::Field()
@@ -730,4 +750,65 @@ Field::Field()
 
     Object::SetPointers(this, (Object***)allCells);
 
+}
+
+Field::~Field()
+{
+    repeat(NumThreads)
+        threadTerminated[i] = false;
+
+    terminateThreads = true;
+
+    for (;;)
+    {
+        uint tcount = 0;
+
+        repeat(NumThreads)
+        {
+            if (threadTerminated[i] == true)
+                ++tcount;
+        }
+
+        if (tcount == NumThreads)
+            break;
+
+        repeat(NumThreads)
+            threadGoMarker[i] = true;
+
+        pauseThreads = false;
+
+        SDL_Delay(1);
+    }
+
+    repeat(NumThreads)
+    {
+        threads[i]->join();
+    }
+}
+
+void FieldDynamicParams::Reset()
+{
+    oceanLevel = InitialOceanHeight;
+    mudLevel = InitialMudLayerHeight;
+    appleEnergy = DefaultAppleEnergy;
+
+    adaptation_DeathChance_Winds = 0;
+    adaptation_StepsNum_Winds = 2;
+
+    adaptation_landBirthBlock = 0;
+    adaptation_seaBirthBlock = 0;
+    adaptation_PSInOceanBlock = 0;
+    adaptation_PSInMudBlock = 0;
+    adaptation_botShouldBeOnLandOnceToMultiply = 0;
+    adaptation_botShouldDoPSOnLandOnceToMultiply = 0;
+    adaptation_forceBotMovements = 0;
+
+    adaptation_organicSpawnRate = 0;
+
+    memset(reserved, 0, sizeof(reserved));
+}
+
+FieldDynamicParams::FieldDynamicParams()
+{
+    Reset();
 }

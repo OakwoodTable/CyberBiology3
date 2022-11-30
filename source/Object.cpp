@@ -5,6 +5,8 @@ uint Object::currentFrame = 0;
 Field* Object::static_pField = NULL;
 Object*** Object::static_pCells = NULL;
 
+const Rect Object::image_rect = { 0, 0, FieldCellSize, FieldCellSize };
+
 
 
 Object::Object(int X, int Y) :x(X), y(Y), type(abstract)

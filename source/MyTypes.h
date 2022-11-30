@@ -6,6 +6,8 @@
 
 typedef unsigned int uint;
 typedef unsigned char byte;
+typedef std::atomic_bool abool;
+typedef std::string string;
 
 
 struct Color
@@ -39,7 +41,6 @@ struct Point
 {
 	int x, y;
 
-
 	Point(int X, int Y);
 	Point();
 
@@ -59,6 +60,8 @@ struct Rect final: public SDL_Rect
 //Get random number (0 to max-1)
 #define RandomVal(max) (rand()%(max))
 
+#define RandomValRange(min, max) (RandomVal(max-min) + min)
+
 //Get random float in given range
 float RandomFloatInRange(float min, float max);
 
@@ -70,3 +73,13 @@ float RandomFloatInRange(float min, float max);
 
 //Simple loop
 #define repeat(times) for(int i=0;i<times;++i)
+
+
+
+
+//High precision tick counter
+typedef std::chrono::steady_clock Clock;
+typedef Clock::time_point TimePoint;
+typedef std::chrono::duration<int, std::milli> Duration;
+
+#define TimeMSBetween(t2, t1) duration_cast<Duration>(t2 - t1).count() 

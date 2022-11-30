@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------
 //Window
 
-#define WindowCaption "CyberBio v1.1.0"
+#define WindowCaption "CyberBio v1.2.1"
 
 #define WindowWidth 1920
 #define WindowHeight 1080
@@ -49,21 +49,21 @@
 //GUI
 
 //#define ShowGUIDemoWindow
+
 #define InterfaceBorder 10
 
 #define GUIWindowWidth 284
 
-#define ConsoleCharLength 4000 //Temporary (Forever)
+#define LogBackgroundColor 0.1f, 0.1f, 0.3f, 1.0f
 
-#define DefaultBrushRadius 7
-#define GUI_Max_interval 1000
-#define GUI_Max_skip 40
-#define GUI_Max_food 500
+#define DefaultBrushRadius 1
+#define GUI_Max_tps 180
+#define GUI_Max_food 25
+#define GUI_Max_fps 120
 #define GUI_Max_brush 50
 
 #define CursorBlinkRate 2
-#define SkipRenderingFramesWhileOnPause 10
-#define SkipGUIFramesWhenNoRender 40
+#define GUI_FPSWhenNoRender 10
 
 //-----------------------------------------------------------------
 
@@ -71,26 +71,33 @@
 //-----------------------------------------------------------------
 //Keyboard
 
-#define Keyboard_Pause SDL_SCANCODE_SPACE
-#define Keyboard_SpawnRandoms SDL_SCANCODE_F1
+#define Keyboard_Pause SDL_SCANCODE_PAUSE
+#define Keyboard_Pause2 SDL_SCANCODE_SPACE
 #define Keyboard_NextFrame SDL_SCANCODE_KP_PLUS
+
 #define Keyboard_RenderNatural SDL_SCANCODE_KP_1
 #define Keyboard_RenderPredators SDL_SCANCODE_KP_2
 #define Keyboard_RenderEnergy SDL_SCANCODE_KP_3
 #define Keyboard_NoRender SDL_SCANCODE_KP_4
 
+#define Keyboard_SpawnRandoms SDL_SCANCODE_F1
+#define Keyboard_PlaceWall SDL_SCANCODE_F2
+#define Keyboard_DropOrganics SDL_SCANCODE_F3
+
 #define Keyboard_ShowSaveLoad_Window SDL_SCANCODE_Z
 #define Keyboard_ShowDangerous_Window SDL_SCANCODE_X
 #define Keyboard_ShowAdaptation_Window SDL_SCANCODE_C
 #define Keyboard_ShowChart_Window SDL_SCANCODE_V
+#define Keyboard_ShowBrain_Window SDL_SCANCODE_B
 
 #define Keyboard_Reset_RenderX SDL_SCANCODE_HOME
 #define Keyboard_Jump_Up_RenderX SDL_SCANCODE_PAGEUP
 #define Keyboard_Jump_Down_RenderX SDL_SCANCODE_PAGEDOWN
+#define Keyboard_Jump_To_First_bot SDL_SCANCODE_END
 
-#define MoveCameraSpeed 2
+#define MoveCameraSpeed 1
 #define MoveCameraFastSpeed 6
-#define MoveCameraJump 250
+#define MoveCameraJump 125
 
 //-----------------------------------------------------------------
 
@@ -98,12 +105,10 @@
 //-----------------------------------------------------------------
 //Field
 
-#define FieldBackgroundColor 255,255,255,255
-
 #define FieldX InterfaceBorder
 #define FieldY InterfaceBorder
 
-#define FieldCellsWidth 13*16*100		//ƒолжно делитьс€ на 8 без остатка если нужны 4 потока! » на 16 без остатка если 8 потоков!
+#define FieldCellsWidth 13*16*6		//ƒолжно делитьс€ на 8 без остатка если нужны 4 потока! » на 16 без остатка если 8 потоков!
 #define FieldCellsHeight 133
 
 #define FieldRenderCellsWidth 202
@@ -112,8 +117,6 @@
 #define FieldCellSizeHalf FieldCellSize/2
 #define FieldWidth FieldCellSize*FieldRenderCellsWidth
 #define FieldHeight FieldCellSize*FieldCellsHeight
-
-#define TileWorldHorizontally
 
 //-----------------------------------------------------------------
 
@@ -127,9 +130,12 @@
 
 #define BotOutlineColor 111,111,111,255
 
+#define FieldBackgroundColor 255,255,255,255
+
 #define RockDrawColor 62, 62, 62, 255
-#define OrganicWateDrawColor 200, 200, 200, 255
-#define AppleDrawColor 0, 100, 0, 255
+#define OrganicWasteDrawColor 0xC8C8C8FF
+#define OrganicWasteOutlineColor 0x808080FF
+#define AppleDrawColorRGBA 0x006400FF
 
 #define DrawOcean
 #define OceanColor 150,150,255,255		//Blue water
@@ -146,8 +152,8 @@
 //-----------------------------------------------------------------
 //Simulation
 
-#define SimTickIntervalAtStart 0
-#define SkipFramesAtStart 0
+#define FPSLimitAtStart 60
+#define LimitFPSAtStart 60
 
 #define StartOnPause
 
@@ -166,7 +172,7 @@
 #define PhotosynthesisReward_Autumn 2
 #define PhotosynthesisReward_Winter 1
 
-#define MaxPossibleEnergyForABot 1000
+#define MaxPossibleEnergyForABot 500
 #define MaxBotLifetime 2000
 
 #define NewbornGetsHalf
@@ -184,13 +190,11 @@
 //#define BotCanEatRock
 #define BotCanEatBot
 
-//#define SpawnOrganicWasteWhenBotDies
 #define OrganicWasteAlwaysFalls
 
-//#define UseApples
-#define DefaultAppleEnergy 125
+#define DefaultAppleEnergy 100
 #define AppleSpawnInterval 1
-#define SpawnAppleInCellChance 4
+#define SpawnAppleInCellChance 1
 
 //#define NoPhotosynthesis
 //#define ForbidMutations
@@ -227,12 +231,8 @@
 
 #define DirectoryName "SavedObjects/"
 
-#define MaxFilenames 100
-
 #define MagicNumber_ObjectFile 0xfcfa47fe
 #define MagicNumber_WorldFile 0xbffa51fd
-
-#define DoNotShowFolders
 
 //-----------------------------------------------------------------
 
@@ -291,7 +291,7 @@
 #define Render_LayerDistance 100
 #define Render_VerticalDistance 60
 
-#define Render_LineThickness 10
+#define Render_LineThickness 7
 
 //-----------------------------------------------------------------
 
@@ -302,7 +302,7 @@
 // Population chart window
 
 #define ChartNumValues 250
-#define AddToChartEvery 250
+#define AddToChartEvery 125
 
 #define ChartLineThickness 1.5f
 

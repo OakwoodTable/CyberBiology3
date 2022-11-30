@@ -61,6 +61,7 @@ const Uint8 presetColors[][4] =
 
 class Bot final:public Object
 {
+
 	//Rotation, see Rotations[]
 	uint direction=0;
 
@@ -124,7 +125,7 @@ class Bot final:public Object
 
 	//----------------------------------------------------------------------------------------------
 	//These functions are used for experiments such as adaptation,
-	//you are supposed to call them at the end of tick() function, or do not use
+	//you are supposed to call them in tick() function, or do not use
 
 	int adaptation_numTicks = 0;
 	int adaptation_numRightSteps = 0;
@@ -132,15 +133,16 @@ class Bot final:public Object
 
 	int adaptationCounter = 0;
 
-	//How many times bot used attack and move commands
-	int numAttacks = 0;
-	int numMoves = 0;
+	//How many times bot used attack, move and PS commands
+	uint numAttacks = 0;
+	uint numMovesY = 0;
+	uint numPSonLand = 0;
 
 	//Bot visited land
 	bool wasOnLand = false;
 
-	bool ArtificialSelectionWatcher_Winds();
-	bool ArtificialSelectionWatcher_Divers();
+	bool ArtificialSelectionWatcher_OnTick();
+	bool ArtificialSelectionWatcher_OnDivide();
 		
 	//----------------------------------------------------------------------------------------------
 
@@ -154,13 +156,13 @@ public:
 	BrainOutput think(BrainInput input);
 
 	//Bot tick function, it should always call parents tick function first
-	int tick() override;
-	
+	int tick() override;	
+
 
 	void draw() override;
 	void drawEnergy() override;
-	void drawPredators() override;
-		
+	void drawPredators() override;	
+
 
 	void Rotate(int dir = 1);
 	
@@ -211,7 +213,17 @@ public:
 	Bot(int X, int Y, uint Energy = MaxPossibleEnergyForABot);
 
 
+
 	static Color GetRandomColor();
+
+	static void CreateImage();
+	static void DeleteImage();
+
+
+private:
+
+	static SDL_Texture* sprite_head[8];
+	static SDL_Texture* sprite_body;
 
 };
 

@@ -7,7 +7,9 @@
 
 struct NeuronConnection
 {
-	uint dest;
+	byte dest_layer;
+	byte dest_neuron;
+
 	float weight;
 
 	void ChangeWeight();
@@ -45,22 +47,24 @@ struct Neuron
 	uint numConnections = 0;
 	NeuronConnection allConnections[NeuronsInLayer];
 
-	int reserved = 0;
+	uint layer;
 
 	Neuron();
 
 	void Clone(Neuron* source);
 
-	void AddConnection(uint DEST, float WEIGHT);
+	void AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT);
 	bool AddRandomConnection();
 	void RemoveConnection(uint index);
+
+	uint GetRandomConnectionIndex();
 
 	//Sort connections by index
 	void SortConnections();
 
 	//Does neuron have a connection,
 	//returns connection index or -1
-	int IsConnected(uint index);
+	int IsConnected(uint LAYER, uint index);
 
 
 	void SetRandomBias();

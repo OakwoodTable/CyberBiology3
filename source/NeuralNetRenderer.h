@@ -8,7 +8,6 @@
 
 struct NeuralNetRenderer final
 {
-	NeuralNetRenderer() {};
 
 	void DrawThickLine(int, int, int, int);
 

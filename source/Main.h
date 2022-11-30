@@ -1,6 +1,5 @@
 #pragma once
 
-#include "SDL.h"
 #include "GUI.h"
 #include "Field.h"
 #include "NeuralNetRenderer.h"
@@ -21,6 +20,46 @@ class Main final
 
 private:
 
+	Clock clock;
+
+	const SDL_Rect screenRect = { 0, 0, WindowWidth, WindowHeight };
+
+	//Save/load object interface
+	ObjectSaver saver;
+
+	//Keyboard
+	const Uint8* keyboard;
+
+	//Simulation
+	int seed, id;
+	uint realTPS = 0;
+	int limit_interval = 0;
+	int limit_ticks_per_second = FPSLimitAtStart;
+
+	Field* field;	
+
+	uint ticknum = 0;
+
+	TimePoint prevTick;
+	TimePoint lastSecondTick;
+	uint tpsTickCounter = 0;
+	TimePoint currentTick;
+
+	//FPS
+	int limitFPS = LimitFPSAtStart;
+	int fpsInterval;
+	uint realFPS = 0;
+	uint fpsCounter = 0;
+	TimePoint lastTickFps;
+	TimePoint lastSecondTickFps;
+
+	RenderTypes renderType = RenderTypeAtStart;
+	MouseFunction mouseFunc = mouse_select;
+
+	//Seasons
+	Season season = summer;
+	uint changeSeasonCounter = 0;
+
 	//Windows
 	void DrawDemoWindow();
 	void DrawMainWindow();
@@ -40,64 +79,12 @@ private:
 	void DrawChartWindow();
 	void DrawBotBrainWindow();
 
-public:
-	
-	//Simulation
-	int seed, id;
-	uint simulationSpeed = 0;
-	int interval = SimTickIntervalAtStart;
-
-	Field* field;	
-
-
-	//Seasons
-	Season season = summer;
-
-	void ChangeSeason();
-
-
-	bool simulate = true;	//Set false to pause
-
-	ULONGLONG prevTick = GetTickCount64();
-	ULONGLONG lastSecond = GetTickCount64();
-	ULONGLONG currentTick;
-
-	uint secondTickCount = 0;
-	uint changeSeasonCounter = 0;
-	int skipping = 0;
-	uint ticknum = 0;
-	int skipFrames = SkipFramesAtStart;
-	int skippingRender = 0;
-
-	RenderTypes renderType = RenderTypeAtStart;
-	MouseFunction mouseFunc = mouse_select;
-
-	//Set to true to close the app
-	bool terminate = false; 
-
-	void Pause();
-
-	void MakeStep();
-
-	void HighlightSelection();
-	void SelectionShadowScreen();
-	
-	void DrawWindows();
-
-	void MouseClick();
-
-	void Render();
-
-	void ClearWorld();
-
-
 	//Show more windows
 	bool showSaveLoad = false;
 	bool showDangerous = false;
-	bool showSummary = false;
 	bool showBrain = false;
 	bool showAdaptation = false;
-	bool showChart = false;
+	bool showChart = false;	
 
 	//Chart (TODO)
 	float chartData_bots[ChartNumValues];
@@ -108,54 +95,87 @@ public:
 
 	int timeBeforeNextDataToChart = AddToChartEvery;
 
+	bool chartShow_apples = false;
+	bool chartShow_organics = false;
+
 	void ClearChart();
 	void AddToChart(float, float, float);
-
 
 	//Neural net renderer
 	NeuralNetRenderer nn_renderer;
 	//Show initial brain or active brain
 	int brainToShow = 0;
 
-
 	//Bot selection
-	bool selection = false;
 	Object* selectedObject;
+
+	int cursorBlink = 0;
+	bool cursorShow = true;	
+	int selectionShadowScreen = 0;
 
 	void Deselect();
 
-	int blink = 0;
-	bool cursorShow = true;
 	int brushSize = DefaultBrushRadius;
-	int selectionShadowScreen = 0;
 
-	SDL_Rect screenRect = { 0, 0, WindowWidth, WindowHeight };
-		
+	//Log
+	ImGuiTextBuffer logText;
 
-	//Console (TODO)
-	char consoleText[ConsoleCharLength] = "";
-
-	void ClearConsole();
-	void ConsoleInput(const char* str, bool newLine = false);
-	void ConsoleInput(int num, bool newLine = true);
-
+	void ClearLog();
+	void LogPrint(const char* str, bool newLine = false);
+	void LogPrint(int num, bool newLine = true);
 
 	//Save/load
-	int listCurrentItem = 0;
 
-	std::string filenamesFull[MaxFilenames];
-	std::string filenamesPartial[MaxFilenames];
-	bool selectedFilenames[MaxFilenames] = {};
-	int selectedFilename = -1;
-	int numFilenames = 0;
+	struct listed_file
+	{
+		string nameFull;
+		string nameShort;
+		string fileSize;
+		string fullCaption;
+
+		bool isSelected = false;
+
+		bool isWorld;
+	};
+
+	std::vector<listed_file> allFilenames;
+	listed_file* selectedFile = NULL;
 
 	void LoadFilenames();
 	void CreateNewFile();
 
+	void DrawWindows();
+
+	void HighlightSelection();
+	void SelectionShadowScreen();
+
+	void ChangeSeason();
+
+	void Pause();
+
+	void ClearWorld();
+	
+
+public:		
+
+	//Set false to pause
+	bool simulate = true;
+
+	//Set to true to close the app
+	bool terminate = false;
+
+
+	void MakeStep();
+	
+	void MouseClick();
+
+	void Render();
+	
 
 	Main();
+	~Main();
 
-	void CatchKeypress(const Uint8*);
+	void CatchKeyboard();
 
 };
 

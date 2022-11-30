@@ -61,6 +61,14 @@ Object* ObjectSaver::LoadObjectFromFile(MyInputStream& file)
         toRet->energy = file.ReadInt();
 
         return toRet;
+
+    case organic_waste:
+        toRet = new Organics(0, 0, 0);
+
+        toRet->SetLifetime(file.ReadInt());
+        toRet->energy = file.ReadInt();
+
+        return toRet;
     }
 
     return NULL;
@@ -91,6 +99,9 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
         toRet.id = file.ReadInt();
         toRet.seed = file.ReadInt();
         toRet.tick = file.ReadInt();
+
+        if (file.ReadInt() != sizeof world->params)
+            goto NoSuccess;
 
         file.read((char*) & world->params, sizeof world->params);
 
@@ -134,6 +145,7 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
     4b - sim id
     4b - seed
     4b - ticknum
+    4b - FieldDynamicParams size
     FieldDynamicParams params
 
     following all objects
@@ -156,6 +168,7 @@ bool ObjectSaver::SaveWorld(Field* world, char* filename, int id, int ticknum)
 
         file.WriteInt(ticknum);
 
+        file.WriteInt(sizeof world->params);
         file.write((char*)&world->params, sizeof world->params);
 
         for (int x = 0; x < FieldCellsWidth; ++x)
@@ -193,21 +206,21 @@ void ObjectSaver::WriteBotToFile(MyOutStream& file, Bot* obj)
     file.WriteInt(NeuronsInLayer);
     file.WriteInt(sizeof Neuron);
 
-    file.WriteInt(((Bot*)obj)->GetColor()->r);
-    file.WriteInt(((Bot*)obj)->GetColor()->g);
-    file.WriteInt(((Bot*)obj)->GetColor()->b);
+    file.WriteInt((obj)->GetColor()->r);
+    file.WriteInt((obj)->GetColor()->g);
+    file.WriteInt((obj)->GetColor()->b);
 
     repeat(NumberOfMutationMarkers)
     {
-        file.WriteInt(((Bot*)obj)->GetMarkers()[i]);
+        file.WriteInt((obj)->GetMarkers()[i]);
     }
 
-    file.WriteInt(((Bot*)obj)->energy);
+    file.WriteInt((obj)->energy);
 
-    file.write((char*)((Bot*)obj)->GetActiveBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
-    file.write((char*)((Bot*)obj)->GetInitialBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
+    file.write((char*)(obj)->GetActiveBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
+    file.write((char*)(obj)->GetInitialBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
 
-    file.write((char*)((Bot*)obj)->GetActiveBrain()->allMemory, NumNeuronLayers* NeuronsInLayer * sizeof(float));
+    file.write((char*)(obj)->GetActiveBrain()->allMemory, NumNeuronLayers* NeuronsInLayer * sizeof(float));
 }
 
 void ObjectSaver::WriteObjectToFile(MyOutStream& file, Object* obj)
@@ -225,6 +238,12 @@ void ObjectSaver::WriteObjectToFile(MyOutStream& file, Object* obj)
 
     case apple:
         file.WriteInt(ObjectTypes::apple);
+        file.WriteInt(obj->GetLifetime());
+        file.WriteInt(obj->energy);
+        break;
+
+    case organic_waste:
+        file.WriteInt(ObjectTypes::organic_waste);
         file.WriteInt(obj->GetLifetime());
         file.WriteInt(obj->energy);
         break;
@@ -301,6 +320,11 @@ void MyOutStream::WriteInt(int data)
     write((char*)&data, sizeof(int));
 }
 
+void MyOutStream::WriteBool(bool data)
+{
+    write((char*)&data, 1);
+}
+
 MyOutStream::MyOutStream(char* filename, int flags) :std::ofstream(filename, flags) {}
 
 
@@ -309,6 +333,15 @@ int MyInputStream::ReadInt()
     int toRet;
 
     read((char*)&toRet, sizeof(int));
+
+    return toRet;
+}
+
+bool MyInputStream::ReadBool()
+{
+    bool toRet = false;
+
+    read((char*)&toRet, 1);
 
     return toRet;
 }

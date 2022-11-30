@@ -7,5 +7,5 @@
 void InitImGUI();
 void DeInitImGUI();
 
-extern inline void GUIStartFrame();
+inline void GUIStartFrame();
 

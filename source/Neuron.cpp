@@ -11,14 +11,17 @@ void Neuron::Clone(Neuron* source)
 	memcpy(this, source, sizeof(Neuron));
 }
 
-void Neuron::AddConnection(uint DEST, float WEIGHT=1000.0f)
+void Neuron::AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT=1000.0f)
 {
-	allConnections[numConnections].dest = DEST;
+	NeuronConnection* nConnection = &allConnections[numConnections];
+
+	nConnection->dest_neuron = DEST;
+	nConnection->dest_layer = DEST_LAYER;
 
 	if (WEIGHT < 1000.0f)
-		allConnections[numConnections].weight = WEIGHT;
+		nConnection->weight = WEIGHT;
 	else
-		allConnections[numConnections].SetRandomWeight();
+		nConnection->SetRandomWeight();
 
 	++numConnections;
 }
@@ -28,15 +31,21 @@ bool Neuron::AddRandomConnection()
 	if (numConnections >= MaxConnectionsPerNeuronType[type])
 		return false;
 
-	int connectionIndex;
+	int c_Index, c_Layer;
 
 	for (;;)
 	{
-		connectionIndex = RandomVal(NeuronsInLayer);
+		c_Index = RandomVal(NeuronsInLayer);
 
-		if (IsConnected(connectionIndex) == -1)
+		if (layer == NumNeuronLayers - 2)
+			c_Layer = NumNeuronLayers - 1;
+		else
+			c_Layer = RandomVal(NumNeuronLayers - (layer + 1)) + layer + 1;
+
+		//If not connected
+		if (IsConnected(c_Layer, c_Index) == -1)
 		{
-			AddConnection(connectionIndex);
+			AddConnection(c_Layer, c_Index);
 
 			return true;
 		}
@@ -53,12 +62,19 @@ void Neuron::RemoveConnection(uint index)
 	}
 }
 
-int Neuron::IsConnected(uint index)
+int Neuron::IsConnected(uint LAYER, uint index)
 {
+	NeuronConnection* c;
+
 	for (uint i = 0; i < numConnections; ++i)
 	{
-		if (allConnections[i].dest == index)
-			return i;
+		c = &allConnections[i];
+
+		if (c->dest_layer == LAYER)
+		{
+			if(c->dest_neuron == index)
+				return i;
+		}			
 	}
 
 	return -1;
@@ -132,7 +148,9 @@ void Neuron::MakeFullyConnected()
 {
 	repeat(NeuronsInLayer)
 	{
-		allConnections[i].dest = i;
+		allConnections[i].dest_layer = layer + 1;
+		allConnections[i].dest_neuron = i;
+
 		allConnections[i].SetRandomWeight();
 	}
 
@@ -154,10 +172,12 @@ void Neuron::SetZero()
 
 void Neuron::SetTunnel(int num)
 {
-	bias = 0.0f;
-	numConnections = 1;
+	SetZero();
+
 	allConnections[0].weight = 1.0f;
-	allConnections[0].dest = num;
+
+	allConnections[0].dest_neuron = num;
+	allConnections[0].dest_layer = layer + 1;
 }
 
 void Neuron::SlightlyChange()
@@ -190,20 +210,34 @@ void Neuron::mutate_ChangeBias()
 		bias = NeuronBiasMin;
 }
 
+uint Neuron::GetRandomConnectionIndex()
+{
+	return RandomVal(numConnections);
+}
+
 void Neuron::mutate_ChangeOneConnection()
 {	
 	if (numConnections == 0)
 		return;
 
 	int roll = RandomVal(101);
- 	int connection = RandomVal(numConnections);
+ 	int connection = GetRandomConnectionIndex();
 
 	if (roll <= 10)
+	{
+		//10% - remove connection
 		RemoveConnection(connection);
+	}
 	else if (roll <= 20)
+	{
+		//10% - add random connection
 		AddRandomConnection();
+	}
 	else
+	{
+		//Change connection weight
 		allConnections[connection].ChangeWeight();
+	}
 
 }
 

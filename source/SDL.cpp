@@ -38,6 +38,7 @@ void DeInitSDL()
 }
 
 
+
 bool CreateWindowSDL()
 {
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -89,7 +90,7 @@ bool ReadMouseState()
 	io->MouseDown[0] = mouseState.buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 	io->MouseDown[1] = mouseState.buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 	io->MouseWheel = static_cast<float>(mouseState.wheel);
-
+	
 	io->KeyShift = ((SDL_GetModState() & KMOD_SHIFT) != 0);
 	io->KeyCtrl = ((SDL_GetModState() & KMOD_CTRL) != 0);
 	io->KeyAlt = ((SDL_GetModState() & KMOD_ALT) != 0);

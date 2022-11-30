@@ -80,7 +80,6 @@ public:
 	
 	BrainOutput GetOutput();
 
-
 	void SetDummy();
 
 };

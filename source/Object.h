@@ -9,10 +9,6 @@ class Field;
 #include "MyTypes.h"
 
 
-//temporary
-extern SDL_Renderer* renderer;
-
-
 
 enum ObjectTypes
 {
@@ -77,19 +73,25 @@ public:
 
 	/*This function returns 1 when the object is destroyed.
 	You should call it on every simulation tick before you
-	call same function in descendant class
+	call same function in derived class
 	Returns:
 	0 - all fine
 	1 - object destroyed
 	2 - nothing to do(last tick frame matches current frame)*/
-	virtual int tick();
-
-	static uint currentFrame;
+	virtual int tick();	
 
 	uint GetLifetime();
 	void SetLifetime(uint);
 
 
+
+	static uint currentFrame;
+
 	static void SetPointers(Field* field, Object*** cells);
+
+protected:
+
+	//Texture rectangle
+	static const Rect image_rect;
 
 };

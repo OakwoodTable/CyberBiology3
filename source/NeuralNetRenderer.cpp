@@ -51,8 +51,8 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 
 				DrawThickLine(drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2),
 					drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2),
-					drawTo.x + xi * Render_LayerDistance + Render_LayerDistance + (Render_NeuronSize/2),
-					drawTo.y + c->dest * Render_VerticalDistance + (Render_NeuronSize/2));
+					drawTo.x + (c->dest_layer) * Render_LayerDistance + (Render_NeuronSize/2),
+					drawTo.y + c->dest_neuron * Render_VerticalDistance + (Render_NeuronSize/2));
 			}
 		}
 	}
