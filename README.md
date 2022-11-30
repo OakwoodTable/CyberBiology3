@@ -64,10 +64,12 @@ Using keyboard is more handy because interface becomes laggy during simulation
 + "Space" - Start/Pause
 + "Plus sign near numpad" - make 1 step
 + "F1" - Spawn a group of random bots
++ "F2" - Create vertical wall
 + "Numpad 1-4" - Select rendering method
 + "Home" - Set camera at X = 0
 + Arrow keys (left, right) - Move camera
 + "Page Up", "Page Down" - Move camera fast
++ "End" - Find first bot on screen
 
 
 ## How to use Settings file
@@ -76,6 +78,4 @@ After that you change your rendering area width ("FieldRenderCellsWidth") and
 world height ("FieldCellsHeight") to match your screen. World can be wider than your render area,
 but you have to keep its width divisible by 16 without a remainder, it's needed for multi threading.
 
-All changable parameters are listed in that file, for example if you want apples to spawn on your world, you 
-uncomment "UseApples" line, if you want organics to spawn, you uncomment "SpawnOrganic", etc. At the moment apples are very laggy though, 
-because of its rendering function. You are welcome to rewrite it in an individual branch.
+All changable parameters are listed in that file.
