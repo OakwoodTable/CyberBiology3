@@ -113,7 +113,7 @@ void Main::ChangeSeason()
 	if (season > spring)
 	{
 		season = summer;
-	}
+	}	
 }
 
 

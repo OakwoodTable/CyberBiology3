@@ -1,0 +1,480 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{994ADDC9-D884-3E1D-A18C-148B84BA4846}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>SDL2-static</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SDL2-static.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SDL2-staticd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SDL2-static.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SDL2-static</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SDL2-static.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SDL2-static</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SDL2-static.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SDL2-static</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-debug;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-debug;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-debug;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-release;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-release;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-release;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-minsizerel;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-minsizerel;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-minsizerel;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-relwithdebinfo;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;SDL_BUILD_MAJOR_VERSION=2;SDL_BUILD_MINOR_VERSION=23;SDL_BUILD_MICRO_VERSION=1;NDEBUG;SDL_STATIC_LIB;USING_GENERATED_CONFIG_H;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-relwithdebinfo;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\include-config-relwithdebinfo;E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule E:/Рабочий стол/GitHub/CyberBiology3/SDL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-file "E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeConfigurableFile.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeDependentOption.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceRuns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.c.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckLibraryExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckOBJCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckStructHasMember.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckSymbolExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindGit.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageMessage.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPkgConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceRuns.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\macros.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\sdlchecks.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_config.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_revision.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\SDL_config.h.intermediate;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule E:/Рабочий стол/GitHub/CyberBiology3/SDL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-file "E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeConfigurableFile.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeDependentOption.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceRuns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.c.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckLibraryExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckOBJCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckStructHasMember.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckSymbolExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindGit.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageMessage.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPkgConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceRuns.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\macros.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\sdlchecks.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_config.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_revision.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\SDL_config.h.intermediate;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule E:/Рабочий стол/GitHub/CyberBiology3/SDL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-file "E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeConfigurableFile.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeDependentOption.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceRuns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.c.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckLibraryExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckOBJCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckStructHasMember.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckSymbolExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindGit.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageMessage.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPkgConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceRuns.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\macros.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\sdlchecks.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_config.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_revision.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\SDL_config.h.intermediate;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule E:/Рабочий стол/GitHub/CyberBiology3/SDL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-file "E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeConfigurableFile.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CMakeDependentOption.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCSourceRuns.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.c.in;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFile.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckIncludeFiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckLibraryExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckOBJCSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckStructHasMember.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\CheckSymbolExists.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindGit.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPackageMessage.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\FindPkgConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\GNUInstallDirs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.24\Modules\Internal\CheckSourceRuns.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\macros.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\cmake\sdlchecks.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_config.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\SDL\include\SDL_revision.h.cmake;E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\SDL_config.h.intermediate;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_assert.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_dataqueue.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_error.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_guid.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_hints.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_list.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_log.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\SDL_utils.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\atomic\SDL_atomic.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\atomic\SDL_spinlock.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_audio.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_audiocvt.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_audiodev.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_audiotypecvt.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_mixer.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\SDL_wave.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\cpuinfo\SDL_cpuinfo.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\dynapi\SDL_dynapi.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_clipboardevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_displayevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_dropevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_events.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_gesture.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_keyboard.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_mouse.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_quit.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_touch.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\SDL_windowevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\events\imKStoUCS.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\file\SDL_rwops.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\haptic\SDL_haptic.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\hidapi\SDL_hidapi.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\SDL_gamecontroller.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\SDL_joystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\controller_type.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_atan2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_exp.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_fmod.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_log.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_log10.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_pow.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_rem_pio2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\e_sqrt.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\k_cos.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\k_rem_pio2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\k_sin.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\k_tan.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_atan.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_copysign.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_cos.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_fabs.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_floor.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_scalbn.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_sin.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\libm\s_tan.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\locale\SDL_locale.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\misc\SDL_url.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\power\SDL_power.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\SDL_d3dmath.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\SDL_render.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\SDL_yuv_sw.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d\SDL_render_d3d.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d\SDL_shaders_d3d.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d11\SDL_render_d3d11.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d11\SDL_shaders_d3d11.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d12\SDL_render_d3d12.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\direct3d12\SDL_shaders_d3d12.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\opengl\SDL_render_gl.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\opengl\SDL_shaders_gl.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\opengles\SDL_render_gles.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\opengles2\SDL_render_gles2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\opengles2\SDL_shaders_gles2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\ps2\SDL_render_ps2.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\psp\SDL_render_psp.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_blendfillrect.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_blendline.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_blendpoint.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_drawline.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_drawpoint.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_render_sw.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_rotate.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\software\SDL_triangle.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\vitagxm\SDL_render_vita_gxm.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\vitagxm\SDL_render_vita_gxm_memory.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\render\vitagxm\SDL_render_vita_gxm_tools.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\sensor\SDL_sensor.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_crc32.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_getenv.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_iconv.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_malloc.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_mslibc.c">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalOptions) /GL-</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalOptions) /GL-</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalOptions) /GL-</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalOptions) /GL-</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_qsort.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_stdlib.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_string.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\stdlib\SDL_strtokr.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\SDL_thread.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\timer\SDL_timer.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_RLEaccel.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_0.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_1.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_A.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_N.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_auto.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_copy.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_blit_slow.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_bmp.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_clipboard.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_egl.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_fillrect.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_pixels.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_rect.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_shape.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_stretch.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_surface.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_video.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_vulkan_utils.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\SDL_yuv.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\yuv2rgb\yuv_rgb.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\dummy\SDL_dummyaudio.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\disk\SDL_diskaudio.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\virtual\SDL_virtualjoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\dummy\SDL_nullevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\dummy\SDL_nullframebuffer.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\dummy\SDL_nullvideo.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\core\windows\SDL_hid.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\core\windows\SDL_immdevice.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\core\windows\SDL_windows.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\core\windows\SDL_xinput.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\misc\windows\SDL_sysurl.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\winmm\SDL_winmm.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\directsound\SDL_directsound.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\wasapi\SDL_wasapi.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\audio\wasapi\SDL_wasapi_win32.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsclipboard.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsevents.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsframebuffer.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowskeyboard.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsmessagebox.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsmodes.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsmouse.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsopengl.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsopengles.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsshape.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsvideo.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowsvulkan.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\video\windows\SDL_windowswindow.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\generic\SDL_syscond.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\windows\SDL_syscond_cv.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\windows\SDL_sysmutex.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\windows\SDL_syssem.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\windows\SDL_systhread.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\thread\windows\SDL_systls.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\sensor\windows\SDL_windowssensor.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\power\windows\SDL_syspower.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\locale\windows\SDL_syslocale.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\filesystem\windows\SDL_sysfilesystem.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\timer\windows\SDL_systimer.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\loadso\windows\SDL_sysloadso.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_combined.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_gamecube.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_luna.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_ps4.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_ps5.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_rumble.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_shield.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_stadia.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_steam.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_switch.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_xbox360.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_xbox360w.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapi_xboxone.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\hidapi\SDL_hidapijoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\windows\SDL_dinputjoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\windows\SDL_rawinputjoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\windows\SDL_windows_gaming_input.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\windows\SDL_windowsjoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\joystick\windows\SDL_xinputjoystick.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\haptic\windows\SDL_dinputhaptic.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\haptic\windows\SDL_windowshaptic.c" />
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\src\haptic\windows\SDL_xinputhaptic.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="E:\Рабочий стол\GitHub\CyberBiology3\build\ZERO_CHECK.vcxproj">
+      <Project>{13F85A99-D276-34D2-BF3E-AFD57E2592FB}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\sdl_headers_copy.vcxproj">
+      <Project>{4228B594-C0AB-329C-9C9A-CDF9A3FF5E12}</Project>
+      <Name>sdl_headers_copy</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

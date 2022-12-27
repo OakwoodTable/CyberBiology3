@@ -225,6 +225,8 @@ BrainInput Bot::FillBrainInput()
 {
 	BrainInput input;
 
+input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
+
 	//If destination is out of bounds
 	if (!pField->IsInBounds(lookAt_x, lookAt_y))
 	{

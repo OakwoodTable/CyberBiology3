@@ -108,7 +108,7 @@
 #define FieldX InterfaceBorder
 #define FieldY InterfaceBorder
 
-#define FieldCellsWidth 13*16*6		//Должно делиться на 8 без остатка если нужны 4 потока! И на 16 без остатка если 8 потоков!
+#define FieldCellsWidth 3*16*6		//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 8 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 4 пїЅпїЅпїЅпїЅпїЅпїЅ! пїЅ пїЅпїЅ 16 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ 8 пїЅпїЅпїЅпїЅпїЅпїЅпїЅ!
 #define FieldCellsHeight 133
 
 #define FieldRenderCellsWidth 202
@@ -167,7 +167,7 @@
 //-----------------------------------------------------------------
 //World rules
 
-#define FoodbaseInitial 6
+#define FoodbaseInitial 2
 #define PhotosynthesisReward_Summer 4
 #define PhotosynthesisReward_Autumn 2
 #define PhotosynthesisReward_Winter 1
@@ -178,14 +178,14 @@
 #define NewbornGetsHalf
 #define EnergyPassedToAChild 100
 
-#define EveryTickEnergyPenalty 0
+#define EveryTickEnergyPenalty 1
 #define AttackCost 4
 #define MoveCost 1
 #define RotateCost 0
 #define GiveBirthCost 10
 
 #define StunAfterBirth 1	//How many turns a creature cannot act after his birth
-#define FertilityDelay 0	//Delay before next birth
+#define FertilityDelay 4	//Delay before next birth
 
 //#define BotCanEatRock
 #define BotCanEatBot

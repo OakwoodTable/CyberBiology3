@@ -1,0 +1,7 @@
+E:/Рабочий стол/GitHub/CyberBiology3/build/CMakeFiles/CyberBiology.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/CMakeFiles/ALL_BUILD.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/CMakeFiles/ZERO_CHECK.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/sdl_headers_copy.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/SDL2-static.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/SDL2_test.dir
+E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/ALL_BUILD.dir
