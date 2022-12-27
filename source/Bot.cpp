@@ -368,7 +368,7 @@ void Bot::Photosynthesis()
 		int toGive;
 
 		//Give energy depending on a season
-		switch (season)
+		switch (pField->season)
 		{
 		case summer:
 		#ifdef UseSeasons

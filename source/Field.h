@@ -143,7 +143,6 @@ public:
 
     int photosynthesisReward = FoodbaseInitial;
 
-
     //Move objects from one cell to another
     int MoveObject(int fromX, int fromY, int toX, int toY);
     int MoveObject(Object* obj, int toX, int toY);
@@ -216,7 +215,7 @@ public:
 
     static int seed;
     static int renderX;
-
+    static unsigned int season;
     FieldDynamicParams params;
 };
 

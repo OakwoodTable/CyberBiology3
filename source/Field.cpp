@@ -4,6 +4,7 @@
 
 int Field::seed;
 int Field::renderX=0;
+unsigned int Field::season=0;
 
 Season season;
 

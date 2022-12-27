@@ -1,0 +1,10 @@
+^E:\РАБОЧИЙ СТОЛ\GITHUB\CYBERBIOLOGY3\SDL\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-file "E:/Рабочий стол/GitHub/CyberBiology3/build/SDL/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

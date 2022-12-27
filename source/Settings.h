@@ -168,9 +168,9 @@
 //World rules
 
 #define FoodbaseInitial 2
-#define PhotosynthesisReward_Summer 4
-#define PhotosynthesisReward_Autumn 2
-#define PhotosynthesisReward_Winter 1
+#define PhotosynthesisReward_Summer 2
+#define PhotosynthesisReward_Autumn 1
+#define PhotosynthesisReward_Winter 0
 
 #define MaxPossibleEnergyForABot 500
 #define MaxBotLifetime 2000
@@ -209,8 +209,8 @@
 #define PresetRandomColors
 //#define RandomColorEveryNewMarkersSet
 
-//#define UseSeasons
-#define ChangeSeasonInterval 4000
+#define UseSeasons
+#define ChangeSeasonInterval 1000
 
 #define NumberOfMutationMarkers 3
 #define HowMuchDifferenseCantBeTold 1

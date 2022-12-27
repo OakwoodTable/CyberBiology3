@@ -113,7 +113,8 @@ void Main::ChangeSeason()
 	if (season > spring)
 	{
 		season = summer;
-	}	
+	}
+	field->season=season;	
 }
 
 
@@ -155,7 +156,7 @@ void Main::MakeStep()
 		++tpsTickCounter;
 
 	#ifdef UseSeasons	
-		if (++changeSeasonCounter >= ChangeSeasonAfter)
+		if (++changeSeasonCounter >= ChangeSeasonInterval)
 		{
 			ChangeSeason();
 
