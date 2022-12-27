@@ -73,9 +73,14 @@ struct FieldDynamicParams
     int adaptation_organicSpawnRate;
 
     bool spawnApples;
+    
+    int SeasonPeriod;
+    int SeasonReward_Summer;
+    int SeasonReward_Autumn;
+    int SeasonReward_Winter;
 
-    int reserved[38];
-
+    int reserved[34]; //Было 38 -4 = 34
+    
     void Reset();
 
     FieldDynamicParams();

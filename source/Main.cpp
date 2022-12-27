@@ -156,7 +156,7 @@ void Main::MakeStep()
 		++tpsTickCounter;
 
 	#ifdef UseSeasons	
-		if (++changeSeasonCounter >= ChangeSeasonInterval)
+		if (++changeSeasonCounter >= field->params.SeasonPeriod)// ChangeSeasonInterval)
 		{
 			ChangeSeason();
 

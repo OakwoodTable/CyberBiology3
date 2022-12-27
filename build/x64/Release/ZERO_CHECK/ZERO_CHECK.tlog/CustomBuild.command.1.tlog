@@ -1,6 +1,6 @@
-^E:\РАБОЧИЙ СТОЛ\GITHUB\CYBERBIOLOGY3\BUILD\CMAKEFILES\820483A1F31E673E7DEB23B3C633C00B\GENERATE.STAMP.RULE
+^C:\DESKTOPGITHUB\CYBERBIOLOGY3\BUILD\CMAKEFILES\FC07B7BE9D703A5FC426AD1C9FA7B28E\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SE:/Рабочий стол/GitHub/CyberBiology3" "-BE:/Рабочий стол/GitHub/CyberBiology3/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "E:/Рабочий стол/GitHub/CyberBiology3/build/CyberBiology.sln"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/DesktopGithub/CyberBiology3 -BC:/DesktopGithub/CyberBiology3/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/DesktopGithub/CyberBiology3/build/CyberBiology.sln
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

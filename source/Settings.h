@@ -166,10 +166,13 @@
 
 //-----------------------------------------------------------------
 //World rules
+//#define ArtificialSelection 
+#define UseSeasons
+#define ChangeSeasonInterval 800
 
 #define FoodbaseInitial 2
 #define PhotosynthesisReward_Summer 2
-#define PhotosynthesisReward_Autumn 1
+#define PhotosynthesisReward_Autumn 2
 #define PhotosynthesisReward_Winter 0
 
 #define MaxPossibleEnergyForABot 1000
@@ -209,8 +212,7 @@
 #define PresetRandomColors
 //#define RandomColorEveryNewMarkersSet
 
-#define UseSeasons
-#define ChangeSeasonInterval 1500
+
 
 #define NumberOfMutationMarkers 3
 #define HowMuchDifferenseCantBeTold 1

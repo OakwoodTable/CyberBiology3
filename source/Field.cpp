@@ -794,7 +794,7 @@ void FieldDynamicParams::Reset()
     appleEnergy = DefaultAppleEnergy;
 
     adaptation_DeathChance_Winds = 0;
-    adaptation_StepsNum_Winds = 2;
+    adaptation_StepsNum_Winds = 0;
 
     adaptation_landBirthBlock = 0;
     adaptation_seaBirthBlock = 0;
@@ -806,6 +806,11 @@ void FieldDynamicParams::Reset()
 
     adaptation_organicSpawnRate = 0;
 
+    SeasonPeriod = ChangeSeasonInterval;
+    SeasonReward_Summer = PhotosynthesisReward_Summer;
+    SeasonReward_Autumn = PhotosynthesisReward_Autumn;
+    SeasonReward_Winter = PhotosynthesisReward_Winter;
+    
     memset(reserved, 0, sizeof(reserved));
 }
 

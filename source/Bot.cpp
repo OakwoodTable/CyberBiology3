@@ -372,7 +372,7 @@ void Bot::Photosynthesis()
 		{
 		case summer:
 		#ifdef UseSeasons
-			toGive = PhotosynthesisReward_Summer;
+			toGive = pField->params.SeasonReward_Summer; // PhotosynthesisReward_Summer;
 		#else
 			toGive = pField->photosynthesisReward;
 			//toGive = FindHowManyFreeCellsAround(x, y) - 3;
@@ -380,10 +380,10 @@ void Bot::Photosynthesis()
 		#endif
 			break;
 		case autumn: case spring:
-			toGive = PhotosynthesisReward_Autumn;
+			toGive = pField->params.SeasonReward_Autumn; // PhotosynthesisReward_Autumn;
 			break;
 		case winter:
-			toGive = PhotosynthesisReward_Winter;
+			toGive = pField->params.SeasonReward_Winter; // PhotosynthesisReward_Winter;
 			//toGive = (ticknum % 5 == 0) ? 2 : 1;
 			break;
 		}
@@ -550,10 +550,10 @@ int Bot::tick()
 		return ret;
 
 	energy -= EveryTickEnergyPenalty;
-
+#ifdef ArtificialSelection
 	if (ArtificialSelectionWatcher_OnTick())
 		return 1;
-
+#endif
 	if (((energy) <= 0) || (lifetime >= MaxBotLifetime))
 		return 1;
 

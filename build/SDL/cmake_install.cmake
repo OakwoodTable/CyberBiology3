@@ -1,4 +1,4 @@
-# Install script for directory: E:/Рабочий стол/GitHub/CyberBiology3/SDL
+# Install script for directory: C:/DesktopGithub/CyberBiology3/SDL
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
