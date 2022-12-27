@@ -17,10 +17,10 @@
 //-----------------------------------------------------------------
 //Window
 
-#define WindowCaption "CyberBio v1.2.1"
+#define WindowCaption "CyberBio v1.2.2"
 
-#define WindowWidth 1920
-#define WindowHeight 1080
+#define WindowWidth 1280 //1920
+#define WindowHeight 1024 //1080
 
 #define BackgroundColorFloat 0.0f,0.0f,0.0f,255.0f
 
@@ -108,10 +108,10 @@
 #define FieldX InterfaceBorder
 #define FieldY InterfaceBorder
 
-#define FieldCellsWidth 3*16*6		//������ �������� �� 8 ��� ������� ���� ����� 4 ������! � �� 16 ��� ������� ���� 8 �������!
+#define FieldCellsWidth 3*16*6		//13*16*6 ������ �������� �� 8 ��� ������� ���� ����� 4 ������! � �� 16 ��� ������� ���� 8 �������!
 #define FieldCellsHeight 133
 
-#define FieldRenderCellsWidth 202
+#define FieldRenderCellsWidth 120 //202
 
 #define FieldCellSize 8
 #define FieldCellSizeHalf FieldCellSize/2
@@ -152,14 +152,14 @@
 //-----------------------------------------------------------------
 //Simulation
 
-#define FPSLimitAtStart 60
-#define LimitFPSAtStart 60
+#define FPSLimitAtStart 0
+#define LimitFPSAtStart 6
 
 #define StartOnPause
 
 //#define SpawnOneAtStart
 //#define SpawnControlGroupAtStart
-#define ControlGroupSize 8000
+#define ControlGroupSize 3000
 
 //-----------------------------------------------------------------
 
@@ -172,7 +172,7 @@
 #define PhotosynthesisReward_Autumn 1
 #define PhotosynthesisReward_Winter 0
 
-#define MaxPossibleEnergyForABot 500
+#define MaxPossibleEnergyForABot 1000
 #define MaxBotLifetime 2000
 
 #define NewbornGetsHalf
@@ -185,7 +185,7 @@
 #define GiveBirthCost 10
 
 #define StunAfterBirth 1	//How many turns a creature cannot act after his birth
-#define FertilityDelay 4	//Delay before next birth
+#define FertilityDelay 5	//Delay before next birth
 
 //#define BotCanEatRock
 #define BotCanEatBot
@@ -210,7 +210,7 @@
 //#define RandomColorEveryNewMarkersSet
 
 #define UseSeasons
-#define ChangeSeasonInterval 1000
+#define ChangeSeasonInterval 1500
 
 #define NumberOfMutationMarkers 3
 #define HowMuchDifferenseCantBeTold 1

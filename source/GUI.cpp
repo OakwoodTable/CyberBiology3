@@ -59,7 +59,7 @@ void Main::DrawMainWindow()
 		ImGui::Text("steps: %i", ticknum);
 		ImGui::Text("(interval %i, ticks/sec: %i, fps: %i)", limit_interval, realTPS, realFPS);
 		ImGui::Text("Objects total: %i", field->GetNumObjects());
-		ImGui::Text("Bots total: %i", field->GetNumBots());
+		ImGui::Text("Bots total: %i Season #%i", field->GetNumBots(), field->season);
 
 		//Show season name
 		/*
