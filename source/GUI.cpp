@@ -610,6 +610,17 @@ void Main::DrawAdaptationWindow()
 				ImGui::SliderInt("Season Winter",&field->params.SeasonReward_Winter, 0, 6);
 				//ImGui::Checkbox("Spawn apples", &field->params.spawnApples);
 			}
+			ImGui::NewLine();
+
+			if (ImGui::CollapsingHeader("Bot Parametr"))
+			{
+				ImGui::SliderInt("Bot Max Life period", &field->params.BotMaxLivePeriod, 50, 5000);
+
+				//ImGui::SliderInt("Season Summer",&field->params.SeasonReward_Summer, 0, 6);
+				//ImGui::SliderInt("Season Autum", &field->params.SeasonReward_Autumn, 0, 6);
+				//ImGui::SliderInt("Season Winter",&field->params.SeasonReward_Winter, 0, 6);
+				//ImGui::Checkbox("Spawn apples", &field->params.spawnApples);
+			}			
 
 			ImGui::NewLine();
 

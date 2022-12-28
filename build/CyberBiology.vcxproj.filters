@@ -1,159 +1,159 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\imgui.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\imgui_demo.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\imgui_draw.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\imgui_tables.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui_tables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\imgui_widgets.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_opengl3.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_opengl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_sdl.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_sdl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_sdlrenderer.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_sdlrenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\implot\implot.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\implot\implot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\implot\implot_demo.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\implot\implot_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\implot\implot_items.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\implot\implot_items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\SDL.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\SDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\GUI.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\GUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Bot.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Bot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\BotNeuralNet.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\BotNeuralNet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Field.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Field.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Main.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\NeuralNetRenderer.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\NeuralNetRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Neuron.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Neuron.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Object.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Organics.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Organics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Rock.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Rock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\Apple.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Apple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\MyTypes.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\MyTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DesktopGithub\CyberBiology3\source\ObjectSaver.cpp">
+    <ClCompile Include="E:\Рабочий стол\GitHub\CyberBiology3\source\ObjectSaver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\imgui\imgui.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_opengl3.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_opengl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_sdl.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_sdl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\imgui\backends\imgui_impl_sdlrenderer.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\imgui\backends\imgui_impl_sdlrenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\implot\implot.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\implot\implot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\implot\implot_internal.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\implot\implot_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\SDL.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\SDL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\GUI.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\GUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Settings.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Systems.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Systems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Bot.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Bot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\BotNeuralNet.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\BotNeuralNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Field.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Main.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\NeuralNetRenderer.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\NeuralNetRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Neuron.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Neuron.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Object.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Organics.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Organics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Rock.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Rock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\Apple.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\Apple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\MyTypes.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\MyTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DesktopGithub\CyberBiology3\source\ObjectSaver.h">
+    <ClInclude Include="E:\Рабочий стол\GitHub\CyberBiology3\source\ObjectSaver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\CMakeLists.txt" />
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{5C213523-229F-327C-BB06-6CD5EC63F906}</UniqueIdentifier>
+      <UniqueIdentifier>{56B333D1-4CB4-3499-8F0D-287C78D98EE3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{09DA9A32-82C1-32FC-81F4-C19AEC48F120}</UniqueIdentifier>
+      <UniqueIdentifier>{311E2166-55E3-38D3-88F0-6CD05CB20B77}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -19,8 +19,14 @@
 
 #define WindowCaption "CyberBio v1.2.2"
 
+//#define SCREEN1280
+
+#define WindowWidth 1920
+#define WindowHeight 1080
+#ifdef SCREEN1280
 #define WindowWidth 1280 //1920
 #define WindowHeight 1024 //1080
+#endif
 
 #define BackgroundColorFloat 0.0f,0.0f,0.0f,255.0f
 
@@ -111,7 +117,11 @@
 #define FieldCellsWidth 3*16*6		//13*16*6 ������ �������� �� 8 ��� ������� ���� ����� 4 ������! � �� 16 ��� ������� ���� 8 �������!
 #define FieldCellsHeight 133
 
+#define FieldRenderCellsWidth 202
+
+#ifdef SCREEN1280
 #define FieldRenderCellsWidth 120 //202
+#endif
 
 #define FieldCellSize 8
 #define FieldCellSizeHalf FieldCellSize/2

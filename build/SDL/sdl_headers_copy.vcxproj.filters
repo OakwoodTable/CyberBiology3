@@ -1,248 +1,248 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_assert.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_assert.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_atomic.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_atomic.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_audio.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_audio.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_bits.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_bits.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_blendmode.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_blendmode.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_clipboard.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_clipboard.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_copying.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_copying.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_cpuinfo.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_cpuinfo.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_egl.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_egl.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_endian.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_endian.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_error.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_error.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_events.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_events.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_filesystem.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_filesystem.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_gamecontroller.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_gamecontroller.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_gesture.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_gesture.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_guid.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_guid.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_haptic.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_haptic.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_hidapi.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_hidapi.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_hints.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_hints.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_joystick.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_joystick.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_keyboard.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_keyboard.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_keycode.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_keycode.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_loadso.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_loadso.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_locale.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_locale.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_log.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_log.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_main.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_main.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_messagebox.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_messagebox.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_metal.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_metal.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_misc.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_misc.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_mouse.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_mouse.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_mutex.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_mutex.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_name.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_name.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengl.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengl.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengl_glext.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengl_glext.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles2.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles2.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles2_gl2.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles2_gl2.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles2_gl2ext.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles2_gl2ext.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles2_gl2platform.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles2_gl2platform.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_opengles2_khrplatform.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_opengles2_khrplatform.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_pixels.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_pixels.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_platform.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_platform.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_power.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_power.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_quit.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_quit.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_rect.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_rect.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_render.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_render.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_rwops.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_rwops.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_scancode.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_scancode.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_sensor.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_sensor.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_shape.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_shape.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_stdinc.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_stdinc.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_surface.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_surface.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_system.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_system.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_syswm.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_syswm.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_assert.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_assert.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_common.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_common.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_compare.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_compare.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_crc32.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_crc32.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_font.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_font.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_fuzzer.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_fuzzer.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_harness.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_harness.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_images.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_images.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_log.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_log.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_md5.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_md5.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_memory.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_memory.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_test_random.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_test_random.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_thread.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_thread.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_timer.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_timer.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_touch.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_touch.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_types.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_types.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_version.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_version.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_video.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_video.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\SDL_vulkan.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\SDL_vulkan.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\begin_code.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\begin_code.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\ffaee91f7a8eed5cd6d8fe8001251428\close_code.h.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\65bd9ee9f8386366b79d475152b6e687\close_code.h.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\build\CMakeFiles\3d08d2ea410dac2943c46b4988ad31d0\sdl_headers_copy.rule">
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\build\CMakeFiles\1b6f7169b5730dddb6e2d6130ac53d1c\sdl_headers_copy.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\DesktopGithub\CyberBiology3\SDL\CMakeLists.txt" />
+    <CustomBuild Include="E:\Рабочий стол\GitHub\CyberBiology3\SDL\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\DesktopGithub\CyberBiology3\build\SDL\CMakeFiles\sdl_headers_copy" />
+    <None Include="E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\CMakeFiles\sdl_headers_copy" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{D9551D04-758F-3C8E-BA93-A349366B97E4}</UniqueIdentifier>
+      <UniqueIdentifier>{CA4DCFF4-CB02-38CB-9485-3120FE9005CB}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

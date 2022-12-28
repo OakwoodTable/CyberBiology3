@@ -79,7 +79,8 @@ struct FieldDynamicParams
     int SeasonReward_Autumn;
     int SeasonReward_Winter;
 
-    int reserved[34]; //Было 38 -4 = 34
+    int BotMaxLivePeriod;
+    int reserved[33]; //Было 38 -5 = 34
     
     void Reset();
 

@@ -274,7 +274,7 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 		}
 	}
 
-	input.age = (lifetime * 1.0f) / (MaxBotLifetime * 1.0f);
+	input.age = (lifetime * 1.0f) / (pField->params.BotMaxLivePeriod * 1.0f);
 
 	//input.rotation = (tmpOut.desired_rotation == (direction * .1f))?1.0f:0.0f;
 	input.rotation = (direction * 1.0f) / 7.0f;
@@ -554,7 +554,7 @@ int Bot::tick()
 	if (ArtificialSelectionWatcher_OnTick())
 		return 1;
 #endif
-	if (((energy) <= 0) || (lifetime >= MaxBotLifetime))
+	if (((energy) <= 0) || (lifetime >= pField->params.BotMaxLivePeriod))
 		return 1;
 
 	BrainOutput tmpOut;

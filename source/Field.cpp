@@ -811,6 +811,7 @@ void FieldDynamicParams::Reset()
     SeasonReward_Autumn = PhotosynthesisReward_Autumn;
     SeasonReward_Winter = PhotosynthesisReward_Winter;
     
+    int BotMaxLifePeriod = MaxBotLifetime;
     memset(reserved, 0, sizeof(reserved));
 }
 
