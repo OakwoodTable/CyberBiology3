@@ -1,3 +1,4 @@
+#include <iostream>
 
 #include "SDL.h"
 
@@ -18,9 +19,8 @@ void InitSDL()
 	}
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // 32: Intel HD Graphics 630 not working
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	//OpenGL version
@@ -52,8 +52,13 @@ bool CreateWindowSDL()
 		window_flags
 	);
 
-	if (window == NULL)
+    if (window == NULL) {
+        auto e = SDL_GetError();
+        std::cerr << "Failed to create SDL window: "
+                  << e
+                  << std::endl;
 		return false;
+    }
 
 	//no resize
 	SDL_SetWindowMinimumSize(window, WindowWidth, WindowHeight);

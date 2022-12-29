@@ -18,10 +18,38 @@
 
 ## Что нужно чтобы запустить программу
 
-+ SDL
-+ Dear Im GUI
-+ ImPlot
++ [Dear Im GUI](https://github.com/Tyyppi77/imgui_sdl)
++ [SDL_ttf](https://github.com/libsdl-org/SDL_ttf)
++ [ImPlot](https://github.com/epezent/implot)
++ Visual studio 2022 и всё что нужно для сборки под Windows на С++
 
+
+## Как запустить то в итоге
+1. Установить пакеты 
+    - `cmake` для конфигурирования проекта
+    - Компилятор С/С++, например `g++` или `clang++` / `Visual studio 2022` для Windows.
+
+2. Склонировать субмодули
+
+```console
+$ git submodule update --init --recursive
+```
+
+3. Создать каталог build и перейти в него
+
+```console
+$ mkdir build && cd build
+```
+
+4. Сконфигурировать проект
+    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64`
+    - [Linux]: `$ cmake ..`
+
+5. Собрать
+
+```console
+$ cmake --build .
+```
 
 ## Интерфейс
 
@@ -70,3 +98,4 @@
 вашему экрану. Мир сам по себе может быть шире, чем ваша область отрисовки, но его ширина должна делиться
 на 16 без остатка, это нужно для многопоточной работы.
 Другие настраиваемые параметры также в этом файле, кроме тех, которые в окошке Адаптация.
+

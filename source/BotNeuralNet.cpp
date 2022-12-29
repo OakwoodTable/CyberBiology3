@@ -43,8 +43,8 @@ BotNeuralNet::BotNeuralNet()
 {
 	for (uint yi = 0; yi < NeuronsInLayer; ++yi)
 	{
-		allNeurons[NeuronOutputLayerIndex][yi].type = output;
-		allNeurons[NeuronInputLayerIndex][yi].type = input;
+		allNeurons[NeuronOutputLayerIndex][yi].type = NeuronType::output;
+		allNeurons[NeuronInputLayerIndex][yi].type = NeuronType::input;
 	}
 
 	for (uint nx = 0; nx < NumNeuronLayers; ++nx)
@@ -97,24 +97,24 @@ void BotNeuralNet::Process()
 
 			switch (n->type)
 			{
-			case basic:
+            case NeuronType::basic:
 				*value = ActivationSimple(*value + n->bias);
 				//*value = Linear(*value + n->bias);
 				break;
 
-			case random:
+            case NeuronType::random:
 				*value = (RandomVal(1000) <= ((int)((*value + n->bias) * 1000.0f))) ? 1.0f : 0.0f;
 				break;
 
-			case input:
+            case NeuronType::input:
 				*value = *value + n->bias;
 				break;
 
-			case radialbasis:
+            case NeuronType::radialbasis:
 				*value = RadialBasisActivation(*value + n->bias);
 				break;
 
-			case memory:
+            case NeuronType::memory:
 
 				if ((*value + n->bias) < -1.0f)
 				{

@@ -17,7 +17,7 @@ struct NeuronConnection
 };
 
 
-enum NeuronType
+enum class NeuronType
 {
 	basic,
 	input,
@@ -27,7 +27,7 @@ enum NeuronType
 	memory
 };
 
-const int MaxConnectionsPerNeuronType[] = 
+const uint MaxConnectionsPerNeuronType[] =
 { 
 	MaxConnections_Basic, 
 	MaxConnections_Input, 
@@ -40,7 +40,7 @@ const int MaxConnectionsPerNeuronType[] =
 
 struct Neuron
 {
-	NeuronType type = basic;
+    NeuronType type = NeuronType::basic;
 
 	float bias = 0.0f;
 
@@ -94,6 +94,5 @@ struct Neuron
 
 
 	//Get neuron description by type (for GUI)
-	static char* GetTextFromType(NeuronType t);
-	
+    static const char *GetTextFromType(NeuronType t);
 };

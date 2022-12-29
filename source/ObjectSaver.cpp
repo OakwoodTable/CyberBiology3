@@ -13,7 +13,7 @@ Bot* ObjectSaver::LoadBotFromFile(MyInputStream& file)
         return NULL;
     if (file.ReadInt() != NeuronsInLayer)
         return NULL;
-    if (file.ReadInt() != sizeof Neuron)
+    if (file.ReadInt() != sizeof(Neuron))
         return NULL;
 
     Bot* toRet = new Bot(0, 0);
@@ -81,7 +81,8 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
     int loadWidth;
 
     //Open file for reading, binary type
-    MyInputStream file(filename, std::ios::in | std::ios::binary | std::ios::beg);
+    MyInputStream file(filename, static_cast<std::ios_base::openmode>(
+                           std::ios::in | std::ios::binary | std::ios::beg));
 
     if (file.is_open())
     {
@@ -204,7 +205,7 @@ void ObjectSaver::WriteBotToFile(MyOutStream& file, Bot* obj)
 
     file.WriteInt(NumNeuronLayers);
     file.WriteInt(NeuronsInLayer);
-    file.WriteInt(sizeof Neuron);
+    file.WriteInt(sizeof(Neuron));
 
     file.WriteInt((obj)->GetColor()->r);
     file.WriteInt((obj)->GetColor()->g);
@@ -296,7 +297,8 @@ Object* ObjectSaver::LoadObject(char* filename)
     Object* toRet;
 
     //Open file for reading, binary type
-    MyInputStream file(filename, std::ios::in | std::ios::binary | std::ios::beg);
+    MyInputStream file(filename, static_cast<std::ios_base::openmode>(
+                           std::ios::in | std::ios::binary | std::ios::beg));
 
     if (file.is_open())
     {
@@ -325,7 +327,8 @@ void MyOutStream::WriteBool(bool data)
     write((char*)&data, 1);
 }
 
-MyOutStream::MyOutStream(char* filename, int flags) :std::ofstream(filename, flags) {}
+MyOutStream::MyOutStream(char* filename, ios_base::openmode flags)
+    : std::ofstream(filename, flags) {}
 
 
 int MyInputStream::ReadInt()
@@ -346,4 +349,5 @@ bool MyInputStream::ReadBool()
     return toRet;
 }
 
-MyInputStream::MyInputStream(char* filename, int flags) :std::ifstream(filename, flags) {}
+MyInputStream::MyInputStream(char* filename, ios_base::openmode flags)
+    : std::ifstream(filename, flags) {}

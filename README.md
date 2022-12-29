@@ -1,33 +1,51 @@
 # CyberBiology
 Artificial evolution
 
-This is a little entertainment project, evolution simulator. Every little cell on screen ("a bot") has its own little neural net.
-Bot makes moves based on output layer data, it can produce energy via photosynthesis, attack other bots, move and divide. 
-When dividing bot creates a copy of his brain, but there is a chance it will mutate a little in the process. 
+This is a little entertainment project, evolution simulator. The code itself is far from best. Lazily written, a lot of code in headers, unconditional jumps at couple of places etc. I'll make it better in later versions!
 
-## What's new?
-+ World is now larger than the screen, use arrow keys to move your camera
-+ You can now save entire worlds, including parameters set in Adaptation window!
-
-  You already have a super cool world in "SavedObjects/" directory called the Divers! 
-In it bots have to dive to the bottom of the screen to multiply and photosynthesis is only available 
-above water, so they dive up and down and evolve! I only saved a small fraction of it because othervise 
-the file was too large. But it doesn't matter, they will fill the world quickly.
 
 ## Screenshots
 
-![Screenshot1](/Screenshots/5.png?raw=true "Screenshot1")
-![Screenshot2](/Screenshots/4.png?raw=true "Screenshot2")
+![Screenshot1](/Screenshots/1.png?raw=true "Screenshot1")
+![Screenshot2](/Screenshots/3.png?raw=true "Screenshot2")
 
 
 ## What you need to build it
 
 + SDL
++ [Dear Im GUI](https://github.com/Tyyppi77/imgui_sdl)
++ [SDL_ttf](https://github.com/libsdl-org/SDL_ttf)
++ [ImPlot](https://github.com/epezent/implot)
++ Visual studio 2022 and all the tools needed to build C++ apps
 
-+ Dear Im GUI
 
-+ ImPlot
+## How to run this code
 
+1. Install packages
+    - `cmake` to configure and build project
+    - С/С++ - compiler, for example `g++` or `clang++` / `Visual studio 2022` for Windows.
+
+2. Clone submodules
+
+```console
+$ git submodule update --init --recursive
+```
+
+3. Make dirrectrory build and enter into it
+
+```console
+$ mkdir build && cd build
+```
+
+4. Configure project
+    - [Windows]: `$ cmake .. -G"Visual Studio 17 2022" -A x64`
+    - [Linux]: `$ cmake ..`
+
+5. Build
+
+```console
+$ cmake --build .
+```
 
 ## Interface
 

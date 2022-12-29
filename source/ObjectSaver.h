@@ -11,7 +11,7 @@ public:
     void WriteInt(int);
     void WriteBool(bool);
 
-    MyOutStream(char* filename, int flags);
+    MyOutStream(char* filename, ios_base::openmode flags);
 };
 
 class MyInputStream final : public std::ifstream
@@ -21,7 +21,7 @@ public:
     int ReadInt();
     bool ReadBool();
 
-    MyInputStream(char* filename, int flags);
+    MyInputStream(char* filename, ios_base::openmode flags);
 };
 
 
@@ -45,7 +45,8 @@ public:
     struct WorldParams
     {
         int id, seed, tick, width;
-    }   
-    LoadWorld(Field* world, char* filename);
+    };
+
+    WorldParams LoadWorld(Field* world, char* filename);
 
 };

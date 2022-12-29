@@ -142,7 +142,7 @@
 //#define OceanColor 100,255,100,255	//Green water
 
 #define DrawMudLayer
-#define MudColor 140,80,62,255		
+#define MudColor 140,80,62,255
 
 #define RenderTypeAtStart natural
 

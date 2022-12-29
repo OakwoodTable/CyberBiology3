@@ -28,7 +28,7 @@ void Neuron::AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT=1000.0f)
 
 bool Neuron::AddRandomConnection()
 {
-	if (numConnections >= MaxConnectionsPerNeuronType[type])
+    if (numConnections >= MaxConnectionsPerNeuronType[static_cast<size_t>(type)])
 		return false;
 
 	int c_Index, c_Layer;
@@ -92,12 +92,12 @@ void Neuron::SetRandomBias()
 
 void Neuron::SetRandomType()
 {
-	if ((type != input) && (type != output))
+    if ((type != NeuronType::input) && (type != NeuronType::output))
 	{
 	#ifdef UseRandomNeuron
 		if (RandomPercent(2))
 		{
-			type = random;
+            type = NeuronType::random;
 
 			return;
 		}
@@ -110,11 +110,11 @@ void Neuron::SetRandomType()
 	#endif
 
 		if (roll <= 5)
-			type = basic;
+            type = NeuronType::basic;
 		else if (roll <= 10)
-			type = radialbasis;
+            type = NeuronType::radialbasis;
 		else
-			type = memory;
+            type = NeuronType::memory;
 				
 	}
 }
@@ -123,7 +123,7 @@ void Neuron::SetRandomConnections()
 {
 	ClearConnections();
 
-	if (type == output)
+    if (type == NeuronType::output)
 		return;
 
 	#ifdef FullyConnected
@@ -131,7 +131,7 @@ void Neuron::SetRandomConnections()
 		return;
 	#endif
 
-	uint connections = RandomVal(MaxConnectionsPerNeuronType[type] + 1);
+    uint connections = RandomVal(MaxConnectionsPerNeuronType[static_cast<size_t>(type)] + 1);
 
 	for (; connections > 0; --connections)
 	{
@@ -245,25 +245,25 @@ void Neuron::mutate_DeleteNeuron()
 {
 	SetZero();
 
-	if((type!=input)&&(type!=output))
-		type = basic;
+    if((type != NeuronType::input)&&(type != NeuronType::output))
+        type = NeuronType::basic;
 }
 
-char* Neuron::GetTextFromType(NeuronType t)
+const char* Neuron::GetTextFromType(NeuronType t)
 {
 	switch (t)
 	{
-		case basic:
+        case NeuronType::basic:
 			return (char*)"basic";
-		case input:
+        case NeuronType::input:
 			return (char*)"input";
-		case output:
+        case NeuronType::output:
 			return (char*)"output";
-		case radialbasis:
+        case NeuronType::radialbasis:
 			return (char*)"radial basis";
-		case memory:
+        case NeuronType::memory:
 			return (char*)"memory";
-		case random:
+        case NeuronType::random:
 			return (char*)"random";
 		default:
 			return (char*)"other";

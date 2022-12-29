@@ -21,13 +21,16 @@
 
 #include "Main.h"
 
-
 Main simulation;
 
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
+#if defined(_WIN32)
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,	_In_opt_ HINSTANCE hPrevInstance,	_In_ LPWSTR    lpCmdLine,	_In_ int       nCmdShow)
+#else
+int main(int argc, char* argv[])
+#endif
 {
-	
+
 	InitSDL();
 
 	if (!CreateWindowSDL())
@@ -328,7 +331,8 @@ void Main::LoadFilenames()
 		f.fileSize += unit;
 
 		//Is world (open file briefly and look for file type)
-		MyInputStream file((char*)f.nameFull.c_str(), std::ios::in | std::ios::binary | std::ios::beg);
+        MyInputStream file((char*)f.nameFull.c_str(), static_cast<std::ios_base::openmode>(
+                               std::ios::in | std::ios::binary | std::ios::beg));
 
 		if (!file.is_open())
 			continue;
@@ -380,6 +384,20 @@ void Main::CreateNewFile()
 
 Main::Main()
 {
+#if !defined(_WIN32)
+
+    auto GetTickCount = []() {
+        struct timespec ts;
+        if(clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
+            exit(-1);
+        }
+        uint32_t theTick  = ts.tv_nsec / 1000000;
+        theTick += ts.tv_sec * 1000;
+        return theTick;
+    };
+
+#endif
+
 	LogPrint((char*)"Started. Seed:\r\n");
 
 	//Set seed

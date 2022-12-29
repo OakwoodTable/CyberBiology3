@@ -71,28 +71,29 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 			switch (n->type)
 			{
 			//Yellow
-			case input: case output:
+			case NeuronType::input: 
+			case NeuronType::output:
 				SDL_SetRenderDrawColor(renderer, 235, 235, 0, 255);
 				break;
 
 			//Grey
-			case basic:
+			case NeuronType::basic:
 				SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
 				break;
 
 			//White
-			case radialbasis:
+			case NeuronType::radialbasis:
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				break;
 
 			//Blue
-			case random:
+			case NeuronType::random:
 				SDL_SetRenderDrawColor(renderer, 0, 0, 200, 255);
 				break;
 
 			//Purple
-			case memory:
-				SDL_SetRenderDrawColor(renderer, 155, 0, 155, 255);
+			case NeuronType::memory:
+				SDL_SetRenderDrawColor(renderer, 216, 191, 216, 255);
 				break;
 
 			}

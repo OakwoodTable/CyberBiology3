@@ -30,4 +30,4 @@ bool CreateRenderer();
 
 
 
-extern inline void SDLPresentScene();
+extern void SDLPresentScene();

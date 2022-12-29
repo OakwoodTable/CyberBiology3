@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "GUI.h"
 #include "Field.h"
 #include "NeuralNetRenderer.h"

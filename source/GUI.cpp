@@ -711,7 +711,8 @@ void Main::DrawBotBrainWindow()
 					//ImGui::Text("Memory data: %i", nn_renderer.selectedBrain->allMemory[][]);
 
 					//TODO
-					if((nn_renderer.selectedNeuron->type!=input) && (nn_renderer.selectedNeuron->type != output))
+                    if((nn_renderer.selectedNeuron->type != NeuronType::input)
+                            && (nn_renderer.selectedNeuron->type != NeuronType::output))
 					{
 						if (ImGui::Button("set random", { 100,30 }))
 						{
