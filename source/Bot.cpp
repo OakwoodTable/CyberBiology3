@@ -273,8 +273,55 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 			}
 		}
 	}
+	////////////////////////////////////////////////
+	//Вместо возраста попробую сделать зрение на +1 клетку
+	//If destination is out of bounds
+	if (!pField->IsInBounds(lookAt_x+1, lookAt_y+1))
+	{
+		//1 if unpassable
+		input.age = 1.0f;
+	}
+	else
+	{
+		Object* tmpDest = (*pCells)[lookAt_x+1][lookAt_y+1];
 
-	input.age = (lifetime * 1.0f) / (pField->params.BotMaxLifePeriod * 1.0f);
+		//Destination cell is empty
+		if (!tmpDest)
+		{
+			//0 if empty
+			input.age = 0.0f;
+		}
+		else
+		{
+			//Destination not empty
+			switch (tmpDest->type)
+			{
+			case bot:
+				//0.5 if someone is in that cell
+				//Calculate how close they are as relatives, based on mutation markers
+				input.age += (1.0f - (FindKinship((Bot*)tmpDest) * 1.0f) / (NumberOfMutationMarkers * 1.0f));
+				break;
+
+			case rock:
+				//0.5 if cell is unpassable
+				input.age = .5f;
+				break;
+
+			case organic_waste:
+				//-.5 if cell contains organics
+				input.age = -.5f;
+				break;
+
+			case apple:
+				//-1.0 if cell contains an apple
+				input.age = -1.0f;
+				break;
+			}
+		}
+	}
+	/////////////////////////////////////////////////
+
+	//input.age = (lifetime * 1.0f) / (pField->params.BotMaxLifePeriod * 1.0f);
 
 	//input.rotation = (tmpOut.desired_rotation == (direction * .1f))?1.0f:0.0f;
 	input.rotation = (direction * 1.0f) / 7.0f;
