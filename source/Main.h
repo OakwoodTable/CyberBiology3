@@ -1,79 +1,9 @@
 #pragma once
 
-
-
-#if defined(_WIN32)
-#include <windows.h>
-#include <string>
-#else
-#include <cstdint>
-#define ULONGLONG uint64_t
-#define strcpy_s(dest, n, src) strncpy(dest, src, n)
-#define sprintf_s snprintf
-#endif
-
+#include "GUI.h"
 #include "Field.h"
 #include "NeuralNetRenderer.h"
 
-
-
-//Seasons
-Season season = summer;
-
-void ChangeSeason()
-{
-	season = (Season)((int)season + 1);
-
-	if (season > spring)
-	{
-		season = summer;
-	}
-}
-
-
-
-//Window
-SDL_Renderer* renderer;
-SDL_Window* window = NULL;
-
-bool simulate = true;	//Set false to pause
-uint ticknum = 0;
-
-void Pause();
-
-//Show more windows
-bool showSaveLoad = false;
-bool showDangerous = false;
-bool showSummary = false;
-bool showBrain = false;
-bool showAdaptation = false;
-bool showChart = false;
-
-//Chart
-float populationChartData[ChartNumValues];
-int chart_numValues = 0;
-int chart_shift = 0;
-int chart_currentPosition = 0;
-
-int timeBeforeNextDataToChart = AddToChartEvery;
-
-void ClearChart();
-void AddToChart(float newVal);
-
-
-//Neural net renderer
-NeuralNetRenderer nn_renderer;
-
-
-//Bot selection
-bool selection = false;
-Object* selectedObject;
-
-void Deselect();
-
-int blink = 0;
-bool cursorShow = true;
-int brushSize = DefaultBrushRadius;
 
 enum MouseFunction
 {
@@ -85,27 +15,170 @@ enum MouseFunction
 };
 
 
+class Main final
+{
+
+private:
+
+	Clock clock;
+
+	const SDL_Rect screenRect = { 0, 0, WindowWidth, WindowHeight };
+
+	//Save/load object interface
+	ObjectSaver saver;
+
+	//Keyboard
+	const Uint8* keyboard;
+
+	//Simulation
+	int seed, id;
+	uint realTPS = 0;
+	int limit_interval = 0;
+	int limit_ticks_per_second = FPSLimitAtStart;
+
+	Field* field;	
+
+	uint ticknum = 0;
+
+	TimePoint prevTick;
+	TimePoint lastSecondTick;
+	uint tpsTickCounter = 0;
+	TimePoint currentTick;
+
+	//FPS
+	int limitFPS = LimitFPSAtStart;
+	int fpsInterval;
+	uint realFPS = 0;
+	uint fpsCounter = 0;
+	TimePoint lastTickFps;
+	TimePoint lastSecondTickFps;
+
+	RenderTypes renderType = RenderTypeAtStart;
+	MouseFunction mouseFunc = mouse_select;
+
+	//Seasons
+	Season season = summer;
+	uint changeSeasonCounter = 0;
+
+	//Windows
+	void DrawDemoWindow();
+	void DrawMainWindow();
+	void DrawSystemWindow();
+	void DrawControlsWindow();
+	void DrawSelectionWindow();
+	void DrawRenderWindow();
+	void DrawConsoleWindow();
+	void DrawMouseFunctionWindow();
+	void DrawAdditionalsWindow();
+
+	//Hidden windows
+	void DrawSaveLoadWindow();
+	void DrawDangerousWindow();
+	void DrawSummaryWindow();
+	void DrawAdaptationWindow();
+	void DrawChartWindow();
+	void DrawBotBrainWindow();
+
+	//Show more windows
+	bool showSaveLoad = false;
+	bool showDangerous = false;
+	bool showBrain = false;
+	bool showAdaptation = false;
+	bool showChart = false;	
+
+	//Chart (TODO)
+	float chartData_bots[ChartNumValues];
+	float chartData_apples[ChartNumValues];
+	float chartData_organics[ChartNumValues];
+	int chart_numValues = 0;
+	int chart_currentPosition = 0;
+
+	int timeBeforeNextDataToChart = AddToChartEvery;
+
+	bool chartShow_apples = false;
+	bool chartShow_organics = false;
+
+	void ClearChart();
+	void AddToChart(float, float, float);
+
+	//Neural net renderer
+	NeuralNetRenderer nn_renderer;
+	//Show initial brain or active brain
+	int brainToShow = 0;
+
+	//Bot selection
+	Object* selectedObject;
+
+	int cursorBlink = 0;
+	bool cursorShow = true;	
+	int selectionShadowScreen = 0;
+
+	void Deselect();
+
+	int brushSize = DefaultBrushRadius;
+
+	//Log
+	ImGuiTextBuffer logText;
+
+	void ClearLog();
+	void LogPrint(const char* str, bool newLine = false);
+	void LogPrint(int num, bool newLine = true);
+
+	//Save/load
+
+	struct listed_file
+	{
+		string nameFull;
+		string nameShort;
+		string fileSize;
+		string fullCaption;
+
+		bool isSelected = false;
+
+		bool isWorld;
+	};
+
+	std::vector<listed_file> allFilenames;
+	listed_file* selectedFile = NULL;
+
+	void LoadFilenames();
+	void CreateNewFile();
+
+	void DrawWindows();
+
+	void HighlightSelection();
+	void SelectionShadowScreen();
+
+	void ChangeSeason();
+
+	void Pause();
+
+	void ClearWorld();
+	
+
+public:		
+
+	//Set false to pause
+	bool simulate = true;
+
+	//Set to true to close the app
+	bool terminate = false;
 
 
-//Console
-char consoleText[ConsoleCharLength] = "";
+	void MakeStep();
+	
+	void MouseClick();
 
-void ClearConsole();
-void ConsoleInput(const char* str, bool newLine = false);
-void ConsoleInput(int num, bool newLine=true);
+	void Render();
+	
+
+	Main();
+	~Main();
+
+	void CatchKeyboard();
+
+};
 
 
-
-//Save/load
-int listCurrentItem = 0;
-
-char filenamesFull[50][FilenameMaxLen];
-char filenamesPartial[50][FilenameMaxLen];
-bool selectedFilenames[FilenameMaxLen] = {};
-int selectedFilename = -1;
-int numFilenames = 0;
-
-void LoadFilenames();
-void CreateNewFile();
-
+extern Main simulation;
 

@@ -4,13 +4,16 @@
 #include <fstream>
 #include <thread>
 #include <filesystem>
-
+#include <vector>
 
 //ImGUI
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 #include "imgui_impl_opengl3.h"
+
+//ImPlot
+#include "implot.h"
 
 //SDL + OpenGL
 #include <SDL.h>

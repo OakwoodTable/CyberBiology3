@@ -6,6 +6,21 @@ set(SRC
     BotNeuralNet.cpp
     BotNeuralNet.h
 
+    SDL.cpp
+    SDL.h
+
+    GUI.cpp
+    GUI.h
+
+    Settings.h
+    Systems.h
+
+    Bot.cpp
+    Bot.h
+
+    BotNeuralNet.cpp
+    BotNeuralNet.h
+
     Field.cpp
     Field.h
 
@@ -30,9 +45,14 @@ set(SRC
     Apple.cpp
     Apple.h
 
+    MyTypes.cpp
     MyTypes.h
+
     Settings.h
     Systems.h
+
+    ObjectSaver.cpp
+    ObjectSaver.h
 )
 
 find_package(OpenGL REQUIRED)
@@ -51,6 +71,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${OPENGL_LIBRARIES}
         SDL2_ttf::SDL2_ttf-static
         imgui
+        implot
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

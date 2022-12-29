@@ -1,26 +1,30 @@
 #pragma once
-#include "Object.h"
+//#pragma message("	Organics_h")
 
 
+#include "Field.h"
 
-//Organics class
+
 class Organics :public Object
 {
 
+	bool doneFalling = false;
+
+	static SDL_Texture* image;
+
 public:
 
-	bool doneFalling = false;
-	int energy;
+	int tick() override;
 
-
-	//Draw
 	void draw() override;
+	void drawEnergy() override;
 
-	//Draw energy
-	void drawEnergy();
 
-	//New organic waste
-	Organics(int, int, int);
+	Organics(int X, int Y, int Energy);
+
+
+	static void CreateImage();
+	static void DeleteImage();
 
 };
 

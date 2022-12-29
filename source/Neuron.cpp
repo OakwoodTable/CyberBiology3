@@ -1,21 +1,83 @@
 #include "Neuron.h"
 
 
-void Neuron::AddConnection(uint NUM, float WEIGHT)
+Neuron::Neuron()
 {
-	allConnections[numConnections].num = NUM;
-	allConnections[numConnections++].weight = WEIGHT;
+	SetRandomType();
 }
 
-bool Neuron::IsConnected(uint index)
+void Neuron::Clone(Neuron* source)
 {
+	memcpy(this, source, sizeof(Neuron));
+}
+
+void Neuron::AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT=1000.0f)
+{
+	NeuronConnection* nConnection = &allConnections[numConnections];
+
+	nConnection->dest_neuron = DEST;
+	nConnection->dest_layer = DEST_LAYER;
+
+	if (WEIGHT < 1000.0f)
+		nConnection->weight = WEIGHT;
+	else
+		nConnection->SetRandomWeight();
+
+	++numConnections;
+}
+
+bool Neuron::AddRandomConnection()
+{
+    if (numConnections >= MaxConnectionsPerNeuronType[static_cast<size_t>(type)])
+		return false;
+
+	int c_Index, c_Layer;
+
+	for (;;)
+	{
+		c_Index = RandomVal(NeuronsInLayer);
+
+		if (layer == NumNeuronLayers - 2)
+			c_Layer = NumNeuronLayers - 1;
+		else
+			c_Layer = RandomVal(NumNeuronLayers - (layer + 1)) + layer + 1;
+
+		//If not connected
+		if (IsConnected(c_Layer, c_Index) == -1)
+		{
+			AddConnection(c_Layer, c_Index);
+
+			return true;
+		}
+	}	
+}
+
+void Neuron::RemoveConnection(uint index)
+{
+	--numConnections;
+
+	for (int i = index; i < numConnections; ++i)
+	{
+		allConnections[i] = allConnections[i + 1];
+	}
+}
+
+int Neuron::IsConnected(uint LAYER, uint index)
+{
+	NeuronConnection* c;
+
 	for (uint i = 0; i < numConnections; ++i)
 	{
-		if (allConnections[i].num == index)
-			return true;
+		c = &allConnections[i];
+
+		if (c->dest_layer == LAYER)
+		{
+			if(c->dest_neuron == index)
+				return i;
+		}			
 	}
 
-	return false;
+	return -1;
 }
 
 void Neuron::ClearConnections()
@@ -25,62 +87,74 @@ void Neuron::ClearConnections()
 
 void Neuron::SetRandomBias()
 {
-	bias = (RandomVal(40001) * 0.0001f) - 2.0f;
+	bias = RandomFloatInRange(NeuronBiasMin, NeuronBiasMax);
 }
 
 void Neuron::SetRandomType()
 {
-	if ((type != NeuronType::input) && (type != NeuronType::output))
+    if ((type != NeuronType::input) && (type != NeuronType::output))
 	{
+	#ifdef UseRandomNeuron
 		if (RandomPercent(2))
 		{
-			type = NeuronType::random;
+            type = NeuronType::random;
 
 			return;
 		}
-
-	#ifdef UseMemoryNeuron
-		int refVal = RandomVal(15);
-	#else
-		int refVal = RandomVal(14);
 	#endif
 
-		if (refVal <= 8)
-			type = NeuronType::basic;
-		else if (refVal <= 13)
-			type = NeuronType::radialbasis;
+	#ifdef UseMemoryNeuron
+		int roll = RandomVal(12);
+	#else
+		int roll = RandomVal(14);
+	#endif
+
+		if (roll <= 5)
+            type = NeuronType::basic;
+		else if (roll <= 10)
+            type = NeuronType::radialbasis;
 		else
-			type = NeuronType::memory;
+            type = NeuronType::memory;
+				
 	}
 }
 
 void Neuron::SetRandomConnections()
 {
-
 	ClearConnections();
 
-	if (type == NeuronType::output)
+    if (type == NeuronType::output)
 		return;
 
-	uint connections = RandomVal(MaxConnectionsPerNeuron + 1);
+	#ifdef FullyConnected
+		MakeFullyConnected();
+		return;
+	#endif
 
-	if (connections > 0)
+    uint connections = RandomVal(MaxConnectionsPerNeuronType[static_cast<size_t>(type)] + 1);
+
+	for (; connections > 0; --connections)
 	{
-		uint connectionIndex;
-
-		for (;;)
+		if (connections > 0)
 		{
-			connectionIndex = RandomVal(NeuronsInLayer);
+			if (!AddRandomConnection())
+				return;
 
-			if (!IsConnected(connectionIndex))
-			{
-				AddConnection(connectionIndex, (RandomVal(40001) * 0.0001f) - 2.0f);
-
-				if (--connections == 0)
-					return;
-			}
 		}
 	}
+}
+
+void Neuron::MakeFullyConnected()
+{
+	repeat(NeuronsInLayer)
+	{
+		allConnections[i].dest_layer = layer + 1;
+		allConnections[i].dest_neuron = i;
+
+		allConnections[i].SetRandomWeight();
+	}
+
+	numConnections = NeuronsInLayer;
 }
 
 void Neuron::SetRandom()
@@ -98,10 +172,12 @@ void Neuron::SetZero()
 
 void Neuron::SetTunnel(int num)
 {
-	bias = 0.0f;
-	numConnections = 1;
+	SetZero();
+
 	allConnections[0].weight = 1.0f;
-	allConnections[0].num = num;
+
+	allConnections[0].dest_neuron = num;
+	allConnections[0].dest_layer = layer + 1;
 }
 
 void Neuron::SlightlyChange()
@@ -114,8 +190,107 @@ void Neuron::SlightlyChange()
 	}
 }
 
+void Neuron::mutate_ChangeType()
+{
+	SetRandomType();
+}
+
+void Neuron::mutate_ChangeBias()
+{
+	float change = RandomFloatInRange(ChangeBiasMin, ChangeBiasMax);
+
+	if (RandomPercent(50))
+		change *= -1.0f;
+
+	bias += change;
+
+	if (bias > NeuronBiasMax)
+		bias = NeuronBiasMax;
+	else if (bias < NeuronBiasMin)
+		bias = NeuronBiasMin;
+}
+
+uint Neuron::GetRandomConnectionIndex()
+{
+	return RandomVal(numConnections);
+}
+
+void Neuron::mutate_ChangeOneConnection()
+{	
+	if (numConnections == 0)
+		return;
+
+	int roll = RandomVal(101);
+ 	int connection = GetRandomConnectionIndex();
+
+	if (roll <= 10)
+	{
+		//10% - remove connection
+		RemoveConnection(connection);
+	}
+	else if (roll <= 20)
+	{
+		//10% - add random connection
+		AddRandomConnection();
+	}
+	else
+	{
+		//Change connection weight
+		allConnections[connection].ChangeWeight();
+	}
+
+}
+
+void Neuron::mutate_DeleteNeuron()
+{
+	SetZero();
+
+    if((type != NeuronType::input)&&(type != NeuronType::output))
+        type = NeuronType::basic;
+}
+
+const char* Neuron::GetTextFromType(NeuronType t)
+{
+	switch (t)
+	{
+        case NeuronType::basic:
+			return (char*)"basic";
+        case NeuronType::input:
+			return (char*)"input";
+        case NeuronType::output:
+			return (char*)"output";
+        case NeuronType::radialbasis:
+			return (char*)"radial basis";
+        case NeuronType::memory:
+			return (char*)"memory";
+        case NeuronType::random:
+			return (char*)"random";
+		default:
+			return (char*)"other";
+	}
+}
+
 void Neuron::SortConnections()
 {
 	//TODO
+}
 
+void NeuronConnection::ChangeWeight()
+{
+	float change = RandomFloatInRange(ChangeConnectionWeightMin, ChangeConnectionWeightMax);
+
+	if (RandomPercent(50))
+		change *= -1.0f;
+
+	weight += change;
+
+	if (weight > ConnectionWeightMax)
+		weight = ConnectionWeightMax;
+	else if (weight < ConnectionWeightMin)
+		weight = ConnectionWeightMin;
+}
+
+void NeuronConnection::SetRandomWeight()
+{
+	weight = RandomFloatInRange(ConnectionWeightMin, ConnectionWeightMax);
 }

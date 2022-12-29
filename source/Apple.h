@@ -1,24 +1,24 @@
 #pragma once
-#include "Object.h"
+//#pragma message("	Apple_h")
 
 
+#include "Field.h"
 
-//Apple class
+
 class Apple :public Object
 {
+private:
+
+	static SDL_Texture* image;
 
 public:
 
-	int energy;
-
-
-	//Draw
 	void draw() override;
 
-	//Draw energy
-	//void drawEnergy();
+	Apple(int X, int Y, int Energy = 0);
 
-	//New apple
-	Apple(int, int, int = 0);
+
+	static void CreateImage();
+	static void DeleteImage();
 
 };

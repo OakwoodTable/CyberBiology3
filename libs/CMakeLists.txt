@@ -14,6 +14,7 @@ add_library(imgui STATIC
 	imgui/imconfig.h
 	imgui/imgui.cpp
 	imgui/imgui.h
+        imgui/imgui_demo.cpp
 	imgui/imgui_draw.cpp
 	imgui/imgui_internal.h
 	imgui/imgui_tables.cpp
@@ -38,3 +39,18 @@ target_link_libraries(imgui
 	PUBLIC
 		SDL2::SDL2-static
 )
+
+###############################################################################
+
+add_library(implot STATIC
+    implot/implot.cpp
+    implot/implot.h
+    implot/implot_internal.h
+
+    implot/implot_demo.cpp
+    implot/implot_items.cpp
+)
+
+target_include_directories(implot PUBLIC implot)
+
+target_link_libraries(implot PUBLIC imgui)

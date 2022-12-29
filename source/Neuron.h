@@ -1,13 +1,19 @@
 #pragma once
 
-#include "Object.h"
 
+#include "Settings.h"
+#include "MyTypes.h"
 
 
 struct NeuronConnection
 {
-	uint num;
+	byte dest_layer;
+	byte dest_neuron;
+
 	float weight;
+
+	void ChangeWeight();
+	void SetRandomWeight();
 };
 
 
@@ -21,66 +27,72 @@ enum class NeuronType
 	memory
 };
 
+const uint MaxConnectionsPerNeuronType[] =
+{ 
+	MaxConnections_Basic, 
+	MaxConnections_Input, 
+	0,
+	MaxConnections_Random,
+	MaxConnections_RadialBasis,
+	MaxConnections_Memory 
+};
+
 
 struct Neuron
 {
-	NeuronType type = NeuronType::basic;
+    NeuronType type = NeuronType::basic;
 
 	float bias = 0.0f;
 
 	uint numConnections = 0;
-	NeuronConnection allConnections[NeuronsInLayer];	
+	NeuronConnection allConnections[NeuronsInLayer];
 
+	uint layer;
 
-	//Self explanatory
-	void AddConnection(uint NUM, float WEIGHT);
+	Neuron();
+
+	void Clone(Neuron* source);
+
+	void AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT);
+	bool AddRandomConnection();
+	void RemoveConnection(uint index);
+
+	uint GetRandomConnectionIndex();
 
 	//Sort connections by index
 	void SortConnections();
 
-	//Does neuron have a connection
-	bool IsConnected(uint index);
+	//Does neuron have a connection,
+	//returns connection index or -1
+	int IsConnected(uint LAYER, uint index);
 
 
-	//Set to random
 	void SetRandomBias();
 	void SetRandomType();
 	void SetRandomConnections();
-
-	//Randomize entire neuron
 	void SetRandom();
 
-	//Zero connections
-	void ClearConnections();
-	//Zero bias and connections
+	void MakeFullyConnected();	
+
+	//Clear bias and connections
 	void SetZero();
+
+	void ClearConnections();	
 
 	//Tunnel neuron - one with no bias and only 1 connection to same neuron in next layer with weight = 1.0f
 	void SetTunnel(int num);
 
-	//Change neuron a little
 	void SlightlyChange();
+
+	
+	//Mutation functions
+	void mutate_ChangeType();
+	void mutate_ChangeBias();
+	void mutate_ChangeOneConnection();
+	void mutate_DeleteNeuron();
+
 
 
 	//Get neuron description by type (for GUI)
-	static char* GetTextFromType(NeuronType t)
-	{
-		switch (t)
-		{
-		case NeuronType::basic:
-			return (char*)"basic";
-		case NeuronType::input:
-			return (char*)"input";
-		case NeuronType::output:
-			return (char*)"output";
-		case NeuronType::radialbasis:
-			return (char*)"radial basis";
-		case NeuronType::memory:
-			return (char*)"memory";
-		case NeuronType::random:
-			return (char*)"random";
-		default:
-			return (char*)"other";
-		}
-	}
+    static const char *GetTextFromType(NeuronType t);
 };
