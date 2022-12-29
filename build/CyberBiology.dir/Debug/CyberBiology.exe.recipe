@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>E:\Рабочий стол\GitHub\CyberBiology3\build\x64\Debug\ZERO_CHECK</FullPath>
+      <FullPath>E:\Рабочий стол\GitHub\CyberBiology3\build\Debug\ZERO_CHECK</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\x64\Debug\sdl_headers_copy</FullPath>
+      <FullPath>E:\Рабочий стол\GitHub\CyberBiology3\build\SDL\Debug\sdl_headers_copy</FullPath>
     </ProjectOutput>
     <ProjectOutput>
       <FullPath>E:\Рабочий стол\GitHub\CyberBiology3\bin\Debug\CyberBiology.exe</FullPath>

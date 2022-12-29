@@ -614,7 +614,7 @@ void Main::DrawAdaptationWindow()
 
 			if (ImGui::CollapsingHeader("Bot Parametr"))
 			{
-				ImGui::SliderInt("Bot Max Life period", &field->params.BotMaxLivePeriod, 50, 5000);
+				ImGui::SliderInt("Bot Max Life period", &field->params.BotMaxLifePeriod, 50, 5000);
 
 				//ImGui::SliderInt("Season Summer",&field->params.SeasonReward_Summer, 0, 6);
 				//ImGui::SliderInt("Season Autum", &field->params.SeasonReward_Autumn, 0, 6);
