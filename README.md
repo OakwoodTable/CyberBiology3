@@ -13,7 +13,11 @@ When dividing bot creates a copy of his brain, but there is a chance it will mut
 In it bots have to dive to the bottom of the screen to multiply and photosynthesis is only available 
 above water, so they dive up and down and evolve! I only saved a small fraction of it because othervise 
 the file was too large. But it doesn't matter, they will fill the world quickly.
-
+## Что новго 15.01.2023
+Времена года допилены.
+Добавлены настройки параметров ботов в интерфейсе, а также параметров сезонов ...
+добавлен новый сенсор зрения через клетку и чуть увеличил нейросеть. Что позволило им учиться лазить в лабиринты..
+Добавленна папка Distrib тут последний собранный файл для Windows x64 и библиотеки, пока возможно не все, потом добавлю недостающие.
 ## Screenshots
 
 ![Screenshot1](/Screenshots/5.png?raw=true "Screenshot1")
