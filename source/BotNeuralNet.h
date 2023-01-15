@@ -9,6 +9,7 @@ struct BrainInput
 	float
 	energy = 0.0f,
 	vision = 0.0f,
+	vision2 = 0.0f,
 	age = 0.0f,
 	rotation = 0.0f,
 	height = 0.0f;

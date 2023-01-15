@@ -254,18 +254,18 @@
 //-----------------------------------------------------------------
 //Neural net
 
-#define NeuronsInLayer 5
-#define NumNeuronLayers 6
+#define NeuronsInLayer 6
+#define NumNeuronLayers 7
 #define NeuronOutputLayerIndex (NumNeuronLayers-1)
 #define NeuronInputLayerIndex 0
 
 //#define FullyConnected
 
-#define MaxConnections_Basic 4
-#define MaxConnections_Input 4
+#define MaxConnections_Basic 5
+#define MaxConnections_Input 5
 #define MaxConnections_Random 1
-#define MaxConnections_RadialBasis 4
-#define MaxConnections_Memory 4
+#define MaxConnections_RadialBasis 5
+#define MaxConnections_Memory 5
 
 #define UseMemoryNeuron
 #define UseRandomNeuron
@@ -282,7 +282,7 @@
 #define ConnectionWeightMin -2.0f
 #define ConnectionWeightMax 2.0f
 
-#define MutateNeuronsMaximum 8
+#define MutateNeuronsMaximum 2
 //#define MutateNeuronsSlightlyMaximum 2
 
 //-----------------------------------------------------------------

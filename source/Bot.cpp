@@ -279,7 +279,7 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 	if (!pField->IsInBounds(lookAt_x+1, lookAt_y+1))
 	{
 		//1 if unpassable
-		input.age = 1.0f;
+		input.vision2 = 1.0f;
 	}
 	else
 	{
@@ -289,7 +289,7 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 		if (!tmpDest)
 		{
 			//0 if empty
-			input.age = 0.0f;
+			input.vision2 = 0.0f;
 		}
 		else
 		{
@@ -299,29 +299,29 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 			case bot:
 				//0.5 if someone is in that cell
 				//Calculate how close they are as relatives, based on mutation markers
-				input.age += (1.0f - (FindKinship((Bot*)tmpDest) * 1.0f) / (NumberOfMutationMarkers * 1.0f));
+				input.vision2 += (1.0f - (FindKinship((Bot*)tmpDest) * 1.0f) / (NumberOfMutationMarkers * 1.0f));
 				break;
 
 			case rock:
 				//0.5 if cell is unpassable
-				input.age = .5f;
+				input.vision2 = .5f;
 				break;
 
 			case organic_waste:
 				//-.5 if cell contains organics
-				input.age = -.5f;
+				input.vision2 = -.5f;
 				break;
 
 			case apple:
 				//-1.0 if cell contains an apple
-				input.age = -1.0f;
+				input.vision2 = -1.0f;
 				break;
 			}
 		}
 	}
 	/////////////////////////////////////////////////
 
-	//input.age = (lifetime * 1.0f) / (pField->params.BotMaxLifePeriod * 1.0f);
+	input.age = (lifetime * 1.0f) / (pField->params.BotMaxLifePeriod * 1.0f);
 
 	//input.rotation = (tmpOut.desired_rotation == (direction * .1f))?1.0f:0.0f;
 	input.rotation = (direction * 1.0f) / 7.0f;
@@ -484,19 +484,20 @@ BrainOutput Bot::think(BrainInput input)
 	//Input data
 	{
 		//Energy
-		activeBrain.allValues[NeuronInputLayerIndex][0] = ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
+		activeBrain.allValues[NeuronInputLayerIndex][0] = input.energy; // ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
 
 		//Sight
 		activeBrain.allValues[NeuronInputLayerIndex][1] = input.vision;
+		activeBrain.allValues[NeuronInputLayerIndex][2] = input.vision2;
 
 		//Bot age
-		activeBrain.allValues[NeuronInputLayerIndex][2] = input.age;
+		activeBrain.allValues[NeuronInputLayerIndex][3] = input.age;
 
 		//Rotation
-		activeBrain.allValues[NeuronInputLayerIndex][3] = input.rotation;
+		activeBrain.allValues[NeuronInputLayerIndex][4] = input.rotation;
 
 		//Height
-		activeBrain.allValues[NeuronInputLayerIndex][4] = (y * 1.0f) / (FieldCellsHeight * 1.0f);
+		activeBrain.allValues[NeuronInputLayerIndex][5] = input.height;//  (y * 1.0f) / (FieldCellsHeight * 1.0f);
 	}
 
 	//Compute
