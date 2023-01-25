@@ -6,13 +6,11 @@ Bot makes moves based on output layer data, it can produce energy via photosynth
 When dividing bot creates a copy of his brain, but there is a chance it will mutate a little in the process. 
 
 ## What's new?
-+ World is now larger than the screen, use arrow keys to move your camera
-+ You can now save entire worlds, including parameters set in Adaptation window!
++ Automatic adaptation added! Just press "Adapt winds/divers" button, lean back in your chair and watch adaptation do its magic!
+Beware that it depends on parameters you choose. At least you have to set world width = 2 screens for winds and width > 10 for divers. 
+While auto adaptation is working do not touch adaptation window settings (open it, but don't interfere). 
 
-  You already have a super cool world in "SavedObjects/" directory called the Divers! 
-In it bots have to dive to the bottom of the screen to multiply and photosynthesis is only available 
-above water, so they dive up and down and evolve! I only saved a small fraction of it because othervise 
-the file was too large. But it doesn't matter, they will fill the world quickly.
++ No saved worlds in this version unfortunately, file size too large
 
 ## Screenshots
 
@@ -24,10 +22,11 @@ the file was too large. But it doesn't matter, they will fill the world quickly.
 
 + SDL
 
-+ Dear Im GUI
++ DearImGUI
 
 + ImPlot
 
+You can build it using CMakeLists.txt file with Visual studio.
 
 ## Interface
 
