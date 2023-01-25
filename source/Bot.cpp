@@ -276,14 +276,14 @@ input.energy=(float)energy/(float)MaxPossibleEnergyForABot;
 	////////////////////////////////////////////////
 	//Вместо возраста попробую сделать зрение на +1 клетку
 	//If destination is out of bounds
-	if (!pField->IsInBounds(lookAt_x+1, lookAt_y+1))
+	if (!pField->IsInBounds(lookAt_x+Rotations[direction].x, lookAt_y+Rotations[direction].y))
 	{
 		//1 if unpassable
 		input.vision2 = 1.0f;
 	}
 	else
 	{
-		Object* tmpDest = (*pCells)[lookAt_x+1][lookAt_y+1];
+		Object* tmpDest = (*pCells)[lookAt_x+Rotations[direction].x][lookAt_y+Rotations[direction].y];
 
 		//Destination cell is empty
 		if (!tmpDest)
