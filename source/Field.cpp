@@ -1,12 +1,39 @@
-
 #include "Field.h"
 
 
 int Field::seed;
 int Field::renderX=0;
 
-Season season;
 
+void Field::ChangeSeason()
+{
+    season = (Season)((int)season + 1);
+
+    if (season > spring)
+    {
+        season = summer;
+    }
+}
+
+void Field::SeasonTick()
+{
+    if (++changeSeasonCounter >= (uint)params.seasonInterval)
+    {
+        ChangeSeason();
+
+        changeSeasonCounter = 0;
+    }
+}
+
+Season Field::GetSeason()
+{
+    return season;
+}
+
+uint Field::GetSeasonCounter()
+{
+    return changeSeasonCounter;
+}
 
 void Field::shiftRenderPoint(int cx)
 {
@@ -34,7 +61,7 @@ void Field::jumpToFirstBot()
 
             if (obj)
             {
-                if (obj->type == bot)
+                if (obj->type() == bot)
                 {
                     renderX = X;
 
@@ -102,7 +129,7 @@ Point Field::FindRandomNeighbourBot(int X, int Y)
             {
                 if (allCells[tx][Y + cy] != NULL)
                 {
-                    if(allCells[tx][Y + cy]->type == bot)
+                    if(allCells[tx][Y + cy]->type() == bot)
                         tmpArray[i++].Set(tx, Y + cy);
                 }
             }
@@ -184,12 +211,24 @@ int Field::MoveObject(Object* obj, int toX, int toY)
 
 bool Field::AddObject(Object* obj)
 {
-    if (allCells[obj->x][obj->y])
+    Object** cell = &allCells[obj->x][obj->y];
+
+    if (*cell)
         return false;
 
-    allCells[obj->x][obj->y] = obj;
+    *cell = obj;
 
     return true;
+}
+
+void Field::ObjectAddOrReplace(Object* obj)
+{
+    Object** cell = &allCells[obj->x][obj->y];
+
+    if (*cell)
+        delete *cell;
+
+    *cell = obj;
 }
 
 void Field::RemoveObject(int X, int Y)
@@ -238,7 +277,7 @@ void Field::RepaintBot(Bot* b, Color newColor, int differs)
 
             if (tmpObj)
             {
-                if (tmpObj->type == bot)
+                if (tmpObj->type() == bot)
                 {
                     if (((Bot*)tmpObj)->FindKinship(b) >= (NumberOfMutationMarkers - differs))
                     {
@@ -259,7 +298,7 @@ void Field::ObjectTick(Object* tmpObj)
     if (t == 1)
     {
         //Object destroyed
-        if (tmpObj->type == bot)
+        if (tmpObj->type() == bot)
             RemoveBot(tmpObj->x, tmpObj->y, tmpObj->energy);
         else
             RemoveObject(tmpObj->x, tmpObj->y);
@@ -268,7 +307,18 @@ void Field::ObjectTick(Object* tmpObj)
     }
 }
 
-//tick function for single threaded build
+void Field::NotifyThreads()
+{
+    mut.lock();
+    {
+        memset(threadsReady, 0, sizeof(threadsReady));
+    }
+    mut.unlock();
+
+    cond.notify_all();
+}
+
+
 inline void Field::tick_single_thread()
 {
     Object* tmpObj;
@@ -277,6 +327,8 @@ inline void Field::tick_single_thread()
     botsTotal = 0;
     applesTotal = 0;
     organicsTotal = 0;
+    predatorsTotal = 0;
+    averageLifetime = 0;
 
     for (uint ix = 0; ix < FieldCellsWidth; ++ix)
     {
@@ -288,11 +340,20 @@ inline void Field::tick_single_thread()
             {
                 ++objectsTotal;
 
-                if (tmpObj->type == bot)
+                if (tmpObj->type() == bot)
+                {
                     ++botsTotal;
-                else if (tmpObj->type == apple)
+
+                    if (((Bot*)tmpObj)->isPredator())
+                    {
+                        ++predatorsTotal;
+                    }
+
+                    averageLifetime += tmpObj->GetLifetime();
+                }
+                else if (tmpObj->type() == apple)
                     ++applesTotal;
-                else if (tmpObj->type == organic_waste)
+                else if (tmpObj->type() == organic_waste)
                     ++organicsTotal;
 
                 ObjectTick(tmpObj);
@@ -300,192 +361,175 @@ inline void Field::tick_single_thread()
         }
 
     }
+
+    if(botsTotal > 0)
+        averageLifetime /= botsTotal;
 }
 
-//Wait for a signal 
-inline void Field::ThreadWait(const uint index)
+
+void Field::ProcessPart_MultipleThreads(const uint X1, const uint X2, const uint index)
 {
-    for (;;)
-    {
-        if (threadGoMarker[index])
-            return;
-
-        std::this_thread::yield();
-
-        if (pauseThreads)
-        {
-            //Delay so it would not eat too many resourses while on pause
-            SDL_Delay(1);
-        }
-    }
-}
-
-//Process function for 4 or 8 threaded simulation
-void Field::ProcessPart_MultipleThreads(const uint X1, const uint Y1, const uint X2, const uint Y2, const uint index)
-{
-
     srand(seed + index);
 
-    auto obj_cals = [&](Object* tmpObj)
+    auto obj_calc = [&](Object* tmpObj)
     {
         if (tmpObj == NULL)
             return;
 
-        ++counters[index][0];
+        ++objectCounters[index][0];
 
-        if (tmpObj->type == bot)
-            ++counters[index][1];
-        else if (tmpObj->type == apple)
-            ++counters[index][2];
-        else if (tmpObj->type == organic_waste)
-            ++counters[index][3];
+        if (tmpObj->type() == bot)
+        {
+            ++objectCounters[index][1];
+
+            if (((Bot*)tmpObj)->isPredator())
+            {
+                ++objectCounters[index][4];
+            }
+
+            objectCounters[index][5] += tmpObj->GetLifetime();
+        }
+        else if (tmpObj->type() == apple)
+            ++objectCounters[index][2];
+        else if (tmpObj->type() == organic_waste)
+            ++objectCounters[index][3];
 
         ObjectTick(tmpObj);
     };
 
-    for(;;)
+    auto lifetime_calc = [&]()
     {
-        
-        ThreadWait(index);
+        uint c = objectCounters[index][1];
 
-        for (int X = X1; X < X1 + ((X2 - X1) / 2); ++X)
+        if (c > 0)
+            objectCounters[index][5] /= c;
+    };
+
+    auto wait = [&]()
+    {
+        mut.lock();
+        cond.wait(mut, [&] {return !threadsReady[index]; });
+        mut.unlock();
+    };
+
+    auto thisThreadIsReady = [&]()
+    {
+        mut.lock();
+        threadsReady[index] = true;
+        mut.unlock();
+    };
+
+    const uint chunkWidth = ((X2 - X1) / 2);
+    const uint _X[2] = {X1, X1 + chunkWidth};
+
+    for(;!terminateThreads;)
+    {
+        repeat(2)
         {
-            for (int Y = Y1; Y < Y2; ++Y)
+            wait();
             {
-                obj_cals(allCells[X][Y]);
+                for (uint X = _X[i]; X < _X[i] + chunkWidth; ++X)
+                {
+                    for (uint Y = 0; Y < FieldCellsHeight; ++Y)
+                    {
+                        obj_calc(allCells[X][Y]);
+                    }
+                }
+
+                lifetime_calc();
+                thisThreadIsReady();
             }
+
+            cond.notify_all();
         }
-
-        threadGoMarker[index] = false;
-
-        ThreadWait(index);
-
-        for (int X = X1 + ((X2 - X1) / 2); X < X2; ++X)
-        {
-            for (int Y = Y1; Y < Y2; ++Y)
-            {
-                obj_cals(allCells[X][Y]);
-            }
-        }
-
-        threadGoMarker[index] = false;
-
-        if (terminateThreads)
-        {
-            threadTerminated[index] = true;
-
-            return;
-        }
-
     }
-
 }
 
-//Start all threads
 void Field::StartThreads()
 {
     repeat(NumThreads)
     {
-        threadGoMarker[i] = true;
+        uint X1 = (FieldCellsWidth / NumThreads) * i;
+        uint X2 = (FieldCellsWidth / NumThreads) * (i + 1);
+
+        thread t(&Field::ProcessPart_MultipleThreads, this, X1, X2, i);
+
+        t.detach();
     }
 }
 
-//Wait for all threads to finish their calculations
-void Field::WaitForThreads()
-{
-    uint threadsReady;
 
-    for (;;)
-    {
-
-        threadsReady = 0;
-
-        repeat(NumThreads)
-        {
-            if (threadGoMarker[i] == false)
-                threadsReady++;
-        }
-
-        if (threadsReady == NumThreads)
-            break;
-
-        std::this_thread::yield();
-
-    }
-}
-
-//Multithreaded tick function
 inline void Field::tick_multiple_threads()
 {
-    auto clear_counters = [&]()
+    auto waitAllThreads = [&]()
     {
-        repeat(NumThreads)
+        for (bool& b : threadsReady)
         {
-            counters[i][0] = 0;
-            counters[i][1] = 0;
-            counters[i][2] = 0;
-            counters[i][3] = 0;
+            if (!b) return false;
         }
+
+        return true;
     };
 
     objectsTotal = 0;
     botsTotal = 0;
     applesTotal = 0;
     organicsTotal = 0;
+    predatorsTotal = 0;
+    averageLifetime = 0;
 
-    auto addToCounters = [&]()
+    //2 passes
+    repeat(2)
     {
+        //Clear object counters
+        memset(objectCounters, 0, sizeof(objectCounters));
+
+        //Starting signal for all threads
+        NotifyThreads();
+
+        //Wait for threads to synchronize
+        mut.lock();
+        cond.wait(mut, waitAllThreads);
+        mut.unlock();
+
+        //Add object counters
         repeat(NumThreads)
         {
-            objectsTotal += counters[i][0];
-            botsTotal += counters[i][1];
-            applesTotal += counters[i][2];
-            organicsTotal += counters[i][3];
-        }
-    };
-
-    //Clear object counters
-    clear_counters();
-
-    //Starting signal for all threads
-    StartThreads();
-
-    //Wait for threads to synchronize first time
-    WaitForThreads();
-
-    //Add object counters
-    addToCounters();
-
-    //Clear object counters
-    clear_counters();
-
-    //Starting signal for all threads
-    StartThreads();
-
-    //Wait for threads to synchronize second time
-    WaitForThreads();
-
-    //Add object counters
-    addToCounters();
-
-}
-
-//Tick function
-void Field::tick(uint thisFrame)
-{
-    Object::currentFrame = thisFrame;
-
-    if(params.spawnApples)
-    {
-        if (spawnApplesInterval++ == AppleSpawnInterval)
-        {
-            SpawnApples();
-
-            spawnApplesInterval = 0;
+            objectsTotal += objectCounters[i][0];
+            botsTotal += objectCounters[i][1];
+            applesTotal += objectCounters[i][2];
+            organicsTotal += objectCounters[i][3];
+            predatorsTotal += objectCounters[i][4];
+            averageLifetime += objectCounters[i][5];
         }
     }
 
-    #ifdef UseOneThread
+    averageLifetime /= NumThreads * 2;
+}
+
+
+void Field::tick(uint thisFrame)
+{
+    //Change season
+    if (params.useSeasons)
+        SeasonTick();
+
+    //Memorize frame number
+    Object::currentFrame = thisFrame;
+
+    //Spawn apples
+    if(params.spawnApples)
+    {
+        if (spawnApplesCounter++ == AppleSpawnInterval)
+        {
+            SpawnApples();
+
+            spawnApplesCounter = 0;
+        }
+    }
+
+    //Make simulation step
+    #if NumThreads == 1
         tick_single_thread();
     #else
         tick_multiple_threads();
@@ -499,22 +543,18 @@ void Field::draw(RenderTypes render)
     //Background
     SDL_SetRenderDrawColor(renderer, FieldBackgroundColor);
     SDL_RenderFillRect(renderer, &mainRect);
-    
-    //Ocean
-#ifdef DrawOcean
-    SDL_SetRenderDrawColor(renderer, OceanColor);
-    oceanRect.y = (FieldHeight + FieldY) - (params.oceanLevel * FieldCellSize);
-    oceanRect.h = params.oceanLevel * FieldCellSize;
-    SDL_RenderFillRect(renderer, &oceanRect);
-#endif
 
     //Mud layer
-#ifdef DrawMudLayer
     SDL_SetRenderDrawColor(renderer, MudColor);
     mudLayerRect.y = (FieldHeight + FieldY) - (params.mudLevel * FieldCellSize);
     mudLayerRect.h = params.mudLevel * FieldCellSize;
     SDL_RenderFillRect(renderer, &mudLayerRect);
-#endif
+
+    //Ocean
+    SDL_SetRenderDrawColor(renderer, OceanColor);
+    oceanRect.y = (FieldHeight + FieldY) - (params.oceanLevel * FieldCellSize);
+    oceanRect.h = (params.oceanLevel * FieldCellSize) - mudLayerRect.h;
+    SDL_RenderFillRect(renderer, &oceanRect);
 
     //Objects
     Object* tmpObj;
@@ -532,7 +572,6 @@ void Field::draw(RenderTypes render)
 
             if (tmpObj)
             {
-                //Draw function switch, based on selected render type
                 switch (render)
                 {
                 case natural:
@@ -550,12 +589,21 @@ void Field::draw(RenderTypes render)
 
         ++ix;
     }
+
+    //Underwater mask
+    #ifdef DrawUnderwaterMask
+    {
+        SDL_SetRenderDrawColor(renderer, UnderwaterMaskColor);
+        oceanRect.h = params.oceanLevel * FieldCellSize;
+        SDL_RenderFillRect(renderer, &oceanRect);
+    }
+    #endif
+
 }
 
-//Is cell out if bounds?
 bool Field::IsInBounds(int X, int Y)
 {
-    return ((X >= 0) && (Y >= 0) && (X < FieldCellsWidth) && (Y < FieldCellsHeight));
+    return ((X >= 0) and (Y >= 0) and (X < FieldCellsWidth) and (Y < FieldCellsHeight));
 }
 
 bool Field::IsInBounds(Point p)
@@ -573,8 +621,6 @@ bool Field::IsInMud(int Y)
     return (Y >= (FieldCellsHeight - params.mudLevel));
 }
 
-
-
 int Field::ValidateX(int X)
 {
     if (X < 0)
@@ -589,12 +635,19 @@ int Field::ValidateX(int X)
     return X;
 }
 
+int Field::FindDistanceX(int X1, int X2)
+{
+    uint minDistX1 = min(X1, (FieldCellsWidth - X1));
+    uint minDistX2 = min(X2, (FieldCellsWidth - X2));
+    uint crossDist = abs(X2 - X1);
+
+    return min(crossDist, minDistX1 + minDistX2);
+}
 
 bool Field::IsInBoundsScreenCoords(int X, int Y)
 {
-    return ((X >= mainRect.x) && (X <= mainRect.x + mainRect.w) && (Y >= mainRect.y) && (Y <= mainRect.y + mainRect.h));
+    return ((X >= mainRect.x) and (X <= mainRect.x + mainRect.w) and (Y >= mainRect.y) and (Y <= mainRect.y + mainRect.h));
 }
-
 
 Point Field::ScreenCoordsToLocal(int X, int Y)
 {
@@ -611,27 +664,15 @@ Point Field::ScreenCoordsToLocal(int X, int Y)
     return { X, Y };
 }
 
-
 Object* Field::GetObjectLocalCoords(int X, int Y)
 {
     return allCells[X][Y];
 }
 
-
 bool Field::ValidateObjectExistance(Object* obj)
 {
-    for (uint ix = 0; ix < FieldCellsWidth; ++ix)
-    {
-        for (uint iy = 0; iy < FieldCellsHeight; ++iy)
-        {
-            if (allCells[ix][iy] == obj)
-                return true;
-        }
-    }
-
-    return false;
+    return (allCells[obj->x][obj->y] == obj);
 }
-
 
 uint Field::GetNumObjects()
 {
@@ -653,8 +694,15 @@ uint Field::GetNumOrganics()
     return organicsTotal;
 }
 
+uint Field::GetNumPredators()
+{
+    return predatorsTotal;
+}
 
-
+uint Field::GetAverageLifetime()
+{
+    return averageLifetime;
+}
 
 void Field::SpawnControlGroup()
 {
@@ -670,16 +718,11 @@ void Field::SpawnControlGroup()
 
 void Field::SpawnApples()
 {
-    Object* tmpObj; 
-
     for (uint ix = 0; ix < FieldCellsWidth; ++ix)
     {
-        for (uint iy = 0; iy < (FieldCellsHeight - params.oceanLevel); ++iy)
+        for (uint iy = 0; iy < (FieldCellsHeight - (uint)params.oceanLevel); ++iy)
         {
-
-            tmpObj = allCells[ix][iy];
-
-            if (tmpObj == NULL)
+            if (allCells[ix][iy] == NULL)
             {
                 //Take a chance to spawn an apple
                 if (RandomPercentX10(SpawnAppleInCellChance))
@@ -691,61 +734,16 @@ void Field::SpawnApples()
     }
 }
 
-void Field::PauseThreads()
-{
-    pauseThreads = true;
-}
 
-void Field::UnpauseThreads()
-{
-    pauseThreads = false;
-}
-
-
-//Create field
 Field::Field()
 {
     //Clear array
-    memset(allCells, 0, sizeof(Point*) * FieldCellsWidth * FieldCellsHeight);
+    memset(allCells, 0, sizeof(Point*) * FieldCellsWidth * FieldCellsHeight);    
 
-    //Spawn objects
-    #ifdef SpawnControlGroupAtStart
-        SpawnControlGroup();
-    #endif
-
-    #ifdef SpawnOneAtStart
-        Bot* tmpBot = new Bot(80, 60, MaxPossibleEnergyForABot);
-
-        AddObject(tmpBot);
-    #endif
-
-    //Start threads
-
-    //4 threads
-    #ifdef UseFourThreads
-    repeat(NumThreads)
-        threadGoMarker[i] = false;
-
-    threads[0] = new std::thread(&Field::ProcessPart_MultipleThreads, this, 0, 0, FieldCellsWidth / 4, FieldCellsHeight, 0);
-    threads[1] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 2, 0, (FieldCellsWidth / 4) * 3, FieldCellsHeight, 1);
-    threads[2] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 4, 0, FieldCellsWidth / 2, FieldCellsHeight, 2);
-    threads[3] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 4) * 3, 0, FieldCellsWidth, FieldCellsHeight, 3);
-
-    #endif
-
-    //8 threads
-    #ifdef UseEightThreads
-    repeat(NumThreads)
-        threadGoMarker[i] = false;
-
-    threads[0] = new std::thread(&Field::ProcessPart_MultipleThreads, this, 0, 0, FieldCellsWidth / 8, FieldCellsHeight, 0);
-    threads[1] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 8, 0, FieldCellsWidth / 4, FieldCellsHeight, 1);
-    threads[2] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 4, 0, (FieldCellsWidth / 8) * 3, FieldCellsHeight, 2);
-    threads[3] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 8) * 3, 0, FieldCellsWidth / 2, FieldCellsHeight, 3);
-    threads[4] = new std::thread(&Field::ProcessPart_MultipleThreads, this, FieldCellsWidth / 2, 0, (FieldCellsWidth / 8) * 5, FieldCellsHeight, 4);
-    threads[5] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 8) * 5, 0, (FieldCellsWidth / 4) * 3, FieldCellsHeight, 5);
-    threads[6] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 4) * 3, 0, (FieldCellsWidth / 8) * 7, FieldCellsHeight, 6);
-    threads[7] = new std::thread(&Field::ProcessPart_MultipleThreads, this, (FieldCellsWidth / 8) * 7, 0, FieldCellsWidth, FieldCellsHeight, 7);
+    #if NumThreads!=1
+    {
+        StartThreads();
+    }
     #endif
 
     Object::SetPointers(this, (Object***)allCells);
@@ -754,36 +752,7 @@ Field::Field()
 
 Field::~Field()
 {
-    repeat(NumThreads)
-        threadTerminated[i] = false;
-
     terminateThreads = true;
-
-    for (;;)
-    {
-        uint tcount = 0;
-
-        repeat(NumThreads)
-        {
-            if (threadTerminated[i] == true)
-                ++tcount;
-        }
-
-        if (tcount == NumThreads)
-            break;
-
-        repeat(NumThreads)
-            threadGoMarker[i] = true;
-
-        pauseThreads = false;
-
-        SDL_Delay(1);
-    }
-
-    repeat(NumThreads)
-    {
-        threads[i]->join();
-    }
 }
 
 void FieldDynamicParams::Reset()
@@ -792,8 +761,11 @@ void FieldDynamicParams::Reset()
     mudLevel = InitialMudLayerHeight;
     appleEnergy = DefaultAppleEnergy;
 
-    adaptation_DeathChance_Winds = 0;
-    adaptation_StepsNum_Winds = 2;
+    spawnApples = false;
+
+    botMaxLifetime = MaxBotLifetimeInitial;
+
+    adaptation_StepsNumToDivide_Winds = 0;
 
     adaptation_landBirthBlock = 0;
     adaptation_seaBirthBlock = 0;
@@ -801,9 +773,21 @@ void FieldDynamicParams::Reset()
     adaptation_PSInMudBlock = 0;
     adaptation_botShouldBeOnLandOnceToMultiply = 0;
     adaptation_botShouldDoPSOnLandOnceToMultiply = 0;
-    adaptation_forceBotMovements = 0;
+    adaptation_forceBotMovementsY = 0;
 
     adaptation_organicSpawnRate = 0;
+
+    adaptation_forceBotMovementsX = 0;
+
+    noPredators = false;
+    noMutations = false;
+
+    fertility_delay = FertilityDelayInitial;
+
+    PSreward = PSRewardInitial;
+
+    useSeasons = false;
+    seasonInterval = 2000;
 
     memset(reserved, 0, sizeof(reserved));
 }

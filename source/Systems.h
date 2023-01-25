@@ -3,6 +3,7 @@
 //System headers
 #include <fstream>
 #include <thread>
+#include <condition_variable>
 #include <filesystem>
 #include <vector>
 

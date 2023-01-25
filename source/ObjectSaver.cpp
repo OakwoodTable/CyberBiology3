@@ -1,4 +1,3 @@
-
 #include "Field.h"
 
 
@@ -8,18 +7,16 @@ Bot* ObjectSaver::LoadBotFromFile(MyInputStream& file)
 
     if (file.ReadInt() != NumberOfMutationMarkers)
         return NULL;
-
     if (file.ReadInt() != NumNeuronLayers)
         return NULL;
-    if (file.ReadInt() != NeuronsInLayer)
+    if (file.ReadInt() != NumNeuronsInLayerMax)
         return NULL;
-    if (file.ReadInt() != sizeof Neuron)
+    if (file.ReadInt() != sizeof(Neuron))
         return NULL;
 
     Bot* toRet = new Bot(0, 0);
 
     toRet->SetLifetime(lifetime);
-
     toRet->SetColor( file.ReadInt(), file.ReadInt(), file.ReadInt() );
 
     repeat(NumberOfMutationMarkers)
@@ -28,12 +25,13 @@ Bot* ObjectSaver::LoadBotFromFile(MyInputStream& file)
     }
 
     toRet->energy = file.ReadInt();
+    toRet->SetDirection(file.ReadInt());
 
-    file.read((char*)(toRet->GetActiveBrain()->allNeurons), NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
+    file.read((char*)toRet->GetActiveBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
 
-    file.read((char*)(toRet->GetInitialBrain()->allNeurons), NumNeuronLayers* NeuronsInLayer * sizeof(Neuron));
+    file.read((char*)toRet->GetInitialBrain()->allNeurons, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(Neuron));
 
-    file.read((char*)toRet->GetActiveBrain()->allMemory, NumNeuronLayers* NeuronsInLayer * sizeof(float));
+    file.read((char*)toRet->GetActiveBrain()->allMemory, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(float));
 
     return toRet;
 }
@@ -74,38 +72,56 @@ Object* ObjectSaver::LoadObjectFromFile(MyInputStream& file)
     return NULL;
 }
 
-ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
+ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename, bool clearWorld, bool loadParams, bool loadLandscape, bool loadBots)
 {
     WorldParams toRet;
     Object* tmpObj;
-    int loadWidth;
 
     //Open file for reading, binary type
     MyInputStream file(filename, std::ios::in | std::ios::binary | std::ios::beg);
 
     if (file.is_open())
     {
-        world->RemoveAllObjects();
+        //Clear world
+        if(clearWorld)
+            world->RemoveAllObjects();
 
+        //Check magic number
         if (file.ReadInt() != MagicNumber_WorldFile)
             goto NoSuccess;
 
-        loadWidth = file.ReadInt();
-        toRet.width = loadWidth;
+        //Read world size
+        toRet.width = file.ReadInt();
+        toRet.height = file.ReadInt();
 
-        if (file.ReadInt() != FieldCellsHeight)
+        if (toRet.height != FieldCellsHeight)
             goto NoSuccess;
+                
+        if(loadParams)
+        {
+            //Load world params
+            toRet.id = file.ReadInt();
+            toRet.seed = file.ReadInt();
+            toRet.tick = file.ReadInt();
 
-        toRet.id = file.ReadInt();
-        toRet.seed = file.ReadInt();
-        toRet.tick = file.ReadInt();
+            if (file.ReadInt() != sizeof world->params)
+                goto NoSuccess;
 
-        if (file.ReadInt() != sizeof world->params)
-            goto NoSuccess;
+            file.read((char*)&world->params, sizeof world->params);
+        }
+        else
+        {
+            //Skip world params
+            file.ignore(4 * 3);
 
-        file.read((char*) & world->params, sizeof world->params);
+            if (file.ReadInt() != sizeof world->params)
+                goto NoSuccess;
+            
+            file.ignore(sizeof world->params);
+        }
 
-        for (int x = 0; x < loadWidth; ++x)
+        //Load objects
+        for (int x = 0; x < toRet.width; ++x)
         {
             for (int y = 0; y < FieldCellsHeight; ++y)
             {
@@ -113,13 +129,35 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
 
                 if (x >= FieldCellsWidth)
                 {
+                    //Object is out of bounds, skip
                     delete tmpObj;
-                    tmpObj = NULL;
-
                     continue;
                 }
                 else if (tmpObj)
                 {
+                    switch (tmpObj->type())
+                    {
+                    case rock:
+                        //Skip landscape
+                        if (!loadLandscape)                            
+                        {
+                            delete tmpObj;
+                            continue;
+                        }
+
+                        break;
+                    case bot:
+                        //Skip bot
+                        if (!loadBots)
+                        {
+                            delete tmpObj;
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    //Save object
                     tmpObj->x = x;
                     tmpObj->y = y;
 
@@ -152,25 +190,29 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename)
 */
 bool ObjectSaver::SaveWorld(Field* world, char* filename, int id, int ticknum)
 {
+
+    //Open file for writing, binary type
     MyOutStream file(filename, std::ios::in | std::ios::binary | std::ios::trunc);
     Object* tmpObj;
 
     if (file.is_open())
     {
+        //Magic number
         file.WriteInt(MagicNumber_WorldFile);
 
+        //World size
         file.WriteInt(FieldCellsWidth);
         file.WriteInt(FieldCellsHeight);
 
+        //World params
         file.WriteInt(id);
-
         file.WriteInt(world->seed);
-
         file.WriteInt(ticknum);
 
         file.WriteInt(sizeof world->params);
         file.write((char*)&world->params, sizeof world->params);
 
+        //All objects
         for (int x = 0; x < FieldCellsWidth; ++x)
         {
             for (int y = 0; y < FieldCellsHeight; ++y)
@@ -178,7 +220,9 @@ bool ObjectSaver::SaveWorld(Field* world, char* filename, int id, int ticknum)
                 tmpObj = world->GetObjectLocalCoords(x, y);
 
                 if (tmpObj)
+                {
                     WriteObjectToFile(file, tmpObj);
+                }
                 else
                 {
                     file.WriteInt(ObjectTypes::abstract);
@@ -197,35 +241,36 @@ bool ObjectSaver::SaveWorld(Field* world, char* filename, int id, int ticknum)
 
 void ObjectSaver::WriteBotToFile(MyOutStream& file, Bot* obj)
 {
-    file.WriteInt(obj->type);
+    file.WriteInt(obj->type());
     file.WriteInt(obj->GetLifetime());
 
     file.WriteInt(NumberOfMutationMarkers);
 
     file.WriteInt(NumNeuronLayers);
-    file.WriteInt(NeuronsInLayer);
-    file.WriteInt(sizeof Neuron);
+    file.WriteInt(NumNeuronsInLayerMax);
+    file.WriteInt(sizeof(Neuron));
 
-    file.WriteInt((obj)->GetColor()->r);
-    file.WriteInt((obj)->GetColor()->g);
-    file.WriteInt((obj)->GetColor()->b);
+    file.WriteInt(obj->GetColor()->c[0]);
+    file.WriteInt(obj->GetColor()->c[1]);
+    file.WriteInt(obj->GetColor()->c[2]);
 
     repeat(NumberOfMutationMarkers)
     {
-        file.WriteInt((obj)->GetMarkers()[i]);
+        file.WriteInt(obj->GetMarkers()[i]);
     }
 
-    file.WriteInt((obj)->energy);
+    file.WriteInt(obj->energy);
+    file.WriteInt(obj->GetDirection());
 
-    file.write((char*)(obj)->GetActiveBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
-    file.write((char*)(obj)->GetInitialBrain()->allNeurons, NumNeuronLayers * NeuronsInLayer * sizeof(Neuron));
+    file.write((char*)(obj)->GetActiveBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
+    file.write((char*)(obj)->GetInitialBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
 
-    file.write((char*)(obj)->GetActiveBrain()->allMemory, NumNeuronLayers* NeuronsInLayer * sizeof(float));
+    file.write((char*)(obj)->GetActiveBrain()->allMemory, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(float));
 }
 
 void ObjectSaver::WriteObjectToFile(MyOutStream& file, Object* obj)
 {
-    switch (obj->type)
+    switch (obj->type())
     {
     case bot:
         WriteBotToFile(file, (Bot*)obj);
@@ -325,7 +370,8 @@ void MyOutStream::WriteBool(bool data)
     write((char*)&data, 1);
 }
 
-MyOutStream::MyOutStream(char* filename, int flags) :std::ofstream(filename, flags) {}
+MyOutStream::MyOutStream(char* filename, int flags) :std::ofstream(filename, flags) 
+{}
 
 
 int MyInputStream::ReadInt()
@@ -346,4 +392,5 @@ bool MyInputStream::ReadBool()
     return toRet;
 }
 
-MyInputStream::MyInputStream(char* filename, int flags) :std::ifstream(filename, flags) {}
+MyInputStream::MyInputStream(char* filename, int flags) :std::ifstream(filename, flags) 
+{}

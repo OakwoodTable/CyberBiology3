@@ -5,35 +5,32 @@
 
 
 typedef unsigned int uint;
-typedef unsigned char byte;
-typedef std::atomic_bool abool;
-typedef std::string string;
+typedef std::uint8_t byte;
+
+using std::thread;
+using std::mutex;
+using std::condition_variable_any;
+
+using std::string;
+using std::vector;
+
+using std::min;
+using std::to_string;
 
 
 struct Color
 {
-	int r=0, g=0, b=0;
+	byte c[3];
 
 	void operator/=(int);
 	void operator+=(Color);
 
+	void Set(int r, int g, int b);
 	void SetRandom();
+	void RandomChange(const int str);
 
-	void RandomChange(int str);
 
-	int ToInt();
-	void FromInt(int);
-
-	Color(int);
-	Color();
-
-private:
-
-	union intchar
-	{
-		int i;
-		char c[4];
-	};
+	static Color GetRandomColor();
 };
 
 
@@ -46,7 +43,8 @@ struct Point
 
 	void Shift(int X, int Y);	
 	void Set(int X, int Y);
-	
+
+	Point operator+(Point toAdd);	
 };
 
 struct Rect final: public SDL_Rect
@@ -55,14 +53,10 @@ struct Rect final: public SDL_Rect
 };
 
 
-
-
+//TODO
 //Get random number (0 to max-1)
 #define RandomVal(max) (rand()%(max))
-
 #define RandomValRange(min, max) (RandomVal(max-min) + min)
-
-//Get random float in given range
 float RandomFloatInRange(float min, float max);
 
 //Roll (chance in percents)

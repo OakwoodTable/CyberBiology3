@@ -1,7 +1,6 @@
 #pragma once
 //#pragma message("   Field_h")
 
-
 class Object;
 class Bot;
 class Apple;
@@ -10,6 +9,8 @@ class Organics;
 class ObjectSaver;
 
 
+#include "Settings.h"
+#include "MyTypes.h"
 
 #include "Object.h"
 #include "Bot.h"
@@ -18,20 +19,8 @@ class ObjectSaver;
 #include "Organics.h"
 
 #include "ObjectSaver.h"
-
-#include "SDL.h"
-
-
-//Don't touch
-#define NumThreads 1
-#ifdef UseFourThreads
-#undef NumThreads
-#define NumThreads 4
-#endif
-#ifdef UseEightThreads
-#undef NumThreads
-#define NumThreads 8
-#endif
+#include "Chart.h"
+#include "ImageFactory.h"
 
 
 
@@ -51,30 +40,51 @@ enum Season
     spring
 };
 
-extern Season season;
+constexpr const char* SeasonNames[] =
+{
+    "summer",
+    "autumn",
+    "winter",
+    "spring"
+};
+
+
 
 struct FieldDynamicParams
 {
+    int botMaxLifetime;
+    int fertility_delay;
+
     int oceanLevel;
-    int mudLevel;
+    int mudLevel;    
+
+    bool spawnApples;
     int appleEnergy;
 
-    int adaptation_DeathChance_Winds;
-    int adaptation_StepsNum_Winds;
+    int adaptation_StepsNumToDivide_Winds;
 
     int adaptation_landBirthBlock;
     int adaptation_seaBirthBlock;
     int adaptation_PSInOceanBlock;
     int adaptation_PSInMudBlock;
     int adaptation_botShouldBeOnLandOnceToMultiply;
-    int adaptation_botShouldDoPSOnLandOnceToMultiply;
-    int adaptation_forceBotMovements;
+    int adaptation_botShouldDoPSOnLandOnceToMultiply;    
 
     int adaptation_organicSpawnRate;
 
-    bool spawnApples;
+    int adaptation_forceBotMovementsY;
+    int adaptation_forceBotMovementsX;
 
-    int reserved[38];
+    bool noPredators;
+    bool noMutations;
+
+    int PSreward;
+
+    bool useSeasons;
+    int seasonInterval;
+
+    int reserved[31];
+
 
     void Reset();
 
@@ -98,57 +108,58 @@ class Field final
     SDL_Rect mudLayerRect = { FieldX , FieldY + (FieldHeight - (InitialMudLayerHeight * FieldCellSize)),
         FieldWidth, InitialMudLayerHeight * FieldCellSize };
 
-    //Needed to calculate number of active objects and bots (calculated on every frame)
+
+    //Needed to calculate number of active objects (calculated on every frame)
     uint objectsTotal = 0;
     uint botsTotal = 0;
     uint applesTotal = 0;
     uint organicsTotal = 0;
+    uint predatorsTotal = 0;
+    uint averageLifetime = 0;
 
-    //Apple spawn timer
-    uint spawnApplesInterval = 0;
+    uint spawnApplesCounter = 0;
 
-    //threads
-    abool threadGoMarker[NumThreads];
-    std::thread* threads[NumThreads];
-    uint counters[NumThreads][4];
-    abool threadTerminated[NumThreads];
-    abool terminateThreads = false;
-    abool pauseThreads = false;
+    //Seasons
+    Season season = summer;
+    uint changeSeasonCounter = 0;
 
+    void SeasonTick();
+    void ChangeSeason();
 
-    //tick function for single threaded build
-    inline void tick_single_thread();
+    //Multithreading
+    mutex mut;
+    condition_variable_any cond;    
 
-    //Process function for multi threaded simulation
-    void ProcessPart_MultipleThreads(const uint X1, const uint Y1, const uint X2, const uint Y2, const uint index);
+    uint objectCounters[NumThreads][6]; 
+    bool threadsReady[NumThreads];
+    bool terminateThreads = false;    
 
-    //Start all threads
+    void NotifyThreads();
     void StartThreads();
 
-    //Wait for all threads to finish their calculations
-    void WaitForThreads();
-
-    //Multithreaded tick function
+    inline void tick_single_thread();
     inline void tick_multiple_threads();
 
-    //Wait for a signal 
-    inline void ThreadWait(const uint index);
+    //Process function for multi threaded simulation
+    void ProcessPart_MultipleThreads(const uint X1, const uint X2, const uint index);  
+
+    //Tick function for every object
+    void ObjectTick(Object* tmpObj);
     
 
 public:
 
+    FieldDynamicParams params;
+
     void shiftRenderPoint(int cx);
-
     void jumpToFirstBot();
-
-    int photosynthesisReward = FoodbaseInitial;
-
 
     //Move objects from one cell to another
     int MoveObject(int fromX, int fromY, int toX, int toY);
     int MoveObject(Object* obj, int toX, int toY);
 
     bool AddObject(Object* obj);
+    void ObjectAddOrReplace(Object* obj);
 
     //Remove object and delete object class
     void RemoveObject(int X, int Y);
@@ -159,9 +170,6 @@ public:
 
     //Repaint bot
     void RepaintBot(Bot* b, Color newColor, int differs = 1);
-
-    //Tick function for every object
-    void ObjectTick(Object* tmpObj);
 
     //Tick function
     void tick(uint thisFrame);
@@ -178,7 +186,6 @@ public:
 
     //Find empty cell nearby, otherwise return {-1, -1}
     Point FindFreeNeighbourCell(int X, int Y);
-
     Point FindRandomNeighbourBot(int X, int Y);
 
     //How may free cells are available around a given one
@@ -186,6 +193,7 @@ public:
 
     //This function is needed to tile world horizontally (change X = -1 to X = FieldCellsWidth etc.)
     int ValidateX(int X);
+    int FindDistanceX(int X1, int X2);
 
     //Is cell out of bounds, given absolute screen space coordinates
     bool IsInBoundsScreenCoords(int X, int Y);
@@ -197,26 +205,25 @@ public:
 
     bool ValidateObjectExistance(Object* obj);
 
-
-    //How many objects on field, prev. frame
     uint GetNumObjects();
     uint GetNumBots();
     uint GetNumApples();
     uint GetNumOrganics();
+    uint GetNumPredators();
+    uint GetAverageLifetime();
 
     //Spawn group of random bots
     void SpawnControlGroup();
     void SpawnApples();
-
-    void PauseThreads();
-    void UnpauseThreads();
+        
+    Season GetSeason();
+    uint GetSeasonCounter();
 
     Field();
     ~Field();
 
+
     static int seed;
     static int renderX;
-
-    FieldDynamicParams params;
 };
 

@@ -1,18 +1,26 @@
 #include "Rock.h"
 
+SDL_Texture* Rock::image;
 
+
+constexpr ObjectTypes Rock::type()
+{
+	return rock;
+}
 
 void Rock::draw()
 {
 	CalcScreenX();
-	CalcObjectRectShrinked(1);
+	CalcObjectRect();
 
-	//Draw stone
-	SDL_SetRenderDrawColor(renderer, RockDrawColor);
-	SDL_RenderFillRect(renderer, &object_rect);
+	//Draw from texture
+	SDL_RenderCopy(renderer, image, &image_rect, &object_rect);
 }
 
-Rock::Rock(int X, int Y) :Object(X, Y)
+Rock::Rock(int X, int Y) :Object(X, Y) 
+{}
+
+void Rock::SetImage(SDL_Texture* img)
 {
-	type = rock;
+	image = img;
 }

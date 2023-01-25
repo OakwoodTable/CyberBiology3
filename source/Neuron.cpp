@@ -26,6 +26,11 @@ void Neuron::AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT=1000.0f)
 	++numConnections;
 }
 
+void Neuron::AddConnection(NeuronConnection* prototype)
+{
+	AddConnection(prototype->dest_layer, prototype->dest_neuron, prototype->weight);
+}
+
 bool Neuron::AddRandomConnection()
 {
 	if (numConnections >= MaxConnectionsPerNeuronType[type])
@@ -35,12 +40,18 @@ bool Neuron::AddRandomConnection()
 
 	for (;;)
 	{
-		c_Index = RandomVal(NeuronsInLayer);
-
 		if (layer == NumNeuronLayers - 2)
-			c_Layer = NumNeuronLayers - 1;
+			c_Layer = NeuronOutputLayerIndex;
 		else
 			c_Layer = RandomVal(NumNeuronLayers - (layer + 1)) + layer + 1;
+
+		if(c_Layer == NeuronOutputLayerIndex)
+		{
+			c_Index = RandomVal(NumOutputNeurons);
+			c_Layer = NeuronOutputLayerIndex;
+		}
+		else
+			c_Index = RandomVal(NumHiddenNeurons);				
 
 		//If not connected
 		if (IsConnected(c_Layer, c_Index) == -1)
@@ -94,20 +105,22 @@ void Neuron::SetRandomType()
 {
 	if ((type != input) && (type != output))
 	{
-	#ifdef UseRandomNeuron
-		if (RandomPercent(2))
+		#ifdef UseRandomNeuron
 		{
-			type = random;
+			if (RandomPercent(2))
+			{
+				type = random;
 
-			return;
+				return;
+			}
 		}
-	#endif
+		#endif
 
-	#ifdef UseMemoryNeuron
+		#ifdef UseMemoryNeuron
 		int roll = RandomVal(12);
-	#else
-		int roll = RandomVal(14);
-	#endif
+		#else
+		int roll = RandomVal(11);
+		#endif
 
 		if (roll <= 5)
 			type = basic;
@@ -127,8 +140,10 @@ void Neuron::SetRandomConnections()
 		return;
 
 	#ifdef FullyConnected
+	{
 		MakeFullyConnected();
 		return;
+	}
 	#endif
 
 	uint connections = RandomVal(MaxConnectionsPerNeuronType[type] + 1);
@@ -146,7 +161,7 @@ void Neuron::SetRandomConnections()
 
 void Neuron::MakeFullyConnected()
 {
-	repeat(NeuronsInLayer)
+	repeat(NumNeuronsInLayerMax)
 	{
 		allConnections[i].dest_layer = layer + 1;
 		allConnections[i].dest_neuron = i;
@@ -154,7 +169,7 @@ void Neuron::MakeFullyConnected()
 		allConnections[i].SetRandomWeight();
 	}
 
-	numConnections = NeuronsInLayer;
+	numConnections = NumNeuronsInLayerMax;
 }
 
 void Neuron::SetRandom()
@@ -162,6 +177,11 @@ void Neuron::SetRandom()
 	SetRandomBias();
 	SetRandomType();
 	SetRandomConnections();
+}
+
+bool Neuron::IsInactive()
+{
+	return numConnections == 0;
 }
 
 void Neuron::SetZero()
@@ -175,19 +195,8 @@ void Neuron::SetTunnel(int num)
 	SetZero();
 
 	allConnections[0].weight = 1.0f;
-
 	allConnections[0].dest_neuron = num;
 	allConnections[0].dest_layer = layer + 1;
-}
-
-void Neuron::SlightlyChange()
-{
-	bias += (RandomVal(1001) * 0.0001f) - .05f;
-
-	for (uint i = 0; i < numConnections; ++i)
-	{
-		allConnections[i].weight += (RandomVal(2001) * 0.0001f) - .1f;
-	}
 }
 
 void Neuron::mutate_ChangeType()
@@ -215,22 +224,19 @@ uint Neuron::GetRandomConnectionIndex()
 	return RandomVal(numConnections);
 }
 
-void Neuron::mutate_ChangeOneConnection()
+void Neuron::mutate_ChangeConnection(uint index)
 {	
-	if (numConnections == 0)
-		return;
-
 	int roll = RandomVal(101);
- 	int connection = GetRandomConnectionIndex();
+ 	int connection = index;
 
-	if (roll <= 10)
+	if (roll <= 15)
 	{
-		//10% - remove connection
+		//15% - remove connection
 		RemoveConnection(connection);
 	}
-	else if (roll <= 20)
+	else if (roll <= 30)
 	{
-		//10% - add random connection
+		//15% - add random connection
 		AddRandomConnection();
 	}
 	else
@@ -245,29 +251,8 @@ void Neuron::mutate_DeleteNeuron()
 {
 	SetZero();
 
-	if((type!=input)&&(type!=output))
+	if((type!=input) and (type!=output))
 		type = basic;
-}
-
-char* Neuron::GetTextFromType(NeuronType t)
-{
-	switch (t)
-	{
-		case basic:
-			return (char*)"basic";
-		case input:
-			return (char*)"input";
-		case output:
-			return (char*)"output";
-		case radialbasis:
-			return (char*)"radial basis";
-		case memory:
-			return (char*)"memory";
-		case random:
-			return (char*)"random";
-		default:
-			return (char*)"other";
-	}
 }
 
 void Neuron::SortConnections()

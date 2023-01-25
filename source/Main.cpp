@@ -3,20 +3,21 @@
 // 
 // 
 // Примерно как устроено:
-// -Входная точка в файле Main.cpp
-// -Все настраиваемые параметры в файле Settings.h в виде дефайнов
-// -Все объекты на поле наследуется от Object
-// -Neuron.h это нейрон, BotNeuralNet.h - вся нейросеть
-// -Field, это класс игрового поля
+// - Входная точка в файле Main.cpp
+// - Все настраиваемые параметры в файле Settings.h в виде макросов
+// - Все объекты на поле наследуется от Object
+// - Neuron.h это нейрон, BotNeuralNet.h - вся нейросеть
+// - Field, это класс игрового поля
 // 
 // Также:
-// -NeuralNetRenderer это класс, который рисует мозг бота в отдельном окошке
-// -ObjectSaver - сохраняет объекты и мир в файл
-// -MyTypes - определение некоторых дополнительных типов данных для удобства
+// - NeuralNetRenderer это класс, который рисует мозг бота в отдельном окошке
+// - ObjectSaver - сохраняет объекты и мир в файл
+// - ImageFactory - создает текстуры для объектов
+// - AutomaticAdaptation - автоматизированный эксперимент адаптация
+// - MyTypes - определение некоторых дополнительных типов данных для удобства
 // 
 //
 //-----------------------------------------------------------------
-
 
 
 #include "Main.h"
@@ -25,9 +26,36 @@
 Main simulation;
 
 
+inline void ValidateThreadsNumber()
+{
+	constexpr uint acceptableThreadNums[] =
+	{
+		1, 4, 8, 16
+	};
+
+	if ((FieldCellsWidth % (NumThreads * 2)) != 0)
+	{
+		//Ширина поля должна делиться на (число потоков х2) без остатка!
+		//Windows only, sorry
+		MessageBox(NULL, L"FieldCellsWidth should be divisible by (NumThreads * 2) without remainder!", L"Wrong params!", MB_ICONERROR | MB_OK);
+		exit(0);
+	}
+	
+	for (uint n : acceptableThreadNums)
+	{
+		if (n == NumThreads)
+			return;	//All fine
+	}
+
+	MessageBox(NULL, L"Invalid number of threads!", L"Wrong params!", MB_ICONERROR | MB_OK);
+	exit(0);
+}
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
-	
+	ValidateThreadsNumber();
+
 	InitSDL();
 
 	if (!CreateWindowSDL())
@@ -37,67 +65,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	InitImGUI();
 
-	Apple::CreateImage();
-	Bot::CreateImage();
-	Organics::CreateImage();
+	ImageFactory::CreateImages();
 
-	//Main loop	
-	SDL_Event e;
-
-	for (;;)
-	{
-		//Events
-		mouseState.wheel = 0;
-
-		while (SDL_PollEvent(&e) != 0)
-		{
-			if (e.type == SDL_QUIT)
-			{
-				goto exitfor;
-			}
-			else if (e.type == SDL_MOUSEWHEEL)
-			{
-				mouseState.wheel = e.wheel.y;
-			}
-			else if (e.type == SDL_KEYDOWN)
-			{
-				simulation.CatchKeyboard();
-			}
-			else if (e.type == SDL_TEXTINPUT)
-			{
-				io->AddInputCharacter(*e.text.text);
-			}
-		}
-
-		//Mouse down event
-		if (ReadMouseState())
-		{
-			simulation.MouseClick();
-		}
-
-		//Simulation
-		if (simulation.simulate)
-		{
-			simulation.MakeStep();
-		}
-		else
-		{
-			//Delay so it would not eat too many resourses while on pause
-			SDL_Delay(1);
-		}
-
-		simulation.Render();
-
-		if (simulation.terminate)
-			goto exitfor;
-
-	}
-exitfor:
+	simulation.MainLoop();
 
 	//Clear memory
-	Apple::DeleteImage();
-	Bot::DeleteImage();
-	Organics::DeleteImage();
+	ImageFactory::DeleteImages();
 
 	DeInitImGUI();
 	DeInitSDL();
@@ -105,30 +78,19 @@ exitfor:
 	return 0;
 }
 
-
-void Main::ChangeSeason()
+void Main::SwitchPause()
 {
-	season = (Season)((int)season + 1);
-
-	if (season > spring)
-	{
-		season = summer;
-	}
+	simulate = !simulate;
 }
 
+void Main::Start()
+{
+	simulate = true;
+}
 
 void Main::Pause()
 {
-	simulate = !simulate;
-
-	if (simulate)
-	{
-		field->UnpauseThreads();
-	}
-	else
-	{
-		field->PauseThreads();
-	}
+	simulate = false;
 }
 
 void Main::MakeStep()
@@ -145,31 +107,26 @@ void Main::MakeStep()
 		limit_interval = 0;
 	}
 
-	if ((TimeMSBetween(currentTick, prevTick) >= limit_interval) || (limit_interval == 0) || (renderType == noRender))
+	if ((TimeMSBetween(currentTick, prevTick) >= limit_interval) or (limit_interval == 0) or (renderType == noRender))
 	{
 		prevTick = currentTick;
 
 		field->tick(ticknum);
 
+		//Manage auto adaptation
+		auto_adapt->AdaptationStep(ticknum);
+
 		++ticknum;
 		++tpsTickCounter;
 
-	#ifdef UseSeasons	
-		if (++changeSeasonCounter >= ChangeSeasonAfter)
-		{
-			ChangeSeason();
-
-			changeSeasonCounter = 0;
-		}
-	#endif
-
 		//Add data to chart
-		if (--timeBeforeNextDataToChart == 0)
+		if (chart.Tick())
 		{
-			AddToChart(field->GetNumBots() * 1.0f,
-				field->GetNumApples() * 1.0f, field->GetNumOrganics() * 1.0f);
-
-			timeBeforeNextDataToChart = AddToChartEvery;
+			chart.AddToChart(field->GetNumBots() * 1.0f,
+				field->GetNumApples() * 1.0f,
+				field->GetNumOrganics() * 1.0f,
+				field->GetNumPredators() * 1.0f,
+				field->GetAverageLifetime() * 1.0f);
 		}
 	}
 
@@ -211,41 +168,10 @@ void Main::SelectionShadowScreen()
 			selectionShadowScreen -= 5;
 	}
 
-	//Cursor blinking
 	if (cursorBlink-- == 0)
 	{
 		cursorBlink = CursorBlinkRate;
 		cursorShow = !cursorShow;
-	}
-}
-
-void Main::ClearChart()
-{
-	memset(chartData_bots, 0, sizeof(chartData_bots));
-	memset(chartData_organics, 0, sizeof(chartData_organics));
-	memset(chartData_apples, 0, sizeof(chartData_apples));
-
-	chart_numValues = 0;
-	chart_currentPosition = 0;
-}
-
-void Main::AddToChart(float newVal_bots, float newVal_apples, float newVal_organics)
-{
-	chartData_bots[chart_currentPosition] = newVal_bots;
-	chartData_apples[chart_currentPosition] = newVal_apples;
-	chartData_organics[chart_currentPosition] = newVal_organics;
-
-	if (chart_numValues < ChartNumValues)
-	{
-		++chart_numValues;
-		++chart_currentPosition;
-	}
-	else
-	{
-		if (chart_currentPosition == ChartNumValues)
-			ClearChart();
-		else
-			++chart_currentPosition;
 	}
 }
 
@@ -305,7 +231,7 @@ void Main::LoadFilenames()
 		f.nameShort = entry.path().filename().string();
 
 		//File size
-		uint size = entry.file_size();
+		auto size = entry.file_size();
 		string unit;		
 
 		//Units
@@ -324,7 +250,7 @@ void Main::LoadFilenames()
 			unit += "b";
 		}			
 
-		f.fileSize += std::to_string(size);
+		f.fileSize += to_string(size);
 		f.fileSize += unit;
 
 		//Is world (open file briefly and look for file type)
@@ -363,7 +289,7 @@ void Main::CreateNewFile()
 	{
 		if (std::filesystem::exists(DirectoryName + fileName))
 		{
-			fileName = "New" + std::to_string(++fileCounter);
+			fileName = "New" + to_string(++fileCounter);
 		}
 		else
 		{
@@ -384,7 +310,7 @@ Main::Main()
 
 	//Set seed
 	#ifdef RandomSeed		
-		seed = GetTickCount();
+		seed = (uint)GetTickCount64();
 	#else
 		seed = Seed;
 	#endif
@@ -397,10 +323,9 @@ Main::Main()
 	LogPrint(seed);
 
 	field = new Field();
+	auto_adapt = new AutomaticAdaptation(field, this);
 
-	#ifdef StartOnPause
-		Pause();
-	#endif
+	Pause();
 
 	LoadFilenames();
 
@@ -410,13 +335,65 @@ Main::Main()
 Main::~Main()
 {
 	delete field;
+	delete auto_adapt;
+}
+
+void Main::MainLoop()
+{
+	//Main loop	
+	SDL_Event e;
+
+	for (;!terminate;)
+	{
+		//Events
+		mouseState.wheel = 0;
+
+		while (SDL_PollEvent(&e) != 0)
+		{
+			if (e.type == SDL_QUIT)
+			{
+				return;
+			}
+			else if (e.type == SDL_MOUSEWHEEL)
+			{
+				mouseState.wheel = e.wheel.y;
+			}
+			else if (e.type == SDL_KEYDOWN)
+			{
+				CatchKeyboard();
+			}
+			else if (e.type == SDL_TEXTINPUT)
+			{
+				io->AddInputCharacter(*e.text.text);
+			}
+		}
+
+		//Mouse down event
+		if (ReadMouseState())
+		{
+			MouseClick();
+		}
+
+		//Simulation
+		if (simulate)
+		{
+			MakeStep();
+		}
+		else
+		{
+			//Delay so it would not eat too many resourses while on pause
+			SDL_Delay(10);
+		}
+
+		Render();
+	}
 }
 
 void Main::CatchKeyboard()
 {
 	if (keyboard[Keyboard_Pause] || keyboard[Keyboard_Pause2])
 	{
-		Pause();
+		SwitchPause();
 	}
 	else if (keyboard[Keyboard_SpawnRandoms])
 	{
@@ -425,7 +402,7 @@ void Main::CatchKeyboard()
 	else if (keyboard[Keyboard_PlaceWall])
 	{
 		repeat(FieldCellsHeight)
-			field->AddObject(new Rock(0, i));
+			field->ObjectAddOrReplace(new Rock(0, i));
 	}
 	else if (keyboard[Keyboard_DropOrganics])
 	{
@@ -436,6 +413,49 @@ void Main::CatchKeyboard()
 				field->AddObject(new Organics(X, Y, MaxPossibleEnergyForABot/2));
 			}
 		}
+	}
+	else if (keyboard[Keyboard_SpawnRocks])
+	{
+		for (int i = 0; i < SpawnRocksSize; ++i)
+		{
+			Rock* tmp = new Rock(RandomVal(FieldCellsWidth), RandomVal(FieldCellsHeight));
+
+			if (!field->AddObject(tmp))
+				delete tmp;
+		}
+	}
+	else if (keyboard[Keyboard_Quicksave])
+	{
+		if (saver.SaveWorld(field, (char*)OuicksaveFilename, id, ticknum))
+		{
+			LogPrint("World saved\r\n");
+
+			LoadFilenames();
+		}
+		else
+		{
+			LogPrint("Error while saving world\r\n");
+		}
+	}
+	else if (keyboard[Keyboard_Quickload])
+	{
+		ObjectSaver::WorldParams ret = saver.LoadWorld(field, (char*)OuicksaveFilename);
+
+		if (ret.id != -1)
+		{
+			if (ret.width != FieldCellsWidth)
+				LogPrint("World loaded(width mismatch)\r\n");
+			else
+				LogPrint("World loaded\r\n");
+
+			seed = ret.seed;
+			ticknum = ret.tick;
+			id = ret.id;
+
+			field->seed = seed;
+		}
+		else
+			LogPrint("Error while loading world\r\n");
 	}
 	else if (keyboard[Keyboard_NextFrame])
 	{
@@ -506,5 +526,9 @@ void Main::CatchKeyboard()
 	else if (keyboard[Keyboard_ShowBrain_Window])
 	{
 		showBrain = !showBrain;
-	}	
+	}
+	else if (keyboard[Keyboard_ShowAutomaticAdaptation_Window])
+	{
+		showAutomaticAdaptation = !showAutomaticAdaptation;
+	}
 }

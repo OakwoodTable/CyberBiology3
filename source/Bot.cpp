@@ -1,98 +1,10 @@
 
 #include "Bot.h"
 
-SDL_Texture* Bot::sprite_head[8];
-SDL_Texture* Bot::sprite_body;
+SDL_Texture* Bot::sprite_head[8] = {};
+SDL_Texture* Bot::sprite_body = NULL;
 
 
-void Bot::CreateImage()
-{
-	SDL_Surface* surf;
-	SDL_Texture* tmpTexTarget;
-	SDL_Texture* tmpTex2;
-
-	//Create rotation sprites (outline and head positions)
-	repeat(8)
-	{
-		//Target texture
-		tmpTexTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, FieldCellSize, FieldCellSize);
-		
-		//Set render target
-		SDL_SetRenderTarget(renderer, tmpTexTarget);
-
-		//Clear texture
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-
-		//Render outline
-	#ifdef DrawBotOutline
-			SDL_SetRenderDrawColor(renderer, BotOutlineColor);
-			SDL_RenderDrawRect(renderer, &image_rect);
-	#endif
-
-		//Render head
-	#ifdef DrawBotHead
-			SDL_RenderDrawLine(renderer, 
-				FieldCellSizeHalf,
-				FieldCellSizeHalf,
-				FieldCellSizeHalf + Rotations[i].x * FieldCellSizeHalf,
-				FieldCellSizeHalf + Rotations[i].y * FieldCellSizeHalf);
-	#endif
-
-		//Create surface
-		surf = SDL_CreateRGBSurface(0, FieldCellSize, FieldCellSize, 32,
-			0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-
-		//Copy previously rendered texture on surface
-		SDL_LockSurface(surf);
-
-		int32_t pixels[FieldCellSize * FieldCellSize];
-		
-		SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_RGBA8888, pixels, surf->pitch);
-
-		SDL_memcpy(surf->pixels, pixels, surf->w * surf->h * 4);
-
-		SDL_UnlockSurface(surf);
-
-		//Create static texture
-		tmpTex2 = SDL_CreateTextureFromSurface(renderer, surf);
-
-		//Save texture
-		sprite_head[i] = tmpTex2;
-
-		//Free target texture and surface
-		SDL_DestroyTexture(tmpTexTarget);
-		SDL_FreeSurface(surf);
-	}
-
-	//Create bot 'body' image (white rectangle)
-	
-	//Another surface
-	surf = SDL_CreateRGBSurface(0, FieldCellSize, FieldCellSize, 32,
-		0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-
-	//Clear surface
-	SDL_LockSurface(surf);
-	SDL_memset(surf->pixels, 255, surf->w* surf->h * 4);
-	SDL_UnlockSurface(surf);
-
-	//Create static texture
-	sprite_body = SDL_CreateTextureFromSurface(renderer, surf);
-
-	//Free surface
-	SDL_FreeSurface(surf);
-	
-	//Free render target
-	SDL_SetRenderTarget(renderer, NULL);
-}
-
-void Bot::DeleteImage()
-{
-	repeat(8)
-		SDL_DestroyTexture(sprite_head[i]);
-
-	SDL_DestroyTexture(sprite_body);
-}
 
 void Bot::CalculateLookAt()
 {
@@ -131,44 +43,26 @@ void Bot::RandomizeMarkers()
 	nextMarker = 0;
 }
 
-Color Bot::GetRandomColor()
+
+void Bot::SetBodyImage(SDL_Texture* img)
 {
-	Color toRet;
+	sprite_body = img;
+}
 
-#ifdef PresetRandomColors
-	uint i = RandomVal(sizeof(presetColors) / (3 * sizeof(Uint8)));
-
-	toRet.r = presetColors[i][0];
-	toRet.g = presetColors[i][1];
-	toRet.b = presetColors[i][2];
-#else
-	toRet.SetRandom();
-#endif
-
-	return toRet;
+void Bot::SetHeadImages(SDL_Texture* img[8])
+{
+	repeat(8)
+		sprite_head[i] = img[i];
 }
 
 void Bot::RandomizeColor()
 {
-	color = GetRandomColor();
+	color.SetRandom();
 }
 
 void Bot::RandomDirection()
 {
 	direction = RandomVal(8);
-}
-
-
-void Bot::TotalMutation()
-{
-	RandomizeMarkers();
-
-	repeat(3)
-		ChangeMutationMarker();
-
-	activeBrain.MutateHarsh();
-
-	RandomizeColor();
 }
 
 
@@ -178,40 +72,30 @@ void Bot::ChangeColor(const int str)
 }
 
 
-void Bot::SlightlyMutate()
-{
-	activeBrain.MutateSlightly();
-
-	#ifdef ChangeColorSlightly
-	ChangeColor(BotColorChangeStrength);
-	#endif
-}
-
-
 
 void Bot::Mutate()
 {
 	ChangeMutationMarker();
 
 	//Mutate brain
-	for (int i = 0; i < (1 + RandomVal(MutateNeuronsMaximum + 1)); ++i)
-		initialBrain.Mutate();
+	constexpr uint MaxMutate = MutateNeuronsMaximum;
 
-	/*
-	for (int s = 0; s < (1 + RandomVal(MutateNeuronsSlightlyMaximum + 1)); ++s)
-		brain.MutateSlightly();
-	*/
+	for (uint i = 0; i < (1 + RandomVal(MaxMutate + 1)); ++i)
+		initialBrain.Mutate();
 
 	//Change color
 	#ifdef ChangeColorSlightly
-	ChangeColor(20);
+	ChangeColor(BotColorChangeStrength);
 	#endif
 
-	/*if (RandomPercentX10(RandomColorChancePercentX100))
+	#ifdef UseRandomColorOccasionaly
 	{
-		RandomizeColor();
-	}*/
-
+		if (RandomPercentX10(RandomColorChancePercentX10))
+		{
+			RandomizeColor();
+		}
+	}
+	#endif
 }
 
 
@@ -225,71 +109,106 @@ BrainInput Bot::FillBrainInput()
 {
 	BrainInput input;
 
-	//If destination is out of bounds
-	if (!pField->IsInBounds(lookAt_x, lookAt_y))
-	{
-		//1 if unpassable
-		input.vision = 1.0f;
-	}
-	else
-	{
-		Object* tmpDest = (*pCells)[lookAt_x][lookAt_y];
-
-		//Destination cell is empty
-		if (!tmpDest)
-		{
-			//0 if empty
-			input.vision = 0.0f;
-		}
-		else
-		{
-			//Destination not empty
-			switch (tmpDest->type)
-			{
-			case bot:
-				//0.5 if someone is in that cell
-				input.vision = 1.0f;
-
-				//Calculate how close they are as relatives, based on mutation markers
-				input.vision += (1.0f - (FindKinship((Bot*)tmpDest) * 1.0f) / (NumberOfMutationMarkers * 1.0f));
-				break;
-
-			case rock:
-				//0.5 if cell is unpassable
-				input.vision = .5f;
-				break;
-
-			case organic_waste:
-				//-.5 if cell contains organics
-				input.vision = -.5f;
-				break;
-
-			case apple:
-				//-1.0 if cell contains an apple
-				input.vision = -1.0f;
-				break;
-			}
-		}
-	}
-
-	input.age = (lifetime * 1.0f) / (MaxBotLifetime * 1.0f);
+	input.energy = ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
+	input.age = (lifetime * 1.0f) / (pField->params.botMaxLifetime * 1.0f);
 
 	//input.rotation = (tmpOut.desired_rotation == (direction * .1f))?1.0f:0.0f;
 	input.rotation = (direction * 1.0f) / 7.0f;
+	input.height = (y * 1.0f) / (FieldCellsHeight * 1.0f);
+
+	if(pField->IsInMud(y))
+		input.area = 1.0f;
+	else if(pField->IsInWater(y))
+		input.area = 0.5f;
+	else
+		input.area = 0.0f;
+
+
+	input.eye1 = FillSightNeuron(lookAt);
+
+	//Second sight sensor
+	Point p = lookAt + Rotations[direction];
+
+	p.x = pField->ValidateX(p.x);
+
+	input.eye2 = FillSightNeuron(p);
 
 	return input;
 }
 
+float Bot::FillSightNeuron(Point at)
+{
+	//If destination is out of bounds
+	if (!pField->IsInBounds(at))
+	{
+		//-1 if unpassable
+		return -1.0f;
+	}
+	else
+	{
+		Object* tmpDest = (*pCells)[at.x][at.y];
 
-void Bot::Multiply(int numChildren)
+		//Destination cell is empty
+		if (tmpDest)
+		{
+			float toRet;
+
+			//Destination not empty
+			switch (tmpDest->type())
+			{
+			case bot:
+				//1.5 if someone is in that cell
+				toRet = 1.5f;
+
+				//Calculate how close they are as relatives, based on mutation markers
+				toRet += (1.0f - (FindKinship((Bot*)tmpDest) * 1.0f) / (NumberOfMutationMarkers * 1.0f));
+
+				return toRet;
+
+			case rock:
+				//-0.5 if cell is unpassable
+				return -.5f;
+
+			case organic_waste:
+				//.5 if cell contains organics
+				return .5f;
+
+			case apple:
+				//1.0 if cell contains an apple
+				return 1.0f;
+			}
+		}
+
+		//0 if empty
+		return 0.0f;
+	}
+}
+
+
+void Bot::Multiply(int numChildren, float energy_to_pass)
 {
 	if (ArtificialSelectionWatcher_OnDivide())
+	{
 		return;
+	}
+
+	int toGive = static_cast<int>((energy - GiveBirthCost*numChildren) * energy_to_pass);
+
+	if (toGive < 0)
+	{
+		//Bot dies
+		energy = 0;
+
+		return;
+	}
+
 
 	for (int b = 0; b < numChildren; ++b)
 	{
 		if (energy <= 1 + GiveBirthCost)
+		{
 			return;
+		}
 		else
 		{
 			Point freeSpace;
@@ -298,17 +217,13 @@ void Bot::Multiply(int numChildren)
 
 			if (freeSpace.x != -1)
 			{
-			#ifndef NewbornGetsHalf
-				TakeEnergy(EnergyPassedToAChild + GiveBirthCost);
+				TakeEnergy(GiveBirthCost + toGive);
 
-				if ((!RandomPercentX10(pField->params.adaptation_botShouldBeOnLandOnceToMultiply)) || (wasOnLand))
-					pField->AddObject(new Bot(freeSpace.x, freeSpace.y, EnergyPassedToAChild, this, RandomPercent(MutationChancePercent)));
-			#else
-				TakeEnergy(energy / 2 + GiveBirthCost);
-
-				if ((!RandomPercentX10(pField->params.adaptation_botShouldBeOnLandOnceToMultiply)) || (wasOnLand))
-					pField->AddObject(new Bot(freeSpace.x, freeSpace.y, energy, this, RandomPercent(MutationChancePercent)));
-			#endif
+				//Adaptation check
+				if ((!RandomPercentX10(pField->params.adaptation_botShouldBeOnLandOnceToMultiply)) or (wasOnLand))
+				{
+					pField->AddObject(new Bot(freeSpace.x, freeSpace.y, toGive, this, RandomPercent(MutationChancePercent)));
+				}
 
 				return;
 			}
@@ -325,30 +240,26 @@ void Bot::Attack()
 
 		if (obj)
 		{
-			if (obj->type == bot)
+			if (obj->type() == bot)
 			{
 				#ifdef BotCanEatBot
-				//Eat a bot
-				GiveEnergy(obj->energy, predation);
-				pField->RemoveBot(lookAt_x, lookAt_y);
-				#endif
+				{
+					//Eat a bot
+					GiveEnergy(obj->energy, predation);
+					pField->RemoveBot(lookAt_x, lookAt_y);
 
-				++numAttacks;
+					++numAttacks;
+				}
+				#endif
 			}
-			else if (obj->type == organic_waste)
-			{
-				//Eat organics
-				GiveEnergy(obj->energy, organics);
-				pField->RemoveObject(lookAt_x, lookAt_y);
-			}
-			else if (obj->type == apple)
+			else if (obj->type() == apple)
 			{
 				//Eat apple
 				GiveEnergy(obj->energy, organics);
 				pField->RemoveObject(lookAt_x, lookAt_y);
 			}
 			#ifdef BotCanEatRock
-			else if (obj->type == rock)
+			else if (obj->type() == rock)
 			{
 				//Eat rock, it gives no energy
 				RemoveObject(lookAt_x, lookAt_y);
@@ -358,32 +269,50 @@ void Bot::Attack()
 	}
 }
 
+void Bot::EatOrganics()
+{
+	if (pField->IsInBounds(lookAt_x, lookAt_y))
+	{		
+		Object* obj = (*pCells)[lookAt_x][lookAt_y];
+
+		//If there is an object
+		if (obj)
+		{
+			if (obj->type() == organic_waste)
+			{
+				//Eat organics
+				GiveEnergy(obj->energy, organics);
+				pField->RemoveObject(lookAt_x, lookAt_y);
+			}
+		}
+	}
+}
+
 void Bot::Photosynthesis()
 {
 	//Above water
 	if (!pField->IsInWater(y))
 	{
-		int toGive;
+		int toGive = pField->params.PSreward;
 
 		//Give energy depending on a season
-		switch (season)
+		if (pField->params.useSeasons)
 		{
-		case summer:
-		#ifdef UseSeasons
-			toGive = PhotosynthesisReward_Summer;
-		#else
-			toGive = pField->photosynthesisReward;
-			//toGive = FindHowManyFreeCellsAround(x, y) - 3;
-			//if (toGive < 0) toGive = 0;
-		#endif
-			break;
-		case autumn: case spring:
-			toGive = PhotosynthesisReward_Autumn;
-			break;
-		case winter:
-			toGive = PhotosynthesisReward_Winter;
-			//toGive = (ticknum % 5 == 0) ? 2 : 1;
-			break;
+			switch (pField->GetSeason())
+			{
+			case summer:
+				toGive = static_cast<int>(toGive * PS_Multiplier_Summer);
+				break;
+			case autumn: case spring:
+				toGive = static_cast<int>(toGive * PS_Multiplier_AutumnSpring);
+				break;
+			case winter:
+				toGive = static_cast<int>(toGive * PS_Multiplier_Winter);
+				break;
+			}
+
+			if (toGive < 1)
+				toGive = 1;
 		}
 
 		GiveEnergy(toGive, PS);
@@ -392,9 +321,7 @@ void Bot::Photosynthesis()
 	}
 	//Below water
 	else
-	{
-		#ifndef NoPhotosyntesisInOcean
-		
+	{		
 		if (pField->IsInMud(y))
 		{
 			if (RandomPercentX10(pField->params.adaptation_PSInMudBlock))
@@ -406,10 +333,18 @@ void Bot::Photosynthesis()
 				return;
 		}
 
-		GiveEnergy(pField->photosynthesisReward, PS);
-
-		#endif
+		GiveEnergy(pField->params.PSreward, PS);
 	}
+}
+
+constexpr ObjectTypes Bot::type()
+{
+	return bot;
+}
+
+bool Bot::isPredator()
+{
+	return (energyFromPredation > 0);
 }
 
 void Bot::Mutagen()
@@ -421,88 +356,31 @@ void Bot::Mutagen()
 
 BrainOutput Bot::think(BrainInput input)
 {
-	//Stunned means the creature can not act
-	if (stunned)
-	{
-		--stunned;
-
-		return BrainOutput::GetEmptyBrain();
-	}
-
-	//Clear all neuron values
-	activeBrain.Clear();
-
-	//Input data
-	{
-		//Energy
-		activeBrain.allValues[NeuronInputLayerIndex][0] = ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f));
-
-		//Sight
-		activeBrain.allValues[NeuronInputLayerIndex][1] = input.vision;
-
-		//Bot age
-		activeBrain.allValues[NeuronInputLayerIndex][2] = input.age;
-
-		//Rotation
-		activeBrain.allValues[NeuronInputLayerIndex][3] = input.rotation;
-
-		//Height
-		activeBrain.allValues[NeuronInputLayerIndex][4] = (y * 1.0f) / (FieldCellsHeight * 1.0f);
-	}
-
 	//Compute
-	activeBrain.Process();
+	activeBrain.Process(input);
 
-	BrainOutput toRet = activeBrain.GetOutput();
-
-	//Cannot multipy if not ready
-	if (fertilityDelay)
-	{
-		--fertilityDelay;
-		toRet.divide = 0;
-	}
-	else if (toRet.divide)
-	{
-		fertilityDelay = FertilityDelay;
-	}
-
-	return toRet;
+	//Return output
+	return activeBrain.GetOutput();
 }
 
 
 
 bool Bot::ArtificialSelectionWatcher_OnTick()
-{
-	//Winds
-	if (pField->IsInWater(y))
-	{
-		if (addaptation_lastX < x)
-			++adaptation_numRightSteps;
-
-		addaptation_lastX = x;
-
-		if (adaptationCounter++ == pField->params.adaptation_StepsNum_Winds)
-		{
-			if (adaptation_numRightSteps == 0)
-			{
-				if (RandomPercentX10(pField->params.adaptation_DeathChance_Winds))
-					return true;
-			}
-
-			adaptation_numRightSteps = 0;
-			adaptationCounter = 0;
-		}
-	}
-
-	//Divers
+{	
 	FieldDynamicParams& params = pField->params;	
 
-	//Force movements Y
+	//Divers
 	if (lifetime > 3)
 	{
+		if (numMovesX * 3 < (lifetime - 3))
+		{
+			if (RandomPercentX10(params.adaptation_forceBotMovementsX))
+				return true;
+		}
+
 		if (numMovesY * 3 < (lifetime - 3))
 		{
-			if (RandomPercentX10(params.adaptation_forceBotMovements))
+			if (RandomPercentX10(params.adaptation_forceBotMovementsY))
 				return true;
 		}
 	}
@@ -514,6 +392,15 @@ bool Bot::ArtificialSelectionWatcher_OnTick()
 bool Bot::ArtificialSelectionWatcher_OnDivide()
 {
 	FieldDynamicParams& params = pField->params;
+
+	//Winds
+	if (pField->IsInWater(y))
+	{
+		if (pField->FindDistanceX(x, addaptation_birthX) < params.adaptation_StepsNumToDivide_Winds)
+		{
+			return true;
+		}
+	}
 
 	//Is on land
 	if (y < FieldCellsHeight - params.oceanLevel)
@@ -552,8 +439,23 @@ int Bot::tick()
 	if (ArtificialSelectionWatcher_OnTick())
 		return 1;
 
-	if (((energy) <= 0) || (lifetime >= MaxBotLifetime))
+	//Stunned means the creature can not act
+	if (stunned)
+	{
+		--stunned;
+		return 0;
+	}
+
+	if (energy <= 0)	
+	{
 		return 1;
+	}
+	#ifdef BotDiesOfOldAge
+	else if (lifetime >= static_cast<uint>(pField->params.botMaxLifetime))
+	{
+		return 1;
+	}
+	#endif
 
 	BrainOutput tmpOut;
 	
@@ -569,15 +471,18 @@ int Bot::tick()
 	tmpOut = think(input);
 
 	//Multiply first
-	if (tmpOut.divide > 0)
+	if (tmpOut.divide_num > 0)
 	{
-		Multiply(tmpOut.divide);
+		if(lifetime >= fertilityDelay)
+		{
+			Multiply(tmpOut.divide_num);
 
-		if (energy <= 0)
-			return 1;
+			if (energy <= 0)
+				return 1;
+		}
 	}
 
-	//Then attack
+	//Then attack or eat organics
 	if (tmpOut.attack > 0)
 	{
 		//If dies of low energy
@@ -585,19 +490,34 @@ int Bot::tick()
 			return 1;
 		else
 		{
+			if (pField->params.noPredators)
+				return 1;
+
 			Attack();
+		}
+	}
+	else if (tmpOut.digestOrganics > 0)
+	{
+		//If dies of low energy
+		if (TakeEnergy(EatOrganicsCost))
+			return 1;
+		else
+		{
+			EatOrganics();
 		}
 	}
 	else
 	{
 		//Rotate after
-		if (tmpOut.desired_rotation != (direction * .1f))
+		uint desired_rotation = RotationsReverse[tmpOut.desired_rotation_x][tmpOut.desired_rotation_y];
+
+		if (desired_rotation != direction)
 		{
 			//If dies of low energy
 			if (TakeEnergy(RotateCost))
 				return 1;
 
- 			Rotate(int(tmpOut.desired_rotation * 10.0f));
+ 			Rotate(desired_rotation);
 		}
 
 		//Move
@@ -606,23 +526,26 @@ int Bot::tick()
 			if (TakeEnergy(MoveCost))
 				return 1;
 
-			//Place object in a new place
+			//Move object to a new place
 			int tmpY = y;
+			int tmpX = x;
 
 			if (pField->MoveObject(this, lookAt_x, lookAt_y) == 0)
 			{
 				if(lookAt_y!=tmpY)
+				{
 					++numMovesY;
+				}
+				if (lookAt_x != tmpX)
+				{
+					++numMovesX;
+				}				
 			}
 
 		}
 		//Photosynthesis
 		else if (tmpOut.photosynthesis > 0)
 		{
-			#ifdef NoPhotosynthesis
-			return 0;
-			#endif
-
 			Photosynthesis();
 		}
 	}
@@ -637,7 +560,7 @@ void Bot::draw()
 	CalcObjectRect();
 
 	//Draw body
-	SDL_SetTextureColorMod(sprite_body, color.r, color.g, color.b);
+	SDL_SetTextureColorMod(sprite_body, color.c[0], color.c[1], color.c[2]);
 	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
 	//Draw outlines
@@ -651,7 +574,7 @@ void Bot::drawEnergy()
 	CalcObjectRect();
 
 	//Draw body
-	SDL_SetTextureColorMod(sprite_body, 255, (1.0f - ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f))) * 255.0f, 0);
+	SDL_SetTextureColorMod(sprite_body, 255, static_cast<int>((1.0f - ((energy * 1.0f) / (MaxPossibleEnergyForABot * 1.0f))) * 255.0f), 0);
 	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
 	//Draw outlines
@@ -670,8 +593,9 @@ void Bot::drawPredators()
 	if (energySumm < 20)
 		SDL_SetTextureColorMod(sprite_body, 180, 180, 180);
 	else
-		SDL_SetTextureColorMod(sprite_body, 255.0f * ((energyFromPredation * 1.0f) / (energySumm * 1.0f)),
-			255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f)), 255.0f * ((energyFromOrganics * 1.0f) / (energySumm * 1.0f)));
+		SDL_SetTextureColorMod(sprite_body, static_cast<int>(255.0f * ((energyFromPredation * 1.0f) / (energySumm * 1.0f))),
+			static_cast<int>(255.0f * ((energyFromPS * 1.0f) / (energySumm * 1.0f))),
+			static_cast<int>(255.0f * ((energyFromOrganics * 1.0f) / (energySumm * 1.0f))));
 
 	SDL_RenderCopy(renderer, sprite_body, &image_rect, &object_rect);
 
@@ -682,16 +606,14 @@ void Bot::drawPredators()
 
 void Bot::Rotate(int dir)
 {
-	dir = dir % 8;
-
-	if (dir < 0)
-		dir = 8 + dir;
+	if (direction == dir)
+		return;
 
 	int delta = (direction - dir);	
 
 	if (delta < 0)
 	{
-		if (delta > 4)
+		if (delta < -4)
 			--direction;
 		else
 			++direction;
@@ -703,8 +625,15 @@ void Bot::Rotate(int dir)
 		else
 			--direction;
 	}
-		
-	direction = direction % 8;
+
+	if (direction < 0)
+	{
+		direction += 8;
+	}
+	else if (direction > 7)
+	{
+		direction -= 8;
+	}
 }
 
 
@@ -725,14 +654,29 @@ void Bot::GiveEnergy(int num, EnergySource src)
 	if (src == PS)
 	{
 		energyFromPS += num;
+
+		if (energyFromPS>100)
+		{
+			energyFromPS = 100;
+		}
 	}
 	else if (src == predation)
 	{
 		energyFromPredation += num;
+
+		if (energyFromPredation > 100)
+		{
+			energyFromPredation = 100;
+		}
 	}
 	else if (src == organics)
 	{
 		energyFromOrganics += num;
+
+		if (energyFromOrganics > 100)
+		{
+			energyFromOrganics = 100;
+		}
 	}
 }
 
@@ -746,6 +690,15 @@ int Bot::GetEnergyFromKills()
 	return energyFromPredation;
 }
 
+int Bot::GetDirection()
+{
+	return direction;
+}
+
+void Bot::SetDirection(int D)
+{
+	direction = D;
+}
 
 int* Bot::GetMarkers()
 {
@@ -767,16 +720,6 @@ bool Bot::TakeEnergy(int val)
 }
 
 
-/*Get neuron summary(info)
-Format: (all integers)
--simple neurons
--radial basis neurons
--random neurons
--memory neurons (if any)
--total connections
--dead end neurons
--total neurons
-*/
 Bot::summary_return Bot::GetNeuronSummary()
 {
 	int toRet[6] = { 0,0,0,0,0,0 };
@@ -784,7 +727,7 @@ Bot::summary_return Bot::GetNeuronSummary()
 
 	for (uint xi = 1; xi < NumNeuronLayers; ++xi)
 	{
-		for (uint yi = 0; yi < NeuronsInLayer; ++yi)
+		for (uint yi = 0; yi < NumNeuronsInLayerMax; ++yi)
 		{
 			n = &activeBrain.allNeurons[xi][yi];
 
@@ -811,7 +754,7 @@ Bot::summary_return Bot::GetNeuronSummary()
 		}
 	}
 
-	return { toRet[0], toRet[1], toRet[2], toRet[3], toRet[4], toRet[5], NumNeuronLayers * NeuronsInLayer };
+	return { toRet[0], toRet[1], toRet[2], toRet[3], toRet[4], toRet[5], NumNeuronLayers * NumNeuronsInLayerMax };
 }
 
 
@@ -838,19 +781,15 @@ void Bot::SetColor(Color newColor)
 
 void Bot::SetColor(Uint8 r, Uint8 g, Uint8 b)
 {
-	color.r = r;
-	color.g = g;
-	color.b = b;
+	color.Set(r, g, b);
 }
 
 
 Bot::Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate) :Object(X, Y), initialBrain(&prototype->initialBrain)
 {
-	type = bot;
-
 	energy = Energy;
 	stunned = StunAfterBirth;
-	fertilityDelay = FertilityDelay;
+	fertilityDelay = pParams->fertility_delay;
 	energyFromPS = 0;
 	energyFromPredation = 0;
 
@@ -864,37 +803,27 @@ Bot::Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate) :Object(X, Y), 
 	RandomDirection();
 
 	//Now mutate
-	#ifndef ForbidMutations
-	if (mutate)
+	if(!pField->params.noMutations)
 	{
-		#ifdef UseTotalMutation
-		if (RandomPercentX10(TotalMutationChancePercentX10))
-			TotalMutation();
-		else
-		#endif
-		{
+		if (mutate)
 			Mutate();
-		}
 	}
-	#endif
 
 	//Create active brain
 	activeBrain.Clone(&initialBrain);
 	activeBrain.Optimize();
 
-	addaptation_lastX = X;
+	addaptation_birthX = X;
 }
 
 
 Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 {
-	type = bot;
-
 	RandomizeMarkers();
 
 	energy = Energy;
 	stunned = StunAfterBirth;
-	fertilityDelay = FertilityDelay;
+	fertilityDelay = pParams->fertility_delay;
 	energyFromPS = 0;
 	energyFromPredation = 0;
 
@@ -912,9 +841,10 @@ Bot::Bot(int X, int Y, uint Energy) :Object(X, Y)
 	//Random direction
 	RandomDirection();
 
-	addaptation_lastX = X;
+	addaptation_birthX = X;
 
 	//Temporary
+	numMovesX = 1000;
 	numMovesY = 1000;
 }
 

@@ -11,14 +11,15 @@ private:
 
 	static SDL_Texture* image;
 
+
 public:
 
+	constexpr ObjectTypes type() override;
 	void draw() override;
+
 
 	Apple(int X, int Y, int Energy = 0);
 
-
-	static void CreateImage();
-	static void DeleteImage();
+	static void SetImage(SDL_Texture* img);
 
 };

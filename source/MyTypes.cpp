@@ -5,88 +5,89 @@
 
 void Color::operator/=(int d)
 {
-	r /= d;
-	g /= d;
-	b /= d;
+	repeat(3)
+		c[i] /= d;
 }
 
-void Color::operator+=(Color c)
+void Color::operator+=(Color C)
 {
-	//Check if color component is out of bounds [0...255]
-	auto limit = [&](int* n)
+	unsigned short tmpVal;
+
+	repeat(3)
 	{
-		if (*n < 0)
-			*n = 0;
-		else if (*n > 255)
-			*n = 255;
-	};
+		tmpVal = c[i];
 
-	r += c.r;
-	g += c.g;
-	b += c.b;
+		tmpVal += C.c[i];
 
-	limit(&r);
-	limit(&g);
-	limit(&b);
+		if (tmpVal > 255)
+			tmpVal = 255;
+
+		c[i] = static_cast<byte>(tmpVal);
+	}
 }
 
 void Color::SetRandom()
 {
-	r = RandomVal(256);
-	g = RandomVal(256);
-	b = RandomVal(256);
-}
-
-void Color::RandomChange(int str)
-{
-	auto change = [&](int* val)
+	#ifdef PresetRandomColors
 	{
-		*val += (RandomVal((2 * str) + 1) - str);
+		uint i = RandomVal(21);
 
-		if (*val > 255)
-			*val = 255;
-		else if (*val < 0)
-			*val = 0;
-	};
-
-	change(&r);
-	change(&g);
-	change(&b);
+		c[0] = presetColors[i][0];
+		c[1] = presetColors[i][1];
+		c[2] = presetColors[i][2];
+	}
+	#else
+	{
+		c[0] = RandomVal(256);
+		c[1] = RandomVal(256);
+		c[2] = RandomVal(256);
+	}
+	#endif
 }
 
-int Color::ToInt()
+void Color::RandomChange(const int str)
 {
-	intchar un;
+	short tmpVal;
 
-	un.c[0] = r;
-	un.c[1] = g;
-	un.c[2] = b;
-	un.c[3] = 0;
+	repeat(3)
+	{
+		tmpVal = RandomValRange(str / 2, str);
 
-	return un.i;
+		if (RandomPercent(50))
+			tmpVal *= -1;
+
+		tmpVal += c[i];
+
+		if (tmpVal > 255)
+			tmpVal = 255;
+		else if (tmpVal < 0)
+			tmpVal = 0;
+
+		c[i] = static_cast<byte>(tmpVal);
+	}
 }
 
-void Color::FromInt(int data)
+void Color::Set(int r, int g, int b)
 {
-	intchar un;
-
-	un.i = data;
-
-	r = un.c[0];
-	g = un.c[1];
-	b = un.c[2];
+	c[0] = r;
+	c[1] = g;
+	c[2] = b;
 }
 
-Color::Color(int data)
+Color Color::GetRandomColor()
 {
-	FromInt(data);
+	Color toRet;
+
+	toRet.SetRandom();
+
+	return toRet;
 }
 
-Color::Color() {}
+Point::Point(int X, int Y) :x(X), y(Y) 
+{}
 
-Point::Point(int X, int Y) :x(X), y(Y) {}
-
-Point::Point() :x(-1), y(-1) {}
+Point::Point() :x(-1), y(-1) 
+{}
 
 void Point::Shift(int X, int Y) 
 {
@@ -98,6 +99,11 @@ void Point::Set(int X, int Y)
 {
 	x = X;
 	y = Y;
+}
+
+Point Point::operator+(Point toAdd)
+{
+	return {x + toAdd.x, y + toAdd.y};
 }
 
 bool Rect::IsInBounds(Point p)

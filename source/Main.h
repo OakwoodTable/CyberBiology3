@@ -3,6 +3,8 @@
 #include "GUI.h"
 #include "Field.h"
 #include "NeuralNetRenderer.h"
+#include "AutomaticAdaptation.h"
+
 
 
 enum MouseFunction
@@ -17,33 +19,31 @@ enum MouseFunction
 
 class Main final
 {
-
 private:
 
 	Clock clock;
 
 	const SDL_Rect screenRect = { 0, 0, WindowWidth, WindowHeight };
 
-	//Save/load object interface
-	ObjectSaver saver;
+	//Automatic adaptation
+	AutomaticAdaptation* auto_adapt;
 
 	//Keyboard
 	const Uint8* keyboard;
 
 	//Simulation
-	int seed, id;
+	uint seed, id;
 	uint realTPS = 0;
 	int limit_interval = 0;
-	int limit_ticks_per_second = FPSLimitAtStart;
-
-	Field* field;	
-
+	int limit_ticks_per_second = TPSLimitAtStart;
 	uint ticknum = 0;
 
 	TimePoint prevTick;
 	TimePoint lastSecondTick;
 	uint tpsTickCounter = 0;
 	TimePoint currentTick;
+
+	Field* field;			
 
 	//FPS
 	int limitFPS = LimitFPSAtStart;
@@ -53,12 +53,8 @@ private:
 	TimePoint lastTickFps;
 	TimePoint lastSecondTickFps;
 
-	RenderTypes renderType = RenderTypeAtStart;
+	RenderTypes renderType = natural;
 	MouseFunction mouseFunc = mouse_select;
-
-	//Seasons
-	Season season = summer;
-	uint changeSeasonCounter = 0;
 
 	//Windows
 	void DrawDemoWindow();
@@ -66,8 +62,8 @@ private:
 	void DrawSystemWindow();
 	void DrawControlsWindow();
 	void DrawSelectionWindow();
-	void DrawRenderWindow();
-	void DrawConsoleWindow();
+	void DrawDisplayWindow();
+	void DrawLogWindow();
 	void DrawMouseFunctionWindow();
 	void DrawAdditionalsWindow();
 
@@ -78,6 +74,7 @@ private:
 	void DrawAdaptationWindow();
 	void DrawChartWindow();
 	void DrawBotBrainWindow();
+	void DrawAAWindow();
 
 	//Show more windows
 	bool showSaveLoad = false;
@@ -85,21 +82,10 @@ private:
 	bool showBrain = false;
 	bool showAdaptation = false;
 	bool showChart = false;	
+	bool showAutomaticAdaptation = false;
 
-	//Chart (TODO)
-	float chartData_bots[ChartNumValues];
-	float chartData_apples[ChartNumValues];
-	float chartData_organics[ChartNumValues];
-	int chart_numValues = 0;
-	int chart_currentPosition = 0;
-
-	int timeBeforeNextDataToChart = AddToChartEvery;
-
-	bool chartShow_apples = false;
-	bool chartShow_organics = false;
-
-	void ClearChart();
-	void AddToChart(float, float, float);
+	//Chart
+	Chart chart;
 
 	//Neural net renderer
 	NeuralNetRenderer nn_renderer;
@@ -125,6 +111,7 @@ private:
 	void LogPrint(int num, bool newLine = true);
 
 	//Save/load
+	ObjectSaver saver;
 
 	struct listed_file
 	{
@@ -134,11 +121,10 @@ private:
 		string fullCaption;
 
 		bool isSelected = false;
-
-		bool isWorld;
+		bool isWorld = false;
 	};
 
-	std::vector<listed_file> allFilenames;
+	vector<listed_file> allFilenames;
 	listed_file* selectedFile = NULL;
 
 	void LoadFilenames();
@@ -149,36 +135,38 @@ private:
 	void HighlightSelection();
 	void SelectionShadowScreen();
 
-	void ChangeSeason();
+	//Set false to pause
+	bool simulate = true;
+	//Set to true to close the app
+	bool terminate = false;
 
-	void Pause();
+	void SwitchPause();		
 
-	void ClearWorld();
+	void MouseClick();
+	void CatchKeyboard();
 	
 
 public:		
 
-	//Set false to pause
-	bool simulate = true;
-
-	//Set to true to close the app
-	bool terminate = false;
-
+	void ClearWorld();
 
 	void MakeStep();
-	
-	void MouseClick();
+	void Render();	
 
-	void Render();
-	
+	void Start();
+	void Pause();
+	void RunWithNoRender();
+	void RunWithMinimumRender();
+
+	void Print(string s);
 
 	Main();
 	~Main();
 
-	void CatchKeyboard();
-
+	void MainLoop();
 };
 
 
 extern Main simulation;
+
 

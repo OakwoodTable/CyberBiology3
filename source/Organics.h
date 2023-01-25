@@ -7,6 +7,7 @@
 
 class Organics :public Object
 {
+private:
 
 	bool doneFalling = false;
 
@@ -14,17 +15,14 @@ class Organics :public Object
 
 public:
 
+	constexpr ObjectTypes type() override;
 	int tick() override;
-
 	void draw() override;
 	void drawEnergy() override;
 
 
 	Organics(int X, int Y, int Energy);
 
-
-	static void CreateImage();
-	static void DeleteImage();
-
+	static void SetImage(SDL_Texture* img);
 };
 

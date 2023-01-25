@@ -1,13 +1,10 @@
 #pragma once
 //#pragma message("	Object_h")
 
+struct FieldDynamicParams;
 class Field;
 
 #include "Field.h"
-
-#include "Settings.h"
-#include "MyTypes.h"
-
 
 
 enum ObjectTypes
@@ -23,7 +20,6 @@ enum ObjectTypes
 //Base class for any object on field
 class Object
 {
-
 private:
 
 	//Prev. tick frame number
@@ -51,6 +47,7 @@ protected:
 	//Pointers to Field class and cells array
 	Object* (*pCells)[FieldCellsWidth][FieldCellsHeight];
 	Field* pField;
+	FieldDynamicParams* pParams;
 
 
 public:
@@ -60,7 +57,7 @@ public:
 	//If an object stores energy it's here
 	int energy;
 
-	ObjectTypes type;
+	virtual constexpr ObjectTypes type();
 
 	Object(int X, int Y);
 
@@ -69,7 +66,6 @@ public:
 	virtual void draw();
 	virtual void drawEnergy();
 	virtual void drawPredators();
-
 
 	/*This function returns 1 when the object is destroyed.
 	You should call it on every simulation tick before you
@@ -84,14 +80,11 @@ public:
 	void SetLifetime(uint);
 
 
-
 	static uint currentFrame;
-
 	static void SetPointers(Field* field, Object*** cells);
 
 protected:
 
 	//Texture rectangle
 	static const Rect image_rect;
-
 };

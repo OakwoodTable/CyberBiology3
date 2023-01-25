@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Settings.h"
 #include "MyTypes.h"
 
@@ -17,7 +16,7 @@ struct NeuronConnection
 };
 
 
-enum NeuronType
+enum NeuronType : byte
 {
 	basic,
 	input,
@@ -27,7 +26,7 @@ enum NeuronType
 	memory
 };
 
-const int MaxConnectionsPerNeuronType[] = 
+constexpr int MaxConnectionsPerNeuronType[] = 
 { 
 	MaxConnections_Basic, 
 	MaxConnections_Input, 
@@ -37,23 +36,35 @@ const int MaxConnectionsPerNeuronType[] =
 	MaxConnections_Memory 
 };
 
-
-struct Neuron
+//Neuron description by type (for GUI)
+constexpr const char* NeuronTypeNames[] =
 {
-	NeuronType type = basic;
+	"basic",
+	"input",
+	"output",
+	"random",
+	"radial basis",
+	"memory"
+};
 
-	float bias = 0.0f;
 
-	uint numConnections = 0;
-	NeuronConnection allConnections[NeuronsInLayer];
+struct Neuron final
+{
+	float bias;
+	NeuronType type = basic;	
 
-	uint layer;
+	byte layer;
+
+	byte numConnections = 0;
+	NeuronConnection allConnections[NumNeuronsInLayerMax];
+	
 
 	Neuron();
 
 	void Clone(Neuron* source);
 
 	void AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT);
+	void AddConnection(NeuronConnection* prototype);
 	bool AddRandomConnection();
 	void RemoveConnection(uint index);
 
@@ -65,7 +76,6 @@ struct Neuron
 	//Does neuron have a connection,
 	//returns connection index or -1
 	int IsConnected(uint LAYER, uint index);
-
 
 	void SetRandomBias();
 	void SetRandomType();
@@ -82,18 +92,13 @@ struct Neuron
 	//Tunnel neuron - one with no bias and only 1 connection to same neuron in next layer with weight = 1.0f
 	void SetTunnel(int num);
 
-	void SlightlyChange();
+	bool IsInactive();
 
 	
 	//Mutation functions
 	void mutate_ChangeType();
 	void mutate_ChangeBias();
-	void mutate_ChangeOneConnection();
+	void mutate_ChangeConnection(uint index);
 	void mutate_DeleteNeuron();
-
-
-
-	//Get neuron description by type (for GUI)
-	static char* GetTextFromType(NeuronType t);
 	
 };

@@ -9,12 +9,18 @@ const Rect Object::image_rect = { 0, 0, FieldCellSize, FieldCellSize };
 
 
 
-Object::Object(int X, int Y) :x(X), y(Y), type(abstract)
+constexpr ObjectTypes Object::type()
+{
+	return abstract;
+}
+
+Object::Object(int X, int Y) :x(X), y(Y)
 {
 	energy = 0;
 
 	//Set up pointers on field class and cells array
 	pField = static_pField;
+	pParams = &pField->params;
 	pCells = (Object* (*)[FieldCellsWidth][FieldCellsHeight])static_pCells;
 }
 
@@ -31,13 +37,24 @@ void Object::CalcScreenX()
 
 void Object::CalcObjectRect()
 {
-	object_rect = { FieldX + screenX * FieldCellSize, FieldY + y * FieldCellSize, FieldCellSize, FieldCellSize };
+	object_rect = 
+	{ 
+		FieldX + screenX * FieldCellSize, 
+		FieldY + y * FieldCellSize, 
+		FieldCellSize, 
+		FieldCellSize 
+	};
 }
 
 void Object::CalcObjectRectShrinked(int shrink)
 {
-	object_rect = { FieldX + screenX * FieldCellSize + shrink, FieldY + y * FieldCellSize + shrink,
-		FieldCellSize - 2*shrink, FieldCellSize - 2*shrink };
+	object_rect = 
+	{ 
+		FieldX + screenX * FieldCellSize + shrink, 
+		FieldY + y * FieldCellSize + shrink,
+		FieldCellSize - 2*shrink, 
+		FieldCellSize - 2*shrink 
+	};
 }
 
 void Object::draw()

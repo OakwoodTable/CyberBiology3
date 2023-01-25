@@ -1,20 +1,20 @@
-
 #include "GUI.h"
 
+using namespace ImGui;
 
 
 void InitImGUI()
 {
-	ImGui::CreateContext();
+	CreateContext();
 
-	io = &ImGui::GetIO();
+	io = &GetIO();
 
 	ImPlot::CreateContext();
 
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 	//Setup Dear ImGui style
-	ImGui::StyleColorsDark();
+	StyleColorsDark();
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
@@ -25,183 +25,167 @@ void DeInitImGUI()
 {
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImPlot::DestroyContext();
-	ImGui::DestroyContext();
+	DestroyContext();
 }
-
-
 
 void GUIStartFrame()
 {
 	ImGui_ImplSDLRenderer_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
-	ImGui::NewFrame();
+	NewFrame();
 }
-
-
 
 void Main::DrawDemoWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowPos({ 20.0f,20.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowPos({ 20.0f,20.0f });
 
-	ImGui::ShowDemoWindow();
+	ShowDemoWindow();
 }
 
 void Main::DrawMainWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 135.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, InterfaceBorder * 1.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 175.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, InterfaceBorder * 1.0f });
 
-	ImGui::Begin("Main", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Main", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
 		//FPS text 
-		ImGui::Text("steps: %i", ticknum);
-		ImGui::Text("(interval %i, ticks/sec: %i, fps: %i)", limit_interval, realTPS, realFPS);
-		ImGui::Text("Objects total: %i", field->GetNumObjects());
-		ImGui::Text("Bots total: %i", field->GetNumBots());
+		Text("steps: %i", ticknum);
+		Text("(interval %i, ticks/sec: %i, fps: %i)", limit_interval, realTPS, realFPS);
+		Text("Objects total: %i", field->GetNumObjects());
+		Text("Bots total: %i", field->GetNumBots());
 
 		//Show season name
-		/*
-		switch (season)
-		{
-		case summer:
-			ImGui::Text("Season: Summer");
-			break;
-		case autumn:
-			ImGui::Text("Season: Autumn");
-			break;
-		case winter:
-			ImGui::Text("Season: Winter");
-			break;
-		case spring:
-			ImGui::Text("Season: Spring");
-			break;
-		}
-
-		ImGui::SameLine();
-		ImGui::Text(" ( %i )", ChangeSeasonInterval - changeSeasonCounter);*/
+		if(field->params.useSeasons)
+			Text("Season: %s ( %i/%i )", SeasonNames[field->GetSeason()], field->GetSeasonCounter(), field->params.seasonInterval);
 
 		//Neural net params and FOV x
-		ImGui::Text("Layers: %i, Neurons: %i, Render_X: %i", NumNeuronLayers, NeuronsInLayer, field->renderX);
+		Text("Layers: %i, Neurons: %i, Render_X: %i", NumNeuronLayers, NumNeuronsInLayerMax, field->renderX);
 
 		//Simulation seed and unique id
-		ImGui::Text("Seed: %i, simulation id: %i", seed, id);
+		Text("Seed: %i, simulation id: %i", seed, id);
+
+		//World size and avg lifetime
+		Text("World size: %i (%i screens)", FieldCellsWidth, (FieldCellsWidth) / (ScreenCellsWidth));
+
+		Text("Avg bot lifetime: %i (max: %i)", field->GetAverageLifetime(), field->params.botMaxLifetime);
 
 	}
-	ImGui::End();
+	End();
 }
 
 
 void Main::DrawSystemWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 70.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 140.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 70.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 195.0f });
 
-	ImGui::Begin("System", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	Begin("System", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 	{
-		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
-		ImGui::SameLine();
-		ImGui::Text(" %s", SDL_GetPlatform());
+		TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
+		SameLine();
+		Text(" %s", SDL_GetPlatform());
 
-		ImGui::SameLine();
+		SameLine();
 
-		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "CPU cores: %d", SDL_GetCPUCount());
+		TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "CPU cores: %d", SDL_GetCPUCount());
+		TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
+		
+		SameLine();
 
-		ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
-
-		ImGui::SameLine();
-
-		//Show number of threads
-		#ifdef UseOneThread
-		ImGui::Text(", 1 thread used");
-		#endif
-
-		#ifdef UseFourThreads
-		ImGui::Text(", 4 threads used");
-		#endif
-
-		#ifdef UseEightThreads
-		ImGui::Text(", 8 threads used");
+		#if NumThreads == 1
+		{
+			Text(", single thread");
+	}
+		#else
+		{
+			uint threads = NumThreads;
+			Text(", %i threads used", threads);
+		}
 		#endif
 	}
-	ImGui::End();
+	End();
 }
 
 void Main::DrawControlsWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 160.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 220.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 160.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 275.0f });
 
-	ImGui::Begin("Controls", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Controls", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		if (ImGui::Button((simulate) ? "stop" : "start", { 200, 25 }))
+		if (Button((simulate) ? "stop" : "start", { 200, 25 }))
 		{
-			Pause();
+			SwitchPause();
 		}
 
-		//Sliders
-		ImGui::PushItemWidth(200);
-		ImGui::SliderInt("limit TPS", &limit_ticks_per_second, 0, GUI_Max_tps, "%d");
-		ImGui::SliderInt("limit FPS", &limitFPS, 0, GUI_Max_fps, "%d");
+		PushItemWidth(200);
+		SliderInt("limit TPS", &limit_ticks_per_second, 0, GUI_Max_tps, "%d");
+		SliderInt("limit FPS", &limitFPS, 0, GUI_Max_fps, "%d");
 
-		ImGui::SliderInt("PS reward", &(field->photosynthesisReward), 0, GUI_Max_food);		
-		ImGui::SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d");
+		SliderInt("PS reward", &(field->params.PSreward), 0, GUI_Max_food);		
+		SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d");
 	}
-	ImGui::End();
+	End();
 }
 
 void Main::DrawSelectionWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 150.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 390.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 150.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 445.0f });
 
-	ImGui::Begin("Selection", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Selection", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
 		if (selectedObject)
 		{
 			if (field->ValidateObjectExistance(selectedObject))
 			{
 				//Object info
-				ImGui::Text("type: Bot	X: %i, Y: %i", selectedObject->x, selectedObject->y);
-				ImGui::Text("lifetime: %i / %i", selectedObject->GetLifetime(), MaxBotLifetime);
-				ImGui::Text("energy: %i (PS: %i, predation: %i)", selectedObject->energy, ((Bot*)selectedObject)->GetEnergyFromPS(), ((Bot*)selectedObject)->GetEnergyFromKills());
+				Text("type: Bot	X: %i, Y: %i", selectedObject->x, selectedObject->y);
+				Text("lifetime: %i / %i", selectedObject->GetLifetime(), field->params.botMaxLifetime);
+				Text("energy: %i (PS: %i, predation: %i)", selectedObject->energy, 
+					((Bot*)selectedObject)->GetEnergyFromPS(), ((Bot*)selectedObject)->GetEnergyFromKills());
 
 				//Mutation markers
 				int m[NumberOfMutationMarkers];
+
 				memcpy(m, ((Bot*)selectedObject)->GetMarkers(), sizeof(m));
-				ImGui::Text("markers: {");
+
+				Text("markers: {");
 
 				repeat(NumberOfMutationMarkers)
 				{
-					ImGui::SameLine();
-					ImGui::Text("%i", m[i]);
+					SameLine();
+					Text("%i", m[i]);
 				}
 
-				ImGui::SameLine();
-				ImGui::Text("}");
+				SameLine();
+				Text("}");
 
 				//Color
-				Uint8 c[3];
+				Color& c = *((Bot*)selectedObject)->GetColor();
 
-				memcpy(c, ((Bot*)selectedObject)->GetColor(), sizeof(c));
-				ImGui::Text("color: {%i, %i, %i}", c[0], c[1], c[2]);
+				Text("color: {%i, %i, %i}", c.c[0], c.c[1], c.c[2]);
 
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(((c[0] * 1.0f) / 255.0f), ((c[1] * 1.0f) / 255.0f), ((c[2] * 1.0f) / 255.0f), 1.0f), "*****");
-
-				ImGui::SameLine();
-				if (ImGui::Button("Repaint", { 50, 20 }))
-				{
-					field->RepaintBot((Bot*)selectedObject, Bot::GetRandomColor(), 1);
-				}
-
-				if (ImGui::Button("Show brain", { 100, 25 }))
+				SameLine();
+				TextColored(ImVec4(((c.c[0] * 1.0f) / 255.0f), ((c.c[1] * 1.0f) / 255.0f), 
+					((c.c[2] * 1.0f) / 255.0f), 1.0f), "*****");
+				
+				if (Button("Show brain", { 100, 25 }))
 				{
 					showBrain = !showBrain;
+				}
+
+				SameLine();
+
+				if (Button("Repaint", { 70, 25 }))
+				{
+					field->RepaintBot((Bot*)selectedObject, Color::GetRandomColor(), RepaintTolerance);
 				}
 			}
 			else
@@ -210,118 +194,124 @@ void Main::DrawSelectionWindow()
 			}
 		}
 	}
-	ImGui::End();
+	End();
 }
 
-void Main::DrawRenderWindow()
+void Main::DrawDisplayWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 140.0f});
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 550.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 100.0f});
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 605.0f });
 
-	ImGui::Begin("Display", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Display", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		ImGui::BeginGroup();
+		BeginGroup();
 
-		ImGui::Text("Render:");
+		Text("Render:");
 
-		ImGui::RadioButton("Natural colors", (int*)&renderType, 0);
-		ImGui::SameLine();
-		ImGui::RadioButton("Predators", (int*)&renderType, 1);
+		RadioButton("Natural colors", (int*)&renderType, 0);
+		SameLine();
+		RadioButton("Predators", (int*)&renderType, 1);
 
-		ImGui::RadioButton("Energy", (int*)&renderType, 2);
-		ImGui::SameLine();
-		ImGui::RadioButton("No render", (int*)&renderType, 3);
+		RadioButton("Energy", (int*)&renderType, 2);
+		SameLine();
+		RadioButton("No render", (int*)&renderType, 3);
 
-		ImGui::EndGroup();
+		EndGroup();
 	}
-	ImGui::End();
+	End();
 }
 
-void Main::DrawConsoleWindow()
+void Main::DrawLogWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 700.0f});
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 120.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 715.0f});
 
-	ImGui::Begin("Log", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Log", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(LogBackgroundColor));
+		PushStyleColor(ImGuiCol_ChildBg, ImVec4(LogBackgroundColor));
 
-		ImGui::BeginChild("scrolling", ImVec2(240, 80), true);
+		BeginChild("scrolling", ImVec2(265, 85), true);
 		{
-			ImGui::TextUnformatted(logText.Buf.Data);
+			TextUnformatted(logText.Buf.Data);
 
-			if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-				ImGui::SetScrollHereY(1.0f);
+			if (GetScrollY() >= GetScrollMaxY())
+				SetScrollHereY(1.0f);
 		}
-		ImGui::EndChild();
+		EndChild();
 
-		ImGui::PopStyleColor();
+		PopStyleColor();
 	}
-	ImGui::End();
+	End();
 }
 
 void Main::DrawMouseFunctionWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 130.0f});
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 830.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 100.0f});
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 845.0f });
 
-	ImGui::Begin("Mouse function", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Mouse function", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
-		ImGui::BeginGroup();
+		BeginGroup();
 
-		ImGui::RadioButton("Select", (int*)&mouseFunc, 0);
-		ImGui::SameLine();
-		ImGui::RadioButton("Remove", (int*)&mouseFunc, 1);
+		RadioButton("Select", (int*)&mouseFunc, 0);
+		SameLine();
+		RadioButton("Remove", (int*)&mouseFunc, 1);
 
-		ImGui::RadioButton("Place rock", (int*)&mouseFunc, 2);
-		ImGui::SameLine();
-		ImGui::RadioButton("From file", (int*)&mouseFunc, 3);
+		RadioButton("Place rock", (int*)&mouseFunc, 2);
+		SameLine();
+		RadioButton("From file", (int*)&mouseFunc, 3);
 
-		ImGui::RadioButton("Mutate", (int*)&mouseFunc, 4);
+		RadioButton("Mutate", (int*)&mouseFunc, 4);
 
-		ImGui::EndGroup();
+		EndGroup();
 	}
-	ImGui::End();
+	End();
 }
 
 void Main::DrawAdditionalsWindow()
 {
-	ImGui::SetNextWindowBgAlpha(1.0f);
-	ImGui::SetNextWindowSize({ GUIWindowWidth * 1.0f, 100.0f });
-	ImGui::SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 970.0f });
+	SetNextWindowBgAlpha(1.0f);
+	SetNextWindowSize({ GUIWindowWidth * 1.0f, 100.0f });
+	SetNextWindowPos({ (2 * FieldX + FieldWidth) * 1.0f, 955.0f });
 
-	ImGui::Begin("Additional windows", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	Begin("Additional windows", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	{
 
-		if (ImGui::Button("Save/load", { 75, 30 }))
+		if (Button("Save/load", { 85, 30 }))
 		{
 			LoadFilenames();
 
 			showSaveLoad = !showSaveLoad;
 		}
-		ImGui::SameLine();
+		SameLine();
 
-		if (ImGui::Button("Dangerous", { 75, 30 }))
+		if (Button("Dangerous", { 85, 30 }))
 		{
 			showDangerous = !showDangerous;
 		}
-		ImGui::SameLine();
+		SameLine();
 
-		if (ImGui::Button("Adaptation", { 75, 30 }))
+		if (Button("Adaptation", { 85, 30 }))
 		{
 			showAdaptation = !showAdaptation;
 		}
 
-		if (ImGui::Button("Chart", { 75, 30 }))
+		if (Button("Chart", { 85, 30 }))
 		{
 			showChart = !showChart;
 		}
+		SameLine();
+
+		if (Button("Auto adapt", { 85, 30 }))
+		{
+			showAutomaticAdaptation = !showAutomaticAdaptation;
+		}
 
 	}
-	ImGui::End();
+	End();
 }
 
 void Main::DrawSaveLoadWindow()
@@ -329,20 +319,20 @@ void Main::DrawSaveLoadWindow()
 	if (showSaveLoad)
 	{
 		//Save/load window
-		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 400.0f, 200.0f });
-		ImGui::SetNextWindowPos({ 100 * 1.0f, 100.0f }, ImGuiCond_Once);
+		SetNextWindowBgAlpha(1.0f);
+		SetNextWindowSize({ 400.0f, 230.0f });
+		SetNextWindowPos({ 100 * 1.0f, 100.0f }, ImGuiCond_Once);
 
-		ImGui::Begin("Save/load", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		Begin("Save/load", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
 			//List of files
-			ImGui::Text("Select file");
+			Text("Select file");
 
-			ImGui::ListBoxHeader("##", ImVec2(380, 110));
+			ListBoxHeader("##", ImVec2(380, 110));
 
 			for (int i = 0; i < allFilenames.size(); ++i)
 			{
-				if (ImGui::Selectable(allFilenames[i].fullCaption.c_str(), &allFilenames[i].isSelected))
+				if (Selectable(allFilenames[i].fullCaption.c_str(), &allFilenames[i].isSelected))
 				{
 					for (int b = 0; b < allFilenames.size(); ++b)
 						allFilenames[b].isSelected = false;
@@ -352,11 +342,11 @@ void Main::DrawSaveLoadWindow()
 				}
 			}
 
-			ImGui::ListBoxFooter();
+			ListBoxFooter();
 
 			//Buttons
 
-			if (ImGui::Button("Load", { 50, 30 }))
+			if (Button("Load", { 50, 30 }))
 			{
 				if (selectedFile)
 				{
@@ -383,9 +373,7 @@ void Main::DrawSaveLoadWindow()
 					else
 					{
 						if (selectedObject)
-						{
 							delete selectedObject;
-						}
 
 						selectedObject = saver.LoadObject((char*)selectedFile->nameFull.c_str());
 
@@ -397,9 +385,9 @@ void Main::DrawSaveLoadWindow()
 				}
 			}			
 
-			ImGui::SameLine();
+			SameLine();
 
-			if (ImGui::Button("Save bot", { 100, 30 }))
+			if (Button("Save bot", { 100, 30 }))
 			{
 				if (selectedObject)
 				{
@@ -419,9 +407,9 @@ void Main::DrawSaveLoadWindow()
 				}
 			}
 
-			ImGui::SameLine();
+			SameLine();
 
-			if (ImGui::Button("Save world", { 100, 30 }))
+			if (Button("Save world", { 100, 30 }))
 			{
 				if (selectedFile)
 				{
@@ -438,16 +426,56 @@ void Main::DrawSaveLoadWindow()
 				}
 			}
 
-			ImGui::SameLine();
+			SameLine();
 
-			if (ImGui::Button("New file", { 100, 30 }))
+			if (Button("New file", { 100, 30 }))
 			{
 				CreateNewFile();
 
 				LoadFilenames();
 			}
+
+			if (selectedFile)
+			{
+				if (selectedFile->isWorld)
+				{
+					if (Button("Load landscape keep bots", { 150, 30 }))
+					{
+						ObjectSaver::WorldParams ret = saver.LoadWorld(field, (char*)selectedFile->nameFull.c_str(),
+							false, false, true, false);
+
+						if (ret.id != -1)
+						{
+							if (ret.width != FieldCellsWidth)
+								LogPrint("Landscape loaded(width mismatch)\r\n");
+							else
+								LogPrint("Landscape loaded\r\n");
+						}
+						else
+							LogPrint("Error while loading Landscape\r\n");
+					}
+
+					SameLine();
+
+					if (Button("Load only bots", { 150, 30 }))
+					{
+						ObjectSaver::WorldParams ret = saver.LoadWorld(field, (char*)selectedFile->nameFull.c_str(),
+							false, false, false, true);
+
+						if (ret.id != -1)
+						{
+							if (ret.width != FieldCellsWidth)
+								LogPrint("Landscape loaded(width mismatch)\r\n");
+							else
+								LogPrint("Landscape loaded\r\n");
+						}
+						else
+							LogPrint("Error while loading Landscape\r\n");
+					}
+				}
+			}
 		}
-		ImGui::End();
+		End();
 	}
 }
 
@@ -455,21 +483,22 @@ void Main::DrawDangerousWindow()
 {
 	if (showDangerous)
 	{
-		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 290.0f, 100.0f });
-		ImGui::SetNextWindowPos({ 100 * 1.0f, 300.0f }, ImGuiCond_Once);
+		SetNextWindowBgAlpha(1.0f);
+		SetNextWindowSize({ 290.0f, 100.0f });
+		SetNextWindowPos({ 100 * 1.0f, 300.0f }, ImGuiCond_Once);
 
-		ImGui::Begin("Use with caution!", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		Begin("Use with caution!", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
-
-			if (ImGui::Button("Wipe world", { 130, 30 }))
+			if (Button("Wipe world", { 130, 30 }))
 			{
 				ClearWorld();
+				field->params.Reset();
+				simulation.chart.ClearChart();
 			}
 
-			ImGui::SameLine();
+			SameLine();
 
-			if (ImGui::Button("Kill bots", { 130, 30 }))
+			if (Button("Kill bots", { 130, 30 }))
 			{
 				Deselect();
 
@@ -482,25 +511,25 @@ void Main::DrawDangerousWindow()
 						if (o == NULL)
 							continue;
 
-						if (o->type == bot)
+						if (o->type() == bot)
 							field->RemoveObject(cx, cy);
 					}
 				}
 			}
 
-			if (ImGui::Button("CloseApp", { 130, 30 }))
+			if (Button("CloseApp", { 130, 30 }))
 			{
 				terminate = true;
 			}
 
-			ImGui::SameLine();
+			SameLine();
 
-			if (ImGui::Button("Zero time", { 130, 30 }))
+			if (Button("Zero time", { 130, 30 }))
 			{
 				ticknum = 0;
 			}
 		}
-		ImGui::End();
+		End();
 	}
 }
 
@@ -508,11 +537,11 @@ void Main::DrawSummaryWindow()
 {
 	if (showBrain)
 	{
-		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 330.0f, 180.0f });
-		ImGui::SetNextWindowPos({ 100 * 1.0f, 150.0f }, ImGuiCond_Once);
+		SetNextWindowBgAlpha(1.0f);
+		SetNextWindowSize({ 330.0f, 180.0f });
+		SetNextWindowPos({ 100 * 1.0f, 150.0f }, ImGuiCond_Once);
 
-		ImGui::Begin("Bot summary", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		Begin("Bot summary", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
 			if (selectedObject)
 			{
@@ -520,16 +549,16 @@ void Main::DrawSummaryWindow()
 				{
 					auto summ = ((Bot*)selectedObject)->GetNeuronSummary();
 
-					ImGui::Text("Neurons:");
-					ImGui::Text("Simple: %i", summ.simple);
-					ImGui::Text("Radial basis: %i", summ.radialBasis);
-					ImGui::Text("Random: %i", summ.random);
-					ImGui::Text("Memory: %i", summ.memory);
+					Text("Neurons:");
+					Text("Simple: %i", summ.simple);
+					Text("Radial basis: %i", summ.radialBasis);
+					Text("Random: %i", summ.random);
+					Text("Memory: %i", summ.memory);
 
-					ImGui::NewLine();
+					NewLine();
 
-					ImGui::Text("Total neurons: %i, dead end neurons: %i", summ.neurons, summ.deadend);
-					ImGui::Text("Total connections: %i", summ.connections);
+					Text("Total neurons: %i, dead end neurons: %i", summ.neurons, summ.deadend);
+					Text("Total connections: %i", summ.connections);
 				}
 				else
 					goto Nothing;
@@ -538,11 +567,11 @@ void Main::DrawSummaryWindow()
 			else
 			{
 			Nothing:
-				ImGui::Text("Nothing is selected");
+				Text("Nothing is selected");
 			}
 
 		}
-		ImGui::End();
+		End();
 	}
 }
 
@@ -550,63 +579,81 @@ void Main::DrawAdaptationWindow()
 {
 	if (showAdaptation)
 	{
-		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 500.0f, 500.0f });
-		ImGui::SetNextWindowPos({ 100 * 1.0f, 250.0f }, ImGuiCond_Once);
+		SetNextWindowBgAlpha(1.0f);
+		SetNextWindowSize({ 600.0f, 650.0f });
+		SetNextWindowPos({ 100 * 1.0f, 250.0f }, ImGuiCond_Once);
 
-		ImGui::Begin("Adaptation", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		Begin("Adaptation", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
-			if(ImGui::CollapsingHeader("Winds"))			
+			if(CollapsingHeader("Winds"))			
 			{
-				ImGui::SliderInt("Phase", &field->params.adaptation_DeathChance_Winds, 0, 1000);
-				ImGui::SliderInt("Steps", &field->params.adaptation_StepsNum_Winds, 0, 20);
+				SliderInt("X steps to divide", &field->params.adaptation_StepsNumToDivide_Winds, 0, 200);
+				SliderInt("Force movements X", &field->params.adaptation_forceBotMovementsX, 0, 1000);
 			}
 
-			ImGui::NewLine();
+			NewLine();
 			
-			if (ImGui::CollapsingHeader("Divers", ImGuiTreeNodeFlags_DefaultOpen))
+			if (CollapsingHeader("Divers", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				ImGui::SliderInt("Land mulpitly block", &field->params.adaptation_landBirthBlock, 0, 1000);
-				ImGui::SliderInt("Sea mulpitly block", &field->params.adaptation_seaBirthBlock, 0, 1000);
+				SliderInt("Land mulpitly block", &field->params.adaptation_landBirthBlock, 0, 1000);
+				SliderInt("Sea mulpitly block", &field->params.adaptation_seaBirthBlock, 0, 1000);
 
-				ImGui::NewLine();
+				NewLine();
 
-				ImGui::SliderInt("no PS in ocean", &field->params.adaptation_PSInOceanBlock, 0, 1000, "%d");
-				ImGui::SliderInt("no PS in mud", &field->params.adaptation_PSInMudBlock, 0, 1000, "%d");
-				ImGui::SliderInt("On land at least once", &field->params.adaptation_botShouldBeOnLandOnceToMultiply, 0, 1000, "%d");
-				ImGui::SliderInt("On land PS at least once", &field->params.adaptation_botShouldDoPSOnLandOnceToMultiply, 0, 1000, "%d");
-				ImGui::SliderInt("Force movements Y", &field->params.adaptation_forceBotMovements, 0, 1000);
+				SliderInt("no PS in ocean", &field->params.adaptation_PSInOceanBlock, 0, 1000, "%d");
+				SliderInt("no PS in mud", &field->params.adaptation_PSInMudBlock, 0, 1000, "%d");
+				SliderInt("On land at least once", &field->params.adaptation_botShouldBeOnLandOnceToMultiply, 0, 1000, "%d");
+				SliderInt("On land PS at least once", &field->params.adaptation_botShouldDoPSOnLandOnceToMultiply, 0, 1000, "%d");				
+				SliderInt("Force movements Y", &field->params.adaptation_forceBotMovementsY, 0, 1000);
 
-				ImGui::NewLine();
+				NewLine();
 
-				ImGui::SliderInt("Ocean level", &field->params.oceanLevel, 0, FieldCellsHeight);
-				ImGui::SliderInt("Mud level", &field->params.mudLevel, 0, FieldCellsHeight);
+				SliderInt("Ocean level", &field->params.oceanLevel, 0, FieldCellsHeight);
+				SliderInt("Mud level", &field->params.mudLevel, 0, FieldCellsHeight);
 			}
 
-			ImGui::NewLine();
+			NewLine();
 
-			if (ImGui::CollapsingHeader("Organics"))
+			if (CollapsingHeader("Organics"))
 			{
-				ImGui::SliderInt("Organics spawn rate", &field->params.adaptation_organicSpawnRate, 0, 1000);
+				SliderInt("Organics spawn rate", &field->params.adaptation_organicSpawnRate, 0, 1000);
 			}
 
-			ImGui::NewLine();
+			NewLine();
 
-			if (ImGui::CollapsingHeader("Apples"))
+			if (CollapsingHeader("Apples"))
 			{
-				ImGui::SliderInt("Apple energy", &field->params.appleEnergy, 1, 200);
-
-				ImGui::Checkbox("Spawn apples", &field->params.spawnApples);
+				SliderInt("Apple energy", &field->params.appleEnergy, 1, 200);
+				Checkbox("Spawn apples", &field->params.spawnApples);
 			}
 
-			ImGui::NewLine();
+			NewLine();
 
-			if (ImGui::Button("Reset", { 70, 20 }))
+			if (CollapsingHeader("More"))
+			{
+				SliderInt("Bot max lifetime", &field->params.botMaxLifetime, MaxBotLifetime_Min, MaxBotLifetime_Max);
+				SliderInt("Fertility delay", &field->params.fertility_delay, 0, field->params.botMaxLifetime);
+
+				Checkbox("No mutations", &field->params.noMutations);
+				Checkbox("No predators", &field->params.noPredators);
+			}
+
+			NewLine();
+
+			if (CollapsingHeader("Seasons"))
+			{	
+				Checkbox("Use seasons", &field->params.useSeasons);
+				SliderInt("Season change interval", &field->params.seasonInterval, 200, 4000);
+			}
+
+			NewLine();
+
+			if (Button("Reset", { 70, 20 }))
 			{
 				field->params.Reset();
 			}
 		}
-		ImGui::End();
+		End();
 	}
 }
 
@@ -614,59 +661,15 @@ void Main::DrawChartWindow()
 {
 	if (showChart)
 	{
-		ImGui::SetNextWindowBgAlpha(1.0f);
-		ImGui::SetNextWindowSize({ 900.0f, 600.0f });
-		ImGui::SetNextWindowPos({ 700.0f, 250.0f }, ImGuiCond_Once);
+		SetNextWindowBgAlpha(1.0f);
+		SetNextWindowSize({ 920.0f, 600.0f });
+		SetNextWindowPos({ 700.0f, 250.0f }, ImGuiCond_Once);
 
-		ImGui::Begin("Population chart", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		Begin("Population chart", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		{
-			if (ImPlot::BeginPlot("Objects", { 800, 550 }))
-			{
-				
-				//Axes
-				ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, 250.0, ImPlotCond_Always);
-				ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 26000.0);
-
-				ImPlot::SetupAxis(ImAxis_X1, "Time");
-				ImPlot::SetupAxis(ImAxis_Y1, "Number");
-
-				//Bots number
-				ImPlot::SetNextLineStyle({ 1, 0, 0, 1 }, ChartLineThickness);
-
-				ImPlot::PlotLine("Bots", chartData_bots, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
-
-				//Apples number
-				if(chartShow_apples)
-				{
-					ImPlot::SetNextLineStyle({ 0, 1, 0, 1 }, ChartLineThickness);
-
-					ImPlot::PlotLine("Apples", chartData_apples, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
-				}
-
-				//Organics number
-				if(chartShow_organics)
-				{
-					ImPlot::SetNextLineStyle({ 0, 0, 1, 1 }, ChartLineThickness);
-
-					ImPlot::PlotLine("Organics", chartData_organics, chart_numValues - 1, 1.0f, 0.0f, ImPlotLineFlags_None);
-				}
-
-				ImPlot::EndPlot();
-			}
-
-			ImGui::SameLine();
-
-			ImGui::BeginGroup();			
-
-			if (ImGui::Button("Clear", { 70.0f, 30.0f }))
-				ClearChart();
-
-			ImGui::Checkbox("Apples", &chartShow_apples);
-			ImGui::Checkbox("Organics", &chartShow_organics);
-
-			ImGui::EndGroup();
+			chart.Plot();
 		}
-		ImGui::End();
+		End();
 	}
 }
 
@@ -676,51 +679,63 @@ void Main::DrawBotBrainWindow()
 	{
 		if (selectedObject)
 		{
-			//Bot brain window
-			ImGui::SetNextWindowBgAlpha(1.0f);
-			ImGui::SetNextWindowSize({ 330.0f, 240.0f });
-			ImGui::SetNextWindowPos({ 650 * 1.0f, 350.0f });
+			SetNextWindowBgAlpha(1.0f);
+			SetNextWindowSize({ 330.0f, 280.0f });
+			SetNextWindowPos({ 650 * 1.0f, 350.0f });
 
-			ImGui::Begin("Bot brain data", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			Begin("Bot brain data", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
-				ImGui::BeginGroup();
+				BeginGroup();
 
-				ImGui::RadioButton("Active brain", &brainToShow, 0);
-				ImGui::RadioButton("Initial brain", &brainToShow, 1);
+				RadioButton("Active brain", &brainToShow, 0);
+				RadioButton("Initial brain", &brainToShow, 1);
 
-				ImGui::EndGroup();
+				EndGroup();
 
 				if (nn_renderer.selectedNeuron)
 				{
 					//Show neuron type
-					ImGui::Text("Neuron type:");
-					ImGui::SameLine();
-					ImGui::Text(Neuron::GetTextFromType(nn_renderer.selectedNeuron->type));
+					Text("Neuron type:");
+					SameLine();
+					Text(NeuronTypeNames[nn_renderer.selectedNeuron->type]);
+
+					if (nn_renderer.selectedNeuronCaption != "")
+					{
+						SameLine();
+						Text(" (%s)", nn_renderer.selectedNeuronCaption);
+					}
+
+					//Show value 
+					Text("Value: %f", nn_renderer.selectedNeuronValue);
+
+					//Show memory
+					if(nn_renderer.selectedNeuron->type == memory)
+						Text("Memory: %f", nn_renderer.selectedNeuronMemory);
 
 					//Show bias
-					ImGui::Text("Bias: %f", nn_renderer.selectedNeuron->bias);
+					Text("Bias: %f", nn_renderer.selectedNeuron->bias);
 
 					//Show connections
 					repeat(nn_renderer.selectedNeuron->numConnections)
 					{
-						ImGui::Text("Connection to l: %i, n: %i, weight: %f", nn_renderer.selectedNeuron->allConnections[i].dest_layer,
+						Text("Connection to l: %i, n: %i, weight: %f", nn_renderer.selectedNeuron->allConnections[i].dest_layer,
 							nn_renderer.selectedNeuron->allConnections[i].dest_neuron, nn_renderer.selectedNeuron->allConnections[i].weight);
 					}
 
-					//Show memory data
-					//ImGui::Text("Memory data: %i", nn_renderer.selectedBrain->allMemory[][]);
+					//Show memory data somehow(TODO)
+					//Text("Memory data: %i", nn_renderer.selectedBrain->allMemory[][]);
 
 					//TODO
-					if((nn_renderer.selectedNeuron->type!=input) && (nn_renderer.selectedNeuron->type != output))
+					if((nn_renderer.selectedNeuron->type!=input) and (nn_renderer.selectedNeuron->type != output))
 					{
-						if (ImGui::Button("set random", { 100,30 }))
+						if (Button("set random", { 100,30 }))
 						{
 							nn_renderer.selectedNeuron->SetRandom();
 						}
 
-						ImGui::SameLine();
+						SameLine();
 
-						if (ImGui::Button("set zero", { 100,30 }))
+						if (Button("set zero", { 100,30 }))
 						{
 							nn_renderer.selectedNeuron->SetZero();
 						}
@@ -728,16 +743,33 @@ void Main::DrawBotBrainWindow()
 				}
 				else
 				{
-					ImGui::Text("Nothing selected");
+					Text("Nothing selected");
+				}
+
+				NewLine();
+
+				if (Button("Mutate brain", { 100,30 }))
+				{
+					if(nn_renderer.selectedBrain)
+						nn_renderer.selectedBrain->Mutate();
 				}
 			}
-			ImGui::End();
+
+			End();
 
 			if(brainToShow == 0)
 				nn_renderer.Render(((Bot*)selectedObject)->GetActiveBrain());
 			else
 				nn_renderer.Render(((Bot*)selectedObject)->GetInitialBrain());
 		}
+	}
+}
+
+void Main::DrawAAWindow()
+{
+	if (showAutomaticAdaptation)
+	{
+		auto_adapt->DrawWindow();
 	}
 }
 
@@ -752,8 +784,8 @@ void Main::DrawWindows()
 	DrawSystemWindow();
 	DrawControlsWindow();
 	DrawSelectionWindow();
-	DrawRenderWindow();
-	DrawConsoleWindow();
+	DrawDisplayWindow();
+	DrawLogWindow();
 	DrawMouseFunctionWindow();
 	DrawAdditionalsWindow();
 
@@ -765,11 +797,12 @@ void Main::DrawWindows()
 	DrawAdaptationWindow();
 	DrawChartWindow();
 	DrawBotBrainWindow();
+	DrawAAWindow();
 }
 
 void Main::MouseClick()
 {
-	if (!(nn_renderer.MouseClick({ mouseState.mouseX, mouseState.mouseY }) && (showBrain)))
+	if (!(nn_renderer.MouseClick({ mouseState.mouseX, mouseState.mouseY }) and (showBrain)))
 	{
 		if (field->IsInBoundsScreenCoords(mouseState.mouseX, mouseState.mouseY))
 		{
@@ -790,7 +823,7 @@ void Main::MouseClick()
 			{
 				if (obj)
 				{
-					if (obj->type == bot)
+					if (obj->type() == bot)
 					{
 						selectedObject = obj;
 					}
@@ -821,12 +854,7 @@ void Main::MouseClick()
 					{
 						if (field->IsInBounds(fieldCoords.x + cx, fieldCoords.y + cy))
 						{
-							obj = field->GetObjectLocalCoords(fieldCoords.x + cx, fieldCoords.y + cy);
-
-							if (!obj)
-							{
-								field->AddObject(new Rock(fieldCoords.x + cx, fieldCoords.y + cy));
-							}
+							field->ObjectAddOrReplace(new Rock(fieldCoords.x + cx, fieldCoords.y + cy));
 						}
 					}
 				}
@@ -870,7 +898,7 @@ void Main::MouseClick()
 
 							if (obj)
 							{
-								if (obj->type == bot)
+								if (obj->type() == bot)
 								{
 									obj->Mutagen();
 								}
@@ -884,8 +912,7 @@ void Main::MouseClick()
 }
 
 void Main::Render()
-{
-	
+{	
 	//Limit FPS
 	TimePoint currentTickFps = clock.now();
 
@@ -938,7 +965,7 @@ void Main::Render()
 	
 	DrawWindows();
 
-	ImGui::EndFrame();
+	EndFrame();
 
 	//Present scene
 	SDLPresentScene();
@@ -951,6 +978,28 @@ void Main::Render()
 		realFPS = fpsCounter;
 		fpsCounter = 0;
 	}
+}
+
+void Main::RunWithNoRender()
+{
+	limit_ticks_per_second = 0;
+	renderType = noRender;
+
+	Start();
+}
+
+void Main::RunWithMinimumRender()
+{
+	limit_ticks_per_second = 0;
+	limitFPS = 25;
+	renderType = natural;
+
+	Start();
+}
+
+void Main::Print(string s)
+{
+	LogPrint(s.c_str());
 }
 
 

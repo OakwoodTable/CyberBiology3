@@ -12,11 +12,13 @@ bool NeuralNetRenderer::MouseClick(Point p)
 void NeuralNetRenderer::DrawThickLine(int x1, int y1, int x2, int y2)
 {
 	repeat(Render_LineThickness)
-		SDL_RenderDrawLine(renderer, x1, y1+i-(Render_LineThickness/2), x2, y2 + i - (Render_LineThickness/2));
+		SDL_RenderDrawLine(renderer, x1, y1 + i - (Render_LineThickness/2), x2, y2 + i - (Render_LineThickness/2));
 }
 
 void NeuralNetRenderer::Render(BotNeuralNet* brain)
 { 
+	selectedBrain = brain;
+
 	//Draw background
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderFillRect(renderer, &bg_rect);
@@ -26,9 +28,14 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 	NeuronConnection* c;
 	Point drawTo = { bg_rect.x + 20, bg_rect.y + 20};
 
+	int shifts[NumNeuronLayers];
+
+	repeat(NumNeuronLayers)
+		shifts[i] = ((NumNeuronsInLayerMax - neuronsInLayer[i]) * Render_VerticalDistance) / 2;
+
 	for (uint xi = 0; xi < NumNeuronLayers; ++xi)
 	{
-		for (uint yi = 0; yi < NeuronsInLayer; ++yi)
+		for (uint yi = 0; yi < neuronsInLayer[xi]; ++yi)
 		{
 			n = &brain->allNeurons[xi][yi];
 
@@ -50,9 +57,9 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 				}
 
 				DrawThickLine(drawTo.x + xi * Render_LayerDistance + (Render_NeuronSize/2),
-					drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2),
+					drawTo.y + yi * Render_VerticalDistance + (Render_NeuronSize/2) + shifts[xi],
 					drawTo.x + (c->dest_layer) * Render_LayerDistance + (Render_NeuronSize/2),
-					drawTo.y + c->dest_neuron * Render_VerticalDistance + (Render_NeuronSize/2));
+					drawTo.y + c->dest_neuron * Render_VerticalDistance + (Render_NeuronSize/2) + shifts[c->dest_layer]);
 			}
 		}
 	}
@@ -60,11 +67,12 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 	//Draw neurons	
 	Rect rect = {0,0,Render_NeuronSize,Render_NeuronSize };
 
+	bool select = false;
+
 	for (uint xi = 0; xi < NumNeuronLayers; ++xi)
 	{
-		for (uint yi = 0; yi < NeuronsInLayer; ++yi)
+		for (uint yi = 0; yi < neuronsInLayer[xi]; ++yi)
 		{
-
 			n = &brain->allNeurons[xi][yi];
 
 			//Choose color
@@ -99,7 +107,7 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 
 			//Draw
 			rect.x = drawTo.x + xi*Render_LayerDistance;
-			rect.y = drawTo.y + yi*Render_VerticalDistance;
+			rect.y = drawTo.y + yi*Render_VerticalDistance + shifts[xi];
 
 			SDL_RenderFillRect(renderer, &rect);
 
@@ -111,11 +119,27 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 				SDL_RenderDrawRect(renderer, &rect);
 
 				selectedNeuron = n;
-				selectedBrain = brain;
-			}
+				
+				if (n->type == input)
+				{
+					selectedNeuronCaption = inputLayerCaptions[yi];
+				}
+				else if (n->type == output)
+				{
+					selectedNeuronCaption = outputLayerCaptions[yi];
+				}
 
+				selectedNeuronValue = brain->allValues[xi][yi];
+				selectedNeuronMemory = brain->allMemory[xi][yi];
+
+				select = true;
+			}
 		}
 	}
 
-
+	if (!select)
+	{
+		selectedNeuronCaption = "";
+		selectedNeuron = NULL;
+	}
 }

@@ -1,25 +1,10 @@
 #pragma once
 //#pragma message("	Bot_h")
 
-
 #include "Field.h"
 #include "BotNeuralNet.h"
 
 
-
-//Rotations array, contains where a bot would look with every
-//position of its head
-const Point Rotations[] =
-{
-	{0,-1},
-	{1,-1},
-	{1,0},
-	{1,1},
-	{0,1},
-	{-1,1},
-	{-1,0},
-	{-1,-1}
-};
 
 enum EnergySource
 {
@@ -57,13 +42,36 @@ const Uint8 presetColors[][4] =
 	{240, 200, 200}
 };
 
+//Rotations array, contains where a bot would look with every
+//position of its head
+const Point Rotations[8] =
+{
+	{0,-1},
+	{1,-1},
+	{1,0},
+	{1,1},
+	{0,1},
+	{-1,1},
+	{-1,0},
+	{-1,-1}
+};
+
+const int RotationsReverse[3][3] =
+{
+	{7, 6, 5},
+	{0, -1, 4},
+	{1, 2, 3}
+};
+
 
 
 class Bot final:public Object
 {
 
+private:
+
 	//Rotation, see Rotations[]
-	uint direction=0;
+	int direction=0;
 
 	//That is what a bot is looking at
 	Point lookAt;
@@ -78,14 +86,14 @@ class Bot final:public Object
 	BotNeuralNet initialBrain;
 
 	//if this is not 0, bot does nothing at his turn
-	int stunned;
+	uint stunned;
 
 	//How long a bot should wait before multiply
-	int fertilityDelay;
+	uint fertilityDelay;
 
 	Color color;
 
-	//Energy acquired from different sources
+	//Energy from different sources
 	int energyFromPS = 0;
 	int energyFromPredation = 0;
 	int energyFromOrganics = 0;
@@ -100,26 +108,21 @@ class Bot final:public Object
 	void RandomizeColor();
 	void RandomDirection();
 
-	//Severe mutation function - Experimental
-	void TotalMutation();
-
 	//Shift color a little (-10 to +10)
 	void ChangeColor(const int str = 10);
 
-	//Experimental
-	void SlightlyMutate();
-
 	void Mutate();
-
 
 	void drawOutlineAndHead();
 
 
 	//Create brain input data
 	BrainInput FillBrainInput();
+	float FillSightNeuron(Point at);
 
-	void Multiply(int numChildren);
+	void Multiply(int numChildren, float energy_to_pass = 0.5f);
 	void Attack();
+	void EatOrganics();
 	void Photosynthesis();
 
 
@@ -127,14 +130,11 @@ class Bot final:public Object
 	//These functions are used for experiments such as adaptation,
 	//you are supposed to call them in tick() function, or do not use
 
-	int adaptation_numTicks = 0;
-	int adaptation_numRightSteps = 0;
-	int addaptation_lastX;
-
-	int adaptationCounter = 0;
+	int addaptation_birthX;
 
 	//How many times bot used attack, move and PS commands
 	uint numAttacks = 0;
+	uint numMovesX = 0;
 	uint numMovesY = 0;
 	uint numPSonLand = 0;
 
@@ -146,9 +146,12 @@ class Bot final:public Object
 		
 	//----------------------------------------------------------------------------------------------
 
-
 public:
+
+	constexpr ObjectTypes type() override;
 	
+	bool isPredator();
+
 	//Experimental
 	void Mutagen();
 
@@ -158,20 +161,19 @@ public:
 	//Bot tick function, it should always call parents tick function first
 	int tick() override;	
 
-
 	void draw() override;
 	void drawEnergy() override;
 	void drawPredators() override;	
 
-
-	void Rotate(int dir = 1);
-	
+	void Rotate(int dir = 1);	
 
 	void GiveEnergy(int num, EnergySource src = unknown);
 
 	//Return current energy amount from different sources
 	int GetEnergyFromPS();
 	int GetEnergyFromKills();
+	int GetDirection();
+	void SetDirection(int);
 
 	int* GetMarkers();
 	Color* GetColor();
@@ -193,10 +195,11 @@ public:
 	-total neurons
 	*/
 	struct summary_return
-	{ 
-		int simple, radialBasis, random, memory, connections, deadend, neurons; 
-	} 
-	GetNeuronSummary();
+	{
+		int simple, radialBasis, random, memory, connections, deadend, neurons;
+	};
+
+	summary_return GetNeuronSummary();
 
 	/*Find out how close these two are as relatives,
 	returns number of matching mutation markers*/
@@ -213,11 +216,8 @@ public:
 	Bot(int X, int Y, uint Energy = MaxPossibleEnergyForABot);
 
 
-
-	static Color GetRandomColor();
-
-	static void CreateImage();
-	static void DeleteImage();
+	static void SetBodyImage(SDL_Texture* img);
+	static void SetHeadImages(SDL_Texture* img[8]);
 
 
 private:

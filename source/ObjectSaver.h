@@ -44,8 +44,14 @@ public:
 
     struct WorldParams
     {
-        int id, seed, tick, width;
-    }   
-    LoadWorld(Field* world, char* filename);
+        int
+        id,
+        seed,
+        tick,
+        width,
+        height;
+    };
+
+    WorldParams LoadWorld(Field* world, char* filename, bool clearWorld = true, bool loadParams = true, bool loadLandscape = true, bool loadBots = true);
 
 };

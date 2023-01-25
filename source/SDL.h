@@ -21,13 +21,11 @@ extern struct MouseState
 
 bool ReadMouseState();
 
-
 void InitSDL();
 void DeInitSDL();
 
 bool CreateWindowSDL();
 bool CreateRenderer();
-
 
 
 extern inline void SDLPresentScene();

@@ -67,10 +67,8 @@ bool CreateRenderer()
 	//renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	//VSync may be here
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 
-	//Setup GL
 	glViewport(0, 0, WindowWidth, WindowHeight);
 
 	glDisable(GL_DEPTH_TEST);
