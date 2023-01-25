@@ -1,5 +1,4 @@
-﻿
-cmake_minimum_required (VERSION 3.10)
+﻿cmake_minimum_required (VERSION 3.10)
 
 project(CyberBiology VERSION 1.0)
 
@@ -74,8 +73,17 @@ set(SOURCE_FILES
     source/MyTypes.h
     source/MyTypes.cpp
 
+    source/Chart.cpp
+    source/Chart.h
+
     source/ObjectSaver.cpp
     source/ObjectSaver.h
+
+    source/ImageFactory.cpp
+    source/ImageFactory.h
+
+    source/AutomaticAdaptation.cpp
+    source/AutomaticAdaptation.h
 
 )
 
@@ -87,7 +95,8 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 
 
-#lib files
+#dynamic libs
+
 #target_link_libraries(${CMAKE_PROJECT_NAME} 
 #opengl32.lib 
 #${CMAKE_CURRENT_SOURCE_DIR}/SDL/lib/SDL2.lib)
@@ -120,5 +129,3 @@ SDL2-static)
 
 #output to /bin folder
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
-
