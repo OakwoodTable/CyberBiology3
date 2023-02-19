@@ -10,7 +10,7 @@ class ObjectSaver;
 
 
 #include "Settings.h"
-#include "MyTypes.h"
+#include "Utils.h"
 
 #include "Object.h"
 #include "Bot.h"
@@ -53,6 +53,7 @@ constexpr const char* SeasonNames[] =
 struct FieldDynamicParams
 {
     int botMaxLifetime;
+    int botMaxEnergy;
     int fertility_delay;
 
     int oceanLevel;
@@ -67,7 +68,6 @@ struct FieldDynamicParams
     int adaptation_seaBirthBlock;
     int adaptation_PSInOceanBlock;
     int adaptation_PSInMudBlock;
-    int adaptation_botShouldBeOnLandOnceToMultiply;
     int adaptation_botShouldDoPSOnLandOnceToMultiply;    
 
     int adaptation_organicSpawnRate;
@@ -96,6 +96,9 @@ struct FieldDynamicParams
 //Simulation field class
 class Field final
 {
+
+private:
+
     //All cells as 2d array
     Object* allCells[FieldCellsWidth][FieldCellsHeight];
 
@@ -127,14 +130,11 @@ class Field final
     void ChangeSeason();
 
     //Multithreading
-    mutex mut;
-    condition_variable_any cond;    
-
     uint objectCounters[NumThreads][6]; 
-    bool threadsReady[NumThreads];
+    atomic_flag threadsGo;
+    atomic_flag threadsReady[NumThreads];
     bool terminateThreads = false;    
 
-    void NotifyThreads();
     void StartThreads();
 
     inline void tick_single_thread();
@@ -153,6 +153,8 @@ public:
 
     void shiftRenderPoint(int cx);
     void jumpToFirstBot();
+    void mutateWorld();
+    void placeWall(uint width = 2);
 
     //Move objects from one cell to another
     int MoveObject(int fromX, int fromY, int toX, int toY);

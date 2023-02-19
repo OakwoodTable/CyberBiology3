@@ -14,7 +14,9 @@ union BrainInput
 		height,	//Y coordinate
 		area,	//is in ocean/mud?
 		eye1,	//Sight
-		eye2;	//Second sight cell
+		eye1_isrelative,
+		eye_islookingatme;
+		//eye2;	//Second sight cell
 	};
 
 	float fields[NumInputNeurons] = {};
@@ -39,45 +41,8 @@ union BrainOutput
 	};
 
 	int fields[NumOutputNeurons];
-
-	static constexpr BrainOutput GetEmptyOutput()
-	{
-		return { 0, 0, 0, 0, 0 };
-	}
 };
 
-
-constexpr uint neuronsInLayer[] = 
-{ 
-	NumInputNeurons,
-	NumHiddenNeurons,
-	NumOutputNeurons
-};
-
-constexpr const char* inputLayerCaptions[] =
-{
-	"energy",
-	"age",
-	"rotation",
-	"height",
-	"area",
-	"eye1",
-	"eye2"	
-};
-
-constexpr const char* outputLayerCaptions[] =
-{
-	"desired_rotation_x",
-	"desired_rotation_y",
-
-	"move",
-	"photosynthesis",
-	"attack",
-	"digestOrganics",
-
-	"divide_num",
-	"divide_energy"
-};
 
 
 class BotNeuralNet
@@ -101,7 +66,7 @@ public:
 
 	//Neuron values and memory
 	float allValues[NumNeuronLayers][NumNeuronsInLayerMax];
-	float allMemory[NumNeuronLayers][NumNeuronsInLayerMax];
+	int8_t allMemory[NumNeuronLayers][NumNeuronsInLayerMax];
 
 	void Clone(BotNeuralNet* prototype);
 

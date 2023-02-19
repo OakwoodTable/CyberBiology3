@@ -62,7 +62,7 @@ void Main::DrawMainWindow()
 			Text("Season: %s ( %i/%i )", SeasonNames[field->GetSeason()], field->GetSeasonCounter(), field->params.seasonInterval);
 
 		//Neural net params and FOV x
-		Text("Layers: %i, Neurons: %i, Render_X: %i", NumNeuronLayers, NumNeuronsInLayerMax, field->renderX);
+		Text("Layers: %i, Neurons: %i, Render_X: %i", NumNeuronLayers, NumHiddenNeurons, field->renderX);
 
 		//Simulation seed and unique id
 		Text("Seed: %i, simulation id: %i", seed, id);
@@ -128,7 +128,7 @@ void Main::DrawControlsWindow()
 		SliderInt("limit FPS", &limitFPS, 0, GUI_Max_fps, "%d");
 
 		SliderInt("PS reward", &(field->params.PSreward), 0, GUI_Max_food);		
-		SliderInt("brush", &brushSize, GUI_Max_brush, 0, "%d");
+		SliderInt("brush", &brushSize, GUI_Max_brush, 1, "%d");
 	}
 	End();
 }
@@ -602,7 +602,6 @@ void Main::DrawAdaptationWindow()
 
 				SliderInt("no PS in ocean", &field->params.adaptation_PSInOceanBlock, 0, 1000, "%d");
 				SliderInt("no PS in mud", &field->params.adaptation_PSInMudBlock, 0, 1000, "%d");
-				SliderInt("On land at least once", &field->params.adaptation_botShouldBeOnLandOnceToMultiply, 0, 1000, "%d");
 				SliderInt("On land PS at least once", &field->params.adaptation_botShouldDoPSOnLandOnceToMultiply, 0, 1000, "%d");				
 				SliderInt("Force movements Y", &field->params.adaptation_forceBotMovementsY, 0, 1000);
 
@@ -632,6 +631,7 @@ void Main::DrawAdaptationWindow()
 			if (CollapsingHeader("More"))
 			{
 				SliderInt("Bot max lifetime", &field->params.botMaxLifetime, MaxBotLifetime_Min, MaxBotLifetime_Max);
+				SliderInt("Bot max energy", &field->params.botMaxEnergy, 100, 2000);
 				SliderInt("Fertility delay", &field->params.fertility_delay, 0, field->params.botMaxLifetime);
 
 				Checkbox("No mutations", &field->params.noMutations);
@@ -710,16 +710,18 @@ void Main::DrawBotBrainWindow()
 
 					//Show memory
 					if(nn_renderer.selectedNeuron->type == memory)
-						Text("Memory: %f", nn_renderer.selectedNeuronMemory);
+					{
+						Text("Memory: %i", nn_renderer.selectedNeuronMemory);
+					}
 
 					//Show bias
-					Text("Bias: %f", nn_renderer.selectedNeuron->bias);
+					Text("Bias: %f", (nn_renderer.selectedNeuron->bias * BiasMultiplier));
 
 					//Show connections
 					repeat(nn_renderer.selectedNeuron->numConnections)
 					{
 						Text("Connection to l: %i, n: %i, weight: %f", nn_renderer.selectedNeuron->allConnections[i].dest_layer,
-							nn_renderer.selectedNeuron->allConnections[i].dest_neuron, nn_renderer.selectedNeuron->allConnections[i].weight);
+							nn_renderer.selectedNeuron->allConnections[i].dest_neuron, (nn_renderer.selectedNeuron->allConnections[i].weight * WeightMultiplier));
 					}
 
 					//Show memory data somehow(TODO)
@@ -836,28 +838,19 @@ void Main::MouseClick()
 			else if (mouseFunc == mouse_remove)
 			{
 				Deselect();
-
-				for (int cx = -brushSize; cx < brushSize + 1; ++cx)
-				{
-					for (int cy = -brushSize; cy < brushSize + 1; ++cy)
-					{
-						if (field->IsInBounds(fieldCoords.x + cx, fieldCoords.y + cy))
-							field->RemoveObject(fieldCoords.x + cx, fieldCoords.y + cy);
+				BrushIterate(fieldCoords, [](uint X, uint Y, Field* field) 
+					{ 
+						field->RemoveObject(X, Y); 
 					}
-				}
+				);
 			}
 			else if (mouseFunc == mouse_place_rock)
 			{
-				for (int cx = -brushSize; cx < brushSize + 1; ++cx)
-				{
-					for (int cy = -brushSize; cy < brushSize + 1; ++cy)
-					{
-						if (field->IsInBounds(fieldCoords.x + cx, fieldCoords.y + cy))
-						{
-							field->ObjectAddOrReplace(new Rock(fieldCoords.x + cx, fieldCoords.y + cy));
-						}
+				BrushIterate(fieldCoords, [](uint X, uint Y, Field* field) 
+					{ 
+						field->ObjectAddOrReplace(new Rock(X, Y)); 
 					}
-				}
+				);
 			}
 			else if (mouseFunc == mouse_from_file)
 			{
@@ -872,7 +865,7 @@ void Main::MouseClick()
 						{
 							obj->x = fieldCoords.x;
 							obj->y = fieldCoords.y;
-							obj->energy = MaxPossibleEnergyForABot;
+							obj->energy = field->params.botMaxEnergy;
 
 							if (field->AddObject(obj))
 							{
@@ -888,24 +881,19 @@ void Main::MouseClick()
 			}
 			else if (mouseFunc == mouse_force_mutation)
 			{
-				for (int cx = -brushSize; cx < brushSize + 1; ++cx)
-				{
-					for (int cy = -brushSize; cy < brushSize + 1; ++cy)
+				BrushIterate(fieldCoords, [](uint X, uint Y, Field* field)
 					{
-						if (field->IsInBounds(fieldCoords.x + cx, fieldCoords.y + cy))
-						{
-							Bot* obj = (Bot*)field->GetObjectLocalCoords(fieldCoords.x + cx, fieldCoords.y + cy);
+						Bot* obj = (Bot*)field->GetObjectLocalCoords(X, Y);
 
-							if (obj)
+						if (obj)
+						{
+							if (obj->type() == bot)
 							{
-								if (obj->type() == bot)
-								{
-									obj->Mutagen();
-								}
+								obj->Mutagen();
 							}
 						}
 					}
-				}
+				);
 			}
 		}
 	}

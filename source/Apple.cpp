@@ -9,6 +9,11 @@ constexpr ObjectTypes Apple::type()
     return apple;
 }
 
+constexpr float Apple::image_sensor_val()
+{
+    return 1.5f;
+}
+
 void Apple::draw()
 {
     CalcScreenX();

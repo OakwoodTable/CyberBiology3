@@ -16,7 +16,7 @@ enum EnergySource
 
 
 //Preset colors
-const Uint8 presetColors[][4] =
+const Uint8 presetColors[][3] =
 {
 	{255, 0, 0},
 	{0, 255, 0},
@@ -65,10 +65,10 @@ const int RotationsReverse[3][3] =
 
 
 
-class Bot final:public Object
+class Bot : public Object
 {
 
-private:
+protected:
 
 	//Rotation, see Rotations[]
 	int direction=0;
@@ -108,22 +108,27 @@ private:
 	void RandomizeColor();
 	void RandomDirection();
 
-	//Shift color a little (-10 to +10)
-	void ChangeColor(const int str = 10);
-
 	void Mutate();
+
+	void UpdateActiveBrain();
 
 	void drawOutlineAndHead();
 
 
 	//Create brain input data
 	BrainInput FillBrainInput();
-	float FillSightNeuron(Point at);
+	void FillSightNeurons(Point at, float& n1, float& n2);
 
 	void Multiply(int numChildren, float energy_to_pass = 0.5f);
 	void Attack();
 	void EatOrganics();
 	void Photosynthesis();
+	void Rotate(int dir = 1);
+
+	//Take away bot energy, return true if 0 or below (bot dies)
+	bool TakeEnergy(int val);
+	void GiveEnergy(int num, EnergySource src = unknown);
+
 
 
 	//----------------------------------------------------------------------------------------------
@@ -138,8 +143,6 @@ private:
 	uint numMovesY = 0;
 	uint numPSonLand = 0;
 
-	//Bot visited land
-	bool wasOnLand = false;
 
 	bool ArtificialSelectionWatcher_OnTick();
 	bool ArtificialSelectionWatcher_OnDivide();
@@ -149,6 +152,7 @@ private:
 public:
 
 	constexpr ObjectTypes type() override;
+	constexpr float image_sensor_val() override;
 	
 	bool isPredator();
 
@@ -165,10 +169,6 @@ public:
 	void drawEnergy() override;
 	void drawPredators() override;	
 
-	void Rotate(int dir = 1);	
-
-	void GiveEnergy(int num, EnergySource src = unknown);
-
 	//Return current energy amount from different sources
 	int GetEnergyFromPS();
 	int GetEnergyFromKills();
@@ -179,10 +179,7 @@ public:
 	Color* GetColor();
 
 	BotNeuralNet* GetActiveBrain();
-	BotNeuralNet* GetInitialBrain();
-
-	//Take away bot energy, return true if 0 or below (bot dies)
-	bool TakeEnergy(int val);
+	BotNeuralNet* GetInitialBrain();	
 
 	/*Get neuron summary(info)
 	Format: (all integers)
@@ -206,14 +203,13 @@ public:
 	int FindKinship(Bot* stranger);
 
 	void SetColor(Color);
-	void SetColor(Uint8, Uint8, Uint8);
 
 
 	//Inherit from a parent
 	Bot(int X, int Y, uint Energy, Bot* prototype, bool mutate = false);
 
 	//New bot
-	Bot(int X, int Y, uint Energy = MaxPossibleEnergyForABot);
+	Bot(int X, int Y, uint Energy = BotMaxEnergyInitial);
 
 
 	static void SetBodyImage(SDL_Texture* img);

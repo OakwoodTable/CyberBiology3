@@ -163,7 +163,6 @@ int Field::FindHowManyFreeCellsAround(int X, int Y)
     {
         for (int cy = -1; cy < 2; ++cy)
         {
-
             tx = ValidateX(X + cx);
 
             if (IsInBounds(tx, Y + cy))
@@ -231,6 +230,25 @@ void Field::ObjectAddOrReplace(Object* obj)
     *cell = obj;
 }
 
+void Field::mutateWorld()
+{
+    for (int cx = 0; cx < FieldCellsWidth; ++cx)
+    {
+        for (int cy = 0; cy < FieldCellsHeight; ++cy)
+        {
+            Object* o = allCells[cx][cy];
+
+            if(o)
+            {
+                if (o->type() == bot)
+                {
+                    ((Bot*)o)->Mutagen();
+                }
+            }
+        }
+    }
+}
+
 void Field::RemoveObject(int X, int Y)
 {
     Object* tmpO = allCells[X][Y];
@@ -240,6 +258,45 @@ void Field::RemoveObject(int X, int Y)
         delete tmpO;
 
         allCells[X][Y] = NULL;
+    }
+}
+
+void Field::placeWall(uint width)
+{
+    Object* o = allCells[0][0];
+
+    //If there is a wall
+    if (o)
+    {
+        if (o->type() == rock)
+        {
+            repeat(FieldCellsHeight)
+            {
+                for (uint b = 0; b < width; ++b)
+                {
+                    o = allCells[b][i];
+
+                    if (o)
+                    {
+                        if (o->type() == rock)
+                        {
+                            RemoveObject(b, i);
+                        }
+                    }
+                }
+            }
+
+            return;
+        }
+    }
+
+    //Otherwise create a new one
+    repeat(FieldCellsHeight)
+    {
+        for(uint b = 0; b < width; ++b)
+        {
+            ObjectAddOrReplace(new Rock(b, i));
+        }
     }
 }
 
@@ -307,17 +364,6 @@ void Field::ObjectTick(Object* tmpObj)
     }
 }
 
-void Field::NotifyThreads()
-{
-    mut.lock();
-    {
-        memset(threadsReady, 0, sizeof(threadsReady));
-    }
-    mut.unlock();
-
-    cond.notify_all();
-}
-
 
 inline void Field::tick_single_thread()
 {
@@ -369,7 +415,7 @@ inline void Field::tick_single_thread()
 
 void Field::ProcessPart_MultipleThreads(const uint X1, const uint X2, const uint index)
 {
-    srand(seed + index);
+    srand(seed + index);    
 
     auto obj_calc = [&](Object* tmpObj)
     {
@@ -397,58 +443,46 @@ void Field::ProcessPart_MultipleThreads(const uint X1, const uint X2, const uint
         ObjectTick(tmpObj);
     };
 
-    auto lifetime_calc = [&]()
-    {
-        uint c = objectCounters[index][1];
-
-        if (c > 0)
-            objectCounters[index][5] /= c;
-    };
-
-    auto wait = [&]()
-    {
-        mut.lock();
-        cond.wait(mut, [&] {return !threadsReady[index]; });
-        mut.unlock();
-    };
-
-    auto thisThreadIsReady = [&]()
-    {
-        mut.lock();
-        threadsReady[index] = true;
-        mut.unlock();
-    };
-
     const uint chunkWidth = ((X2 - X1) / 2);
     const uint _X[2] = {X1, X1 + chunkWidth};
 
     for(;!terminateThreads;)
     {
-        repeat(2)
+        for(uint pass = 0; pass < 2; ++pass)
         {
-            wait();
-            {
-                for (uint X = _X[i]; X < _X[i] + chunkWidth; ++X)
-                {
-                    for (uint Y = 0; Y < FieldCellsHeight; ++Y)
-                    {
-                        obj_calc(allCells[X][Y]);
-                    }
-                }
+            //Wait for the signal
+            threadsGo.wait(pass != 0);
 
-                lifetime_calc();
-                thisThreadIsReady();
+            //Calculate chunk
+            for (uint X = _X[pass]; X < _X[pass] + chunkWidth; ++X)
+            {
+                for (uint Y = 0; Y < FieldCellsHeight; ++Y)
+                {
+                    obj_calc(allCells[X][Y]);
+                }
             }
 
-            cond.notify_all();
+            //Calculate bots lifetime
+            uint c = objectCounters[index][1];
+
+            if (c > 0)
+                objectCounters[index][5] /= c;
+
+            //This thread is done
+            threadsReady[index].test_and_set();
+            threadsReady[index].notify_one();
         }
     }
 }
 
 void Field::StartThreads()
 {
+    threadsGo.clear();
+
     repeat(NumThreads)
     {
+        threadsReady[i].clear();
+
         uint X1 = (FieldCellsWidth / NumThreads) * i;
         uint X2 = (FieldCellsWidth / NumThreads) * (i + 1);
 
@@ -461,16 +495,6 @@ void Field::StartThreads()
 
 inline void Field::tick_multiple_threads()
 {
-    auto waitAllThreads = [&]()
-    {
-        for (bool& b : threadsReady)
-        {
-            if (!b) return false;
-        }
-
-        return true;
-    };
-
     objectsTotal = 0;
     botsTotal = 0;
     applesTotal = 0;
@@ -485,12 +509,21 @@ inline void Field::tick_multiple_threads()
         memset(objectCounters, 0, sizeof(objectCounters));
 
         //Starting signal for all threads
-        NotifyThreads();
+        if (i == 0)
+        {
+            threadsGo.test_and_set();
+        }
+        else
+        {
+            threadsGo.clear();
+        }
+        threadsGo.notify_all();
 
         //Wait for threads to synchronize
-        mut.lock();
-        cond.wait(mut, waitAllThreads);
-        mut.unlock();
+        repeat(NumThreads)
+        {
+            threadsReady[i].wait(false);
+        }
 
         //Add object counters
         repeat(NumThreads)
@@ -501,6 +534,9 @@ inline void Field::tick_multiple_threads()
             organicsTotal += objectCounters[i][3];
             predatorsTotal += objectCounters[i][4];
             averageLifetime += objectCounters[i][5];
+
+            //Reset atomic flag
+            threadsReady[i].clear();
         }
     }
 
@@ -708,7 +744,7 @@ void Field::SpawnControlGroup()
 {
     for (int i = 0; i < ControlGroupSize; ++i)
     {
-        Bot* tmpBot = new Bot(RandomVal(FieldCellsWidth), RandomVal(FieldCellsHeight), MaxPossibleEnergyForABot);
+        Bot* tmpBot = new Bot(RandomVal(FieldCellsWidth), RandomVal(FieldCellsHeight), params.botMaxEnergy);
 
         if (!AddObject(tmpBot))
             delete tmpBot;
@@ -764,6 +800,7 @@ void FieldDynamicParams::Reset()
     spawnApples = false;
 
     botMaxLifetime = MaxBotLifetimeInitial;
+    botMaxEnergy = BotMaxEnergyInitial;
 
     adaptation_StepsNumToDivide_Winds = 0;
 
@@ -771,7 +808,6 @@ void FieldDynamicParams::Reset()
     adaptation_seaBirthBlock = 0;
     adaptation_PSInOceanBlock = 0;
     adaptation_PSInMudBlock = 0;
-    adaptation_botShouldBeOnLandOnceToMultiply = 0;
     adaptation_botShouldDoPSOnLandOnceToMultiply = 0;
     adaptation_forceBotMovementsY = 0;
 

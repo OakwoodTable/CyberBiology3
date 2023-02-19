@@ -8,6 +8,11 @@ constexpr ObjectTypes Rock::type()
 	return rock;
 }
 
+constexpr float Rock::image_sensor_val()
+{
+	return -1.0f;
+}
+
 void Rock::draw()
 {
 	CalcScreenX();

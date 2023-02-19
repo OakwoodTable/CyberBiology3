@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Settings.h"
-#include "MyTypes.h"
+#include "Utils.h"
 
 
-struct NeuronConnection
+struct NeuronConnection final
 {
-	byte dest_layer;
-	byte dest_neuron;
+	byte dest_layer : 4;
+	byte dest_neuron : 4;
 
-	float weight;
+	int8_t weight : 8;
 
 	void ChangeWeight();
 	void SetRandomWeight();
@@ -50,12 +50,12 @@ constexpr const char* NeuronTypeNames[] =
 
 struct Neuron final
 {
-	float bias;
-	NeuronType type = basic;	
+	NeuronType type : 4;
+	byte layer : 4;
 
-	byte layer;
-
-	byte numConnections = 0;
+	int8_t bias : 8;
+	
+	byte numConnections : 8;
 	NeuronConnection allConnections[NumNeuronsInLayerMax];
 	
 
@@ -63,15 +63,12 @@ struct Neuron final
 
 	void Clone(Neuron* source);
 
-	void AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT);
+	void AddConnection(uint DEST_LAYER, uint DEST, int8_t WEIGHT);
 	void AddConnection(NeuronConnection* prototype);
 	bool AddRandomConnection();
 	void RemoveConnection(uint index);
 
 	uint GetRandomConnectionIndex();
-
-	//Sort connections by index
-	void SortConnections();
 
 	//Does neuron have a connection,
 	//returns connection index or -1

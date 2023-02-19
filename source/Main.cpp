@@ -4,7 +4,7 @@
 // 
 // Примерно как устроено:
 // - Входная точка в файле Main.cpp
-// - Все настраиваемые параметры в файле Settings.h в виде макросов
+// - Все настраиваемые параметры в файле Settings.h
 // - Все объекты на поле наследуется от Object
 // - Neuron.h это нейрон, BotNeuralNet.h - вся нейросеть
 // - Field, это класс игрового поля
@@ -14,7 +14,6 @@
 // - ObjectSaver - сохраняет объекты и мир в файл
 // - ImageFactory - создает текстуры для объектов
 // - AutomaticAdaptation - автоматизированный эксперимент адаптация
-// - MyTypes - определение некоторых дополнительных типов данных для удобства
 // 
 //
 //-----------------------------------------------------------------
@@ -28,50 +27,49 @@ Main simulation;
 
 inline void ValidateThreadsNumber()
 {
-	constexpr uint acceptableThreadNums[] =
-	{
-		1, 4, 8, 16
-	};
-
 	if ((FieldCellsWidth % (NumThreads * 2)) != 0)
 	{
 		//Ширина поля должна делиться на (число потоков х2) без остатка!
-		//Windows only, sorry
-		MessageBox(NULL, L"FieldCellsWidth should be divisible by (NumThreads * 2) without remainder!", L"Wrong params!", MB_ICONERROR | MB_OK);
+		ErrorMessage(L"FieldCellsWidth should be divisible by (NumThreads * 2) without remainder!", L"Wrong params!");
+		exit(0);
+	}
+
+	if ((FieldCellsWidth / (NumThreads * 2)) < 4)
+	{
+		//Поле должно быть шире или потоков должно быть меньше
+		ErrorMessage(L"Field chunk too small for selected number of threads!", L"Wrong params!");
 		exit(0);
 	}
 	
-	for (uint n : acceptableThreadNums)
+	for (uint n : {1, 4, 8, 16, 24, 48})
 	{
 		if (n == NumThreads)
 			return;	//All fine
 	}
 
-	MessageBox(NULL, L"Invalid number of threads!", L"Wrong params!", MB_ICONERROR | MB_OK);
+	ErrorMessage(L"Invalid number of threads!", L"Wrong params!");
 	exit(0);
 }
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine, _In_ int       nCmdShow)
 {
+	//Init
 	ValidateThreadsNumber();
-
 	InitSDL();
 
 	if (!CreateWindowSDL())
 		return -2;
 
 	CreateRenderer();
-
 	InitImGUI();
-
 	ImageFactory::CreateImages();
 
+	//Main cycle
 	simulation.MainLoop();
 
 	//Clear memory
 	ImageFactory::DeleteImages();
-
 	DeInitImGUI();
 	DeInitSDL();
 
@@ -81,6 +79,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 void Main::SwitchPause()
 {
 	simulate = !simulate;
+}
+
+void Main::BrushIterate(Point p, void(*callback)(uint, uint, Field*))
+{
+	uint X = p.x, Y = p.y;
+
+	for (int cx = -brushSize; cx < brushSize + 1; ++cx)
+	{
+		for (int cy = -brushSize; cy < brushSize + 1; ++cy)
+		{
+			if (field->IsInBounds(X + cx, Y + cy))
+			{
+				if ((brushSize * brushSize) > ((cx * cx) + (cy * cy)))
+				{
+					callback(X + cx, Y + cy, field);
+				}
+			}
+		}
+	}
 }
 
 void Main::Start()
@@ -282,7 +299,7 @@ void Main::LoadFilenames()
 
 void Main::CreateNewFile()
 {
-	std::string fileName = "New1";
+	string fileName = "New1";
 	int fileCounter = 1;
 
 	for (;;)
@@ -308,7 +325,7 @@ Main::Main()
 {
 	LogPrint((char*)"Started. Seed:\r\n");
 
-	//Set seed
+	//Set seed and id
 	#ifdef RandomSeed		
 		seed = (uint)GetTickCount64();
 	#else
@@ -366,6 +383,18 @@ void Main::MainLoop()
 			{
 				io->AddInputCharacter(*e.text.text);
 			}
+			else if (e.type == SDL_WINDOWEVENT)
+			{
+				if(e.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+				{
+					windowIsVisible = false;
+				}
+				else if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				{
+					windowIsVisible = true;
+				}
+			}
+
 		}
 
 		//Mouse down event
@@ -382,10 +411,11 @@ void Main::MainLoop()
 		else
 		{
 			//Delay so it would not eat too many resourses while on pause
-			SDL_Delay(10);
+			SDL_Delay(5);
 		}
 
-		Render();
+		if(windowIsVisible)
+			Render();
 	}
 }
 
@@ -401,8 +431,7 @@ void Main::CatchKeyboard()
 	}
 	else if (keyboard[Keyboard_PlaceWall])
 	{
-		repeat(FieldCellsHeight)
-			field->ObjectAddOrReplace(new Rock(0, i));
+		field->placeWall();
 	}
 	else if (keyboard[Keyboard_DropOrganics])
 	{
@@ -410,7 +439,7 @@ void Main::CatchKeyboard()
 		{
 			for (int Y = 0; Y < 25 + RandomVal(20); ++Y)
 			{
-				field->AddObject(new Organics(X, Y, MaxPossibleEnergyForABot/2));
+				field->AddObject(new Organics(X, Y, BotMaxEnergyInitial/2));
 			}
 		}
 	}
@@ -423,6 +452,12 @@ void Main::CatchKeyboard()
 			if (!field->AddObject(tmp))
 				delete tmp;
 		}
+	}
+	else if (keyboard[Keyboard_MutateScreen])
+	{
+		field->mutateWorld();
+
+		LogPrint("[Solar flare!]");
 	}
 	else if (keyboard[Keyboard_Quicksave])
 	{

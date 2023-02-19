@@ -14,6 +14,11 @@ constexpr ObjectTypes Object::type()
 	return abstract;
 }
 
+constexpr float Object::image_sensor_val()
+{
+	return NAN;
+}
+
 Object::Object(int X, int Y) :x(X), y(Y)
 {
 	energy = 0;

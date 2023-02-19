@@ -18,7 +18,8 @@ void Organics::drawEnergy()
     CalcObjectRectShrinked(2);
 
 	//Draw
-	SDL_SetRenderDrawColor(renderer, 255, static_cast<int>((1.0f - ((energy * 1.0f) / (MaxPossibleEnergyForABot * .5f))) * 255.0f), 0, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 
+        static_cast<int>((1.0f - ((energy * 1.0f) / (pField->params.botMaxEnergy * .5f))) * 255.0f), 0, 255);
 	SDL_RenderFillRect(renderer, &object_rect);
 }
 
@@ -36,6 +37,11 @@ void Organics::SetImage(SDL_Texture* img)
 constexpr ObjectTypes Organics::type()
 {
     return organic_waste;
+}
+
+constexpr float Organics::image_sensor_val()
+{
+    return 0.5f;
 }
 
 int Organics::tick()

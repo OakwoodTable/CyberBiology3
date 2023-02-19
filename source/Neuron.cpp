@@ -4,6 +4,9 @@
 Neuron::Neuron()
 {
 	SetRandomType();
+
+	type = basic;
+	numConnections = 0u;
 }
 
 void Neuron::Clone(Neuron* source)
@@ -11,17 +14,17 @@ void Neuron::Clone(Neuron* source)
 	memcpy(this, source, sizeof(Neuron));
 }
 
-void Neuron::AddConnection(uint DEST_LAYER, uint DEST, float WEIGHT=1000.0f)
+void Neuron::AddConnection(uint DEST_LAYER, uint DEST, int8_t WEIGHT = 120)
 {
-	NeuronConnection* nConnection = &allConnections[numConnections];
+	NeuronConnection& nConnection = allConnections[numConnections];
 
-	nConnection->dest_neuron = DEST;
-	nConnection->dest_layer = DEST_LAYER;
+	nConnection.dest_neuron = DEST;
+	nConnection.dest_layer = DEST_LAYER;
 
-	if (WEIGHT < 1000.0f)
-		nConnection->weight = WEIGHT;
+	if (WEIGHT < 120)
+		nConnection.weight = WEIGHT;
 	else
-		nConnection->SetRandomWeight();
+		nConnection.SetRandomWeight();
 
 	++numConnections;
 }
@@ -98,7 +101,7 @@ void Neuron::ClearConnections()
 
 void Neuron::SetRandomBias()
 {
-	bias = RandomFloatInRange(NeuronBiasMin, NeuronBiasMax);
+	bias = RandomValRange(NeuronBiasMin, NeuronBiasMax);
 }
 
 void Neuron::SetRandomType()
@@ -187,14 +190,14 @@ bool Neuron::IsInactive()
 void Neuron::SetZero()
 {
 	ClearConnections();
-	bias = 0.0f;
+	bias = 0;
 }
 
 void Neuron::SetTunnel(int num)
 {
 	SetZero();
 
-	allConnections[0].weight = 1.0f;
+	allConnections[0].weight = WeightValueCorrespondingTo_1;
 	allConnections[0].dest_neuron = num;
 	allConnections[0].dest_layer = layer + 1;
 }
@@ -206,10 +209,10 @@ void Neuron::mutate_ChangeType()
 
 void Neuron::mutate_ChangeBias()
 {
-	float change = RandomFloatInRange(ChangeBiasMin, ChangeBiasMax);
+	char change = RandomValRange(ChangeBiasMin, ChangeBiasMax);
 
 	if (RandomPercent(50))
-		change *= -1.0f;
+		change *= -1;
 
 	bias += change;
 
@@ -255,19 +258,14 @@ void Neuron::mutate_DeleteNeuron()
 		type = basic;
 }
 
-void Neuron::SortConnections()
-{
-	//TODO
-}
-
 void NeuronConnection::ChangeWeight()
 {
-	float change = RandomFloatInRange(ChangeConnectionWeightMin, ChangeConnectionWeightMax);
+	char change = RandomValRange(ChangeConnectionWeightMin, ChangeConnectionWeightMax);
 
 	if (RandomPercent(50))
-		change *= -1.0f;
+		change *= -1;
 
-	weight += change;
+	weight += change * WeightValueCorrespondingTo_1;
 
 	if (weight > ConnectionWeightMax)
 		weight = ConnectionWeightMax;
@@ -277,5 +275,5 @@ void NeuronConnection::ChangeWeight()
 
 void NeuronConnection::SetRandomWeight()
 {
-	weight = RandomFloatInRange(ConnectionWeightMin, ConnectionWeightMax);
+	weight = (RandomValRange(ConnectionWeightMin, ConnectionWeightMax) * WeightValueCorrespondingTo_1);
 }

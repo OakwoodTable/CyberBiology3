@@ -86,17 +86,16 @@ void BotNeuralNet::Process(BrainInput input)
 		allValues[NeuronInputLayerIndex][i] = input.fields[i];
 	}
 
-	float* m;
+	int8_t* m;
 	Neuron* n;
 	float tmpVal;
-
 
 	//Parse input layer
 	for (uint yi = 0; yi < NumInputNeurons; ++yi)
 	{
 		n = &allNeurons[NeuronInputLayerIndex][yi];
 
-		tmpVal = allValues[NeuronInputLayerIndex][yi] + n->bias;		
+		tmpVal = allValues[NeuronInputLayerIndex][yi] + (n->bias * BiasMultiplier);
 
 		NeuronConnection* tmpC;
 
@@ -104,7 +103,7 @@ void BotNeuralNet::Process(BrainInput input)
 		{
 			tmpC = &n->allConnections[i];
 
-			allValues[tmpC->dest_layer][tmpC->dest_neuron] += tmpVal * tmpC->weight;
+			allValues[tmpC->dest_layer][tmpC->dest_neuron] += tmpVal * (tmpC->weight * WeightMultiplier);
 		}
 	}
 
@@ -115,7 +114,7 @@ void BotNeuralNet::Process(BrainInput input)
 		{
 			m = &allMemory[xi][yi];
 			n = &allNeurons[xi][yi];
-			tmpVal = allValues[xi][yi] + n->bias;			
+			tmpVal = allValues[xi][yi] + (n->bias * BiasMultiplier);
 
 			//Skip calculation if neuron has no further connections
 			if (n->numConnections == 0)
@@ -138,18 +137,18 @@ void BotNeuralNet::Process(BrainInput input)
 
 			case memory:
 
-				if (tmpVal < -1000)
+				if (tmpVal < -1.0f)
 				{
 					//Wipe memory
 					*m = 0;
 				}
-				else if (tmpVal > 1000)
+				else if (tmpVal > 1.0f)
 				{
 					//Write in memory
-					*m = 1000;
+					*m = 1;
 				}
 
-				tmpVal = *m;
+				tmpVal = *m * 1.0f;
 
 				break;
 
@@ -162,7 +161,7 @@ void BotNeuralNet::Process(BrainInput input)
 			{
 				tmpC = &n->allConnections[i];
 
-				allValues[tmpC->dest_layer][tmpC->dest_neuron] += tmpVal * tmpC->weight;
+				allValues[tmpC->dest_layer][tmpC->dest_neuron] += tmpVal * (tmpC->weight * WeightMultiplier);
 			}
 		}
 	}
@@ -174,7 +173,7 @@ void BotNeuralNet::Process(BrainInput input)
 	repeat(2)
 	{
 		n = &allNeurons[NeuronOutputLayerIndex][i];
-		tmpVal = allValues[NeuronOutputLayerIndex][i] + n->bias;		
+		tmpVal = allValues[NeuronOutputLayerIndex][i] + (n->bias * BiasMultiplier);
 
 		tmpVal = PlusMinusActivation(tmpVal);
 	}
@@ -183,7 +182,7 @@ void BotNeuralNet::Process(BrainInput input)
 	for (uint oi = 2; oi < NumOutputNeurons; ++oi)
 	{
 		n = &allNeurons[NeuronOutputLayerIndex][oi];
-		tmpVal = allValues[NeuronOutputLayerIndex][oi] + n->bias;
+		tmpVal = allValues[NeuronOutputLayerIndex][oi] + (n->bias * BiasMultiplier);
 
 		tmpVal = ActivationSimple(tmpVal);
 	}
@@ -207,45 +206,45 @@ void BotNeuralNet::Mutate()
 				n = &allNeurons[xi][yi];
 				roll = RandomVal(101);
 								
-				if(roll <= 5)
+				if(roll <= 10)
 				{
-					//5% - set neuron to random
+					//10% - set neuron to random
 					n->SetRandom();
 				}
-				else if (roll <= 7)
+				else if (roll <= 12)
 				{
 					//2% - clear neuron
 					n->mutate_DeleteNeuron();
 				}
-				else if (roll <= 12)
+				else if (roll <= 22)
 				{
-					//5% - change neuron type
+					//10% - change neuron type
 					n->mutate_ChangeType();
 				}
-				else if (roll <= 30)
+				else if (roll <= 40)
 				{
 					//18% - change bias
 					n->mutate_ChangeBias();
 				}
-				else if (roll <= 35)
+				else if (roll <= 50)
 				{
-					//5% - 1 connection jump to next layer 
+					//10% - 1 connection jump to next layer 
 					//TODO
 					if (n->numConnections > 0)
 					{
-						uint connection = n->GetRandomConnectionIndex();
+						NeuronConnection& connection = n->allConnections[n->GetRandomConnectionIndex()];
 
-						byte lx = n->allConnections[connection].dest_layer;
-						byte nx = n->allConnections[connection].dest_neuron;
+						byte lx = connection.dest_layer;
+						byte nx = connection.dest_neuron;
 
 						Neuron* n2 = &allNeurons[lx][nx];
 
 						if (n2->numConnections > 0)
 						{
-							uint connection_dest = n2->GetRandomConnectionIndex();
+							NeuronConnection& connection_dest = n2->allConnections[n2->GetRandomConnectionIndex()];
 
-							n->allConnections[connection].dest_layer = n2->allConnections[connection_dest].dest_layer;
-							n->allConnections[connection].dest_neuron = n2->allConnections[connection_dest].dest_neuron;
+							connection.dest_layer = connection_dest.dest_layer;
+							connection.dest_neuron = connection_dest.dest_neuron;
 						}
 						else
 						{
@@ -281,13 +280,13 @@ void BotNeuralNet::Mutate()
 								if (n2.IsInactive())
 								{
 									//Copy neuron connection
-									n2.bias = 0.0f;
+									n2.bias = 0;
 									n2.AddConnection(c);
 
 									//Retarget old connection
 									n->RemoveConnection(connection);
 
-									c->weight = 1.0f;
+									c->weight = WeightValueCorrespondingTo_1;
 									c->dest_layer = i;
 									c->dest_neuron = b;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Settings.h"
-#include "MyTypes.h"
+#include "Utils.h"
 
 //Window
 extern SDL_Renderer* renderer;
@@ -18,6 +18,7 @@ extern struct MouseState
 	wheel,
 	mouseX, mouseY;
 } mouseState;
+
 
 bool ReadMouseState();
 

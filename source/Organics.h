@@ -16,6 +16,7 @@ private:
 public:
 
 	constexpr ObjectTypes type() override;
+	constexpr float image_sensor_val() override;
 	int tick() override;
 	void draw() override;
 	void drawEnergy() override;

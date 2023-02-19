@@ -58,6 +58,7 @@ public:
 	int energy;
 
 	virtual constexpr ObjectTypes type();
+	virtual constexpr float image_sensor_val();
 
 	Object(int X, int Y);
 

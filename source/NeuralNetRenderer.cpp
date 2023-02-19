@@ -43,11 +43,11 @@ void NeuralNetRenderer::Render(BotNeuralNet* brain)
 			{
 				c = &n->allConnections[ci];
 
-				if (c->weight > Render_GreyThreshold)
+				if ((c->weight * WeightMultiplier) > Render_GreyThreshold)
 				{
 					SDL_SetRenderDrawColor(renderer, Render_PositiveWeightColor, 255);
 				}
-				else if (c->weight < -Render_GreyThreshold)
+				else if ((c->weight * WeightMultiplier) < -Render_GreyThreshold)
 				{
 					SDL_SetRenderDrawColor(renderer, Render_NegativeWeightColor, 255);
 				}

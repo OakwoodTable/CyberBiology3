@@ -15,7 +15,7 @@ struct NeuralNetRenderer final
 	Neuron* selectedNeuron = NULL;
 	const char* selectedNeuronCaption = "";
 	float selectedNeuronValue = 0.0f;
-	float selectedNeuronMemory = 0.0f;
+	int8_t selectedNeuronMemory = 0;
 
 
 private:

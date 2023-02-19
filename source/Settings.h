@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils.h"
+
 
 //-----------------------------------------------------------------
 //OpenGL
@@ -15,7 +17,7 @@
 //-----------------------------------------------------------------
 //Window
 
-#define WindowCaption "CyberBio v1.3.0"
+#define WindowCaption "CyberBio v1.3.1"
 
 #define WindowWidth 1920
 #define WindowHeight 1080
@@ -31,8 +33,8 @@
 #define RandomSeed
 //#define Seed 0
 
-//Number of threads (only 1, 4, 8 or 16)
-#define NumThreads 16
+//Number of threads (only 1, 4, 8, 16, 24 or 48)
+#define NumThreads 48
 
 //-----------------------------------------------------------------
 
@@ -56,7 +58,7 @@
 #define GUI_Max_brush 50
 
 #define CursorBlinkRate 2
-#define GUI_FPSWhenNoRender 10
+#define GUI_FPSWhenNoRender 20
 
 #define RepaintTolerance 2
 
@@ -83,6 +85,8 @@
 #define Keyboard_Quicksave SDL_SCANCODE_F5
 #define Keyboard_Quickload SDL_SCANCODE_F9
 
+#define Keyboard_MutateScreen SDL_SCANCODE_F11
+
 #define Keyboard_ShowSaveLoad_Window SDL_SCANCODE_Z
 #define Keyboard_ShowDangerous_Window SDL_SCANCODE_X
 #define Keyboard_ShowAdaptation_Window SDL_SCANCODE_C
@@ -108,16 +112,23 @@
 #define FieldX InterfaceBorder
 #define FieldY InterfaceBorder
 
-#define ScreenCellsWidth 13*16
+#define FieldCellSize 8
+#define FieldCellSizeHalf FieldCellSize/2
+
+//constexpr uint ScreenCellsWidth = ((WindowWidth - InterfaceBorder * 2 - GUIWindowWidth) / FieldCellSize);
+#define ScreenCellsWidth 12*16
 
 //ƒолжно делитьс€ на 8 без остатка если нужны 4 потока! » на 16 без остатка если 8 потоков и т.д.!
-#define FieldCellsWidth ScreenCellsWidth*2		
+#define FieldCellsWidth ScreenCellsWidth*30
 #define FieldCellsHeight 133
 
 #define FieldRenderCellsWidth 202
 
-#define FieldCellSize 8
-#define FieldCellSizeHalf FieldCellSize/2
+#if ScreenCellsWidth < FieldRenderCellsWidth
+	#undef FieldRenderCellsWidth
+	#define FieldRenderCellsWidth ScreenCellsWidth
+#endif
+
 #define FieldWidth FieldCellSize*FieldRenderCellsWidth
 #define FieldHeight FieldCellSize*FieldCellsHeight
 
@@ -166,7 +177,7 @@
 //World rules
 
 //#define BotDiesIfEnergyOverflow
-#define MaxPossibleEnergyForABot 300
+#define BotMaxEnergyInitial 500
 
 #define BotDiesOfOldAge
 #define MaxBotLifetimeInitial 200
@@ -174,7 +185,7 @@
 #define MaxBotLifetime_Max 10000
 
 #define EveryTickEnergyPenalty 0
-#define AttackCost 15
+#define AttackCost 10
 #define EatOrganicsCost 8
 #define MoveCost 1
 #define RotateCost 0
@@ -197,10 +208,11 @@
 #define MutationChancePercent 20
 
 //#define UseRandomColorOccasionaly
-#define RandomColorChancePercentX10 2
+//#define RandomColorChancePercentX10 2
 
 #define ChangeColorSlightly
-#define BotColorChangeStrength 20
+#define BotColorChangeMin 3
+#define BotColorChangeMax 12
 
 #define PresetRandomColors
 //#define RandomColorEveryNewMarkersSet
@@ -234,21 +246,49 @@
 
 
 
+//-----------------------------------------------------------------
+// Population chart window
+
+#define ChartNumValues 250
+#define AddToChartEvery 125
+
+#define ChartLineThickness 2.0f
+
+#define ChartBotsColor 1, 1, 0, 1
+#define ChartApplesColor 0, 1, 0, 1
+#define ChartOrganicsColor 0, 0, 1, 1
+#define ChartPredatorsColor 1, 0, 0, 1
+#define ChartAVGLifetimeColor 1, 1, 1, 1
+
+//-----------------------------------------------------------------
+
+
 
 //-----------------------------------------------------------------
 //Neural net
 
-#define NumNeuronsInLayerMax 8
-#define NumInputNeurons 7
-#define NumHiddenNeurons 4
-#define NumOutputNeurons 8
+//Only change this
+constexpr uint neuronsInLayer[] =
+{
+	8,
+	6,
+	6,
+	6,
+	6,
+	8
+};
 
-#define NumNeuronLayers 3
+constexpr uint NumNeuronsInLayerMax = neuronsInLayer[0];
+constexpr uint NumInputNeurons = neuronsInLayer[0];
+constexpr uint NumNeuronLayers = static_cast<uint>(std::size(neuronsInLayer));
 
-#define NeuronOutputLayerIndex (NumNeuronLayers-1)
-#define NeuronInputLayerIndex 0
+constexpr uint NeuronOutputLayerIndex = (NumNeuronLayers-1);
+constexpr uint NeuronInputLayerIndex = 0;
 
-#define NumNeuronsTotal (NumInputNeurons + NumOutputNeurons + (NumHiddenNeurons * (NumNeuronLayers - 2)))
+constexpr uint NumHiddenNeurons = neuronsInLayer[1];
+constexpr uint NumOutputNeurons = neuronsInLayer[NeuronOutputLayerIndex];
+
+constexpr uint NumNeuronsTotal = (NumInputNeurons + NumOutputNeurons + (NumHiddenNeurons * (NumNeuronLayers - 2)));
 
 //#define FullyConnected
 
@@ -261,19 +301,25 @@
 #define UseMemoryNeuron
 #define UseRandomNeuron
 
-#define NeuronBiasMin -1.0f
-#define NeuronBiasMax 1.0f
+#define BiasMultiplier 0.01f
+#define BiasValueCorrespondingTo_1 100
 
-#define ChangeBiasMax 0.2f
-#define ChangeBiasMin 0.05f
+constexpr char NeuronBiasMin = -100;
+constexpr char NeuronBiasMax = 100;
 
-#define ChangeConnectionWeightMax 0.2f
-#define ChangeConnectionWeightMin 0.05f
+#define ChangeBiasMax 10
+#define ChangeBiasMin 2
 
-#define ConnectionWeightMin -2.0f
-#define ConnectionWeightMax 2.0f
+#define WeightMultiplier 0.02f
+#define WeightValueCorrespondingTo_1 50
 
-#define MutateNeuronsMaximum (NumNeuronsTotal/6)
+#define ChangeConnectionWeightMax 5
+#define ChangeConnectionWeightMin 1
+
+constexpr char ConnectionWeightMin = -100;
+constexpr char ConnectionWeightMax = 100;
+
+#define MutateNeuronsMaximum (NumNeuronsTotal/6)	// (NumNeuronsTotal/8) is acceptable too	
 
 //-----------------------------------------------------------------
 
@@ -294,22 +340,33 @@
 
 #define Render_LineThickness 7
 
-//-----------------------------------------------------------------
 
+constexpr const char* inputLayerCaptions[] =
+{
+	"energy",
+	"age",
+	"rotation",
+	"height",
+	"area",
+	"eye1",
+	"is relative",
+	"is looking at me"
+	//"eye2"	
+};
 
+constexpr const char* outputLayerCaptions[] =
+{
+	"desired_rotation_x",
+	"desired_rotation_y",
 
-//-----------------------------------------------------------------
-// Population chart window
+	"move",
+	"photosynthesis",
+	"attack",
+	"digestOrganics",
 
-#define ChartNumValues 250
-#define AddToChartEvery 125
+	"divide_num",
+	"divide_energy"
+};
 
-#define ChartLineThickness 2.0f
-
-#define ChartBotsColor 1, 1, 0, 1
-#define ChartApplesColor 0, 1, 0, 1
-#define ChartOrganicsColor 0, 0, 1, 1
-#define ChartPredatorsColor 1, 0, 0, 1
-#define ChartAVGLifetimeColor 1, 1, 1, 1
 
 //-----------------------------------------------------------------

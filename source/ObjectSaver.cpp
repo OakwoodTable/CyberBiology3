@@ -17,7 +17,16 @@ Bot* ObjectSaver::LoadBotFromFile(MyInputStream& file)
     Bot* toRet = new Bot(0, 0);
 
     toRet->SetLifetime(lifetime);
-    toRet->SetColor( file.ReadInt(), file.ReadInt(), file.ReadInt() );
+
+    Color c;
+
+    repeat(3)
+    {
+        c.c[i] = file.ReadInt();
+        c.change_vector[i] = file.ReadInt();
+    }
+
+    toRet->SetColor( c );
 
     repeat(NumberOfMutationMarkers)
     {
@@ -28,10 +37,8 @@ Bot* ObjectSaver::LoadBotFromFile(MyInputStream& file)
     toRet->SetDirection(file.ReadInt());
 
     file.read((char*)toRet->GetActiveBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
-
-    file.read((char*)toRet->GetInitialBrain()->allNeurons, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(Neuron));
-
-    file.read((char*)toRet->GetActiveBrain()->allMemory, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(float));
+    file.read((char*)toRet->GetInitialBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
+    file.read((char*)toRet->GetActiveBrain()->allMemory, NumNeuronLayers * NumNeuronsInLayerMax);
 
     return toRet;
 }
@@ -190,7 +197,6 @@ ObjectSaver::WorldParams ObjectSaver::LoadWorld(Field* world, char* filename, bo
 */
 bool ObjectSaver::SaveWorld(Field* world, char* filename, int id, int ticknum)
 {
-
     //Open file for writing, binary type
     MyOutStream file(filename, std::ios::in | std::ios::binary | std::ios::trunc);
     Object* tmpObj;
@@ -250,9 +256,11 @@ void ObjectSaver::WriteBotToFile(MyOutStream& file, Bot* obj)
     file.WriteInt(NumNeuronsInLayerMax);
     file.WriteInt(sizeof(Neuron));
 
-    file.WriteInt(obj->GetColor()->c[0]);
-    file.WriteInt(obj->GetColor()->c[1]);
-    file.WriteInt(obj->GetColor()->c[2]);
+    repeat(3)
+    {
+        file.WriteInt(obj->GetColor()->c[i]);
+        file.WriteInt(obj->GetColor()->change_vector[i]);
+    }
 
     repeat(NumberOfMutationMarkers)
     {
@@ -264,8 +272,7 @@ void ObjectSaver::WriteBotToFile(MyOutStream& file, Bot* obj)
 
     file.write((char*)(obj)->GetActiveBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
     file.write((char*)(obj)->GetInitialBrain()->allNeurons, NumNeuronLayers * NumNeuronsInLayerMax * sizeof(Neuron));
-
-    file.write((char*)(obj)->GetActiveBrain()->allMemory, NumNeuronLayers* NumNeuronsInLayerMax * sizeof(float));
+    file.write((char*)(obj)->GetActiveBrain()->allMemory, NumNeuronLayers * NumNeuronsInLayerMax);
 }
 
 void ObjectSaver::WriteObjectToFile(MyOutStream& file, Object* obj)
@@ -294,7 +301,7 @@ void ObjectSaver::WriteObjectToFile(MyOutStream& file, Object* obj)
         break;
 
     default:
-        throw("TODO save object");
+        throw;
     }
 }
 
@@ -362,7 +369,7 @@ Object* ObjectSaver::LoadObject(char* filename)
 
 void MyOutStream::WriteInt(int data)
 {
-    write((char*)&data, sizeof(int));
+    write((char*)&data, 4);
 }
 
 void MyOutStream::WriteBool(bool data)
@@ -378,14 +385,14 @@ int MyInputStream::ReadInt()
 {
     int toRet;
 
-    read((char*)&toRet, sizeof(int));
+    read((char*)&toRet, 4);
 
     return toRet;
 }
 
 bool MyInputStream::ReadBool()
 {
-    bool toRet = false;
+    bool toRet;
 
     read((char*)&toRet, 1);
 

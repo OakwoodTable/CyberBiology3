@@ -17,9 +17,9 @@ enum MouseFunction
 };
 
 
-class Main final
+class Main
 {
-private:
+protected:
 
 	Clock clock;
 
@@ -139,8 +139,12 @@ private:
 	bool simulate = true;
 	//Set to true to close the app
 	bool terminate = false;
+	
+	bool windowIsVisible = true;
 
 	void SwitchPause();		
+
+	void BrushIterate(Point p, void (*callback)(uint, uint, Field*));
 
 	void MouseClick();
 	void CatchKeyboard();

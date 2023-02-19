@@ -37,7 +37,7 @@ public:
 	void Clear();
 
 
-	static vector<uint>* history;
+	vector<uint>* history;
 };
 
 
@@ -55,12 +55,19 @@ private:
 	uint phaseBeginTick;
 	uint phase;
 	uint numPhases;
+
+	uint iteration;
+	uint numIterations;
 	
 	const char* phaseDesc = NULL;
 
-	vector<uint> history;
+	vector<vector<uint>> history;
+	vector<uint> avg_history;
+
+	void CalculateHistoryAverage();
 
 	void NextPhase(const char* desc = NULL);
+	void NewEpoch();
 	void Finish();
 
 	ParameterSweep sweep;		
@@ -79,7 +86,6 @@ private:
 	void BeginWinds();
 	void Stop();
 	void Reset();
-
 
 	Field* field;
 	FieldDynamicParams* params;
